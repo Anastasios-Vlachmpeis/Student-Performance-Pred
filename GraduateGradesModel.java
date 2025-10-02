@@ -1,8 +1,9 @@
 import java.io.File;
+import java.lang.reflect.Array;
 import java.util.Scanner;
 import java.util.Arrays;
 
-public class GraduateGrades {
+public class GraduateGradesModel {
     /* This class was specifically made for the "GraduateGrades.csv" file.
      * Originally was a FileDisplayer provided by UM, but it got modified to specialize on previously mentioned .csv
      *
@@ -100,6 +101,71 @@ public class GraduateGrades {
 		// Example: Printing the grade of studentID 42 at Evolutionary Dynamics (courseID 1)
 		System.out.println("The grade of student with ID 42 at Evolutionary Dynamics is " + grades[42][1]);
 		System.out.println("The course with courseID 25 is " + courses[25]);
+
+        performDescriptiveStatisticOnStudent(2);
     }
+
+    public static void performDescriptiveStatisticOnStudent(int studentId) {
+        if (studentId < 0 || studentId > 21243) {
+            System.out.println("Student ID doesn't exist");
+            return;
+        }
+
+        double[] studentGrades = grades[studentId];
+
+        //MEAN
+        double sum = 0;
+        for (int i = 0; i < studentGrades.length; i++) {
+            double grade = studentGrades[i];
+            sum += grade;
+        }
+        double mean = sum / studentGrades.length;
+
+
+        //MODE
+        sum = 0;
+        double mode = studentGrades[0];
+        int maxCount = 0;
+
+        for (int i = 0; i < studentGrades.length; i++) {
+            double current = studentGrades[i];
+            int count = 0;
+
+            for (int j = 0; j < studentGrades.length; j++) {
+                if (studentGrades[j] == current) {
+                    count++;
+                }
+            }
+
+            if (count > maxCount) {
+                maxCount = count;
+                mode = current;
+            }
+        }
+
+        //MEDIAN
+        // Arrays.sort() is in place method => make a copy of student's grades so grades 2D indexing is not messed up
+        // Reuse studentGrades from MODE
+        Arrays.sort(studentGrades);
+
+        // MEDIAN is calculated differently depening if there are even or odd number of elements
+        double median;
+        if (studentGrades.length % 2 == 1) {
+            // When odd, it is exactly the middle element
+            median = studentGrades[studentGrades.length / 2];
+        } else {
+            // Average of the middle two value
+            int middleLeft, middleRight;
+            middleRight = studentGrades.length / 2;
+            middleLeft = (studentGrades.length / 2) - 1;
+            median = (middleLeft + middleRight) / 2.0;
+        }
+
+        System.out.println("For the student with the studentId " + studentId + ":");
+        System.out.println("Mean: " + mean);
+        System.out.println("Mode: " + mode);
+        System.out.println(("Median: " + median));
+    }
+
 }
 
