@@ -1,4 +1,5 @@
 import java.io.File;
+import java.lang.reflect.Array;
 import java.util.Scanner;
 import java.util.Arrays;
 
@@ -140,12 +141,30 @@ public class GraduateGradesModel {
                 maxCount = count;
                 mode = current;
             }
-
         }
+
+        //MEDIAN
+        // Arrays.sort() is in place method => make a copy of student's grades so grades 2D indexing is not messed up
+        // Reuse studentGrades from MODE
+        Arrays.sort(studentGrades);
+
+        // MEDIAN is calculated differently depening if there are even or odd number of elements
+        double median;
+        if (studentGrades.length % 2 == 1) {
+            // When odd, it is exactly the middle element
+            median = studentGrades[studentGrades.length / 2];
+        } else {
+            // Average of the middle two value
+            int middleLeft, middleRight;
+            middleRight = studentGrades.length / 2;
+            middleLeft = (studentGrades.length / 2) - 1;
+            median = (middleLeft + middleRight) / 2.0;
+        }
+
         System.out.println("For the student with the studentId " + studentId + ":");
         System.out.println("Mean: " + mean);
         System.out.println("Mode: " + mode);
-
+        System.out.println(("Median: " + median));
     }
 
 }
