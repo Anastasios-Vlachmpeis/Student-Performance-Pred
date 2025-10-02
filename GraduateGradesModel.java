@@ -2,7 +2,7 @@ import java.io.File;
 import java.util.Scanner;
 import java.util.Arrays;
 
-public class GraduateGrades {
+public class GraduateGradesModel {
     /* This class was specifically made for the "GraduateGrades.csv" file.
      * Originally was a FileDisplayer provided by UM, but it got modified to specialize on previously mentioned .csv
      *
@@ -100,6 +100,9 @@ public class GraduateGrades {
 		// Example: Printing the grade of studentID 42 at Evolutionary Dynamics (courseID 1)
 		System.out.println("The grade of student with ID 42 at Evolutionary Dynamics is " + grades[42][1]);
 		System.out.println("The course with courseID 25 is " + courses[25]);
+
+		new StudentInfo(2);
     }
+
 }
 
