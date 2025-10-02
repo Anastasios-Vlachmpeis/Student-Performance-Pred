@@ -101,7 +101,51 @@ public class GraduateGradesModel {
 		System.out.println("The grade of student with ID 42 at Evolutionary Dynamics is " + grades[42][1]);
 		System.out.println("The course with courseID 25 is " + courses[25]);
 
-		new StudentInfo(2);
+        performDescriptiveStatisticOnStudent(2);
+    }
+
+    public static void performDescriptiveStatisticOnStudent(int studentId) {
+        if (studentId < 0 || studentId > 21243) {
+            System.out.println("Student ID doesn't exist");
+            return;
+        }
+
+        double[] studentGrades = grades[studentId];
+
+        //MEAN
+        double sum = 0;
+        for (int i = 0; i < studentGrades.length; i++) {
+            double grade = studentGrades[i];
+            sum += grade;
+        }
+        double mean = sum / studentGrades.length;
+
+
+        //MODE
+        sum = 0;
+        double mode = studentGrades[0];
+        int maxCount = 0;
+
+        for (int i = 0; i < studentGrades.length; i++) {
+            double current = studentGrades[i];
+            int count = 0;
+
+            for (int j = 0; j < studentGrades.length; j++) {
+                if (studentGrades[j] == current) {
+                    count++;
+                }
+            }
+
+            if (count > maxCount) {
+                maxCount = count;
+                mode = current;
+            }
+
+        }
+        System.out.println("For the student with the studentId " + studentId + ":");
+        System.out.println("Mean: " + mean);
+        System.out.println("Mode: " + mode);
+
     }
 
 }
