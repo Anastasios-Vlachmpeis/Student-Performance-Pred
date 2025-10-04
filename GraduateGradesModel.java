@@ -167,5 +167,65 @@ public class GraduateGradesModel {
         System.out.println(("Median: " + median));
     }
 
+    public static double getCourseMean(int courseId) {
+        // Calculates mean of grades of a specific course
+        double sum = 0;
+        for (int studentId = 0; studentId < grades.length; studentId++) {
+            sum += grades[studentId][courseId];
+        }
+        return sum / grades.length;
+
+    }
+
+    public static double getCourseMedian(int courseId) {
+        // Calculate median of grades of a specific course
+
+        // Since grades stores arrays of grades of student's. The array of grades of courses is vertical
+        // Let's reconstruct it locally in order to sort, which is necessary for getting the median
+        double[] gradesByCourse = new double[grades.length];    // one course the same number of grades as number of students
+        for (int studentId = 0; studentId < grades.length; studentId++) {
+            gradesByCourse[studentId] = grades[studentId][courseId];
+        }
+        // Now that we have a local copy sorting it does not mess up grades 2D array
+        Arrays.sort(gradesByCourse);
+
+        // Now finding the median branches based on parity of the number of elements
+        double median;
+        if (gradesByCourse.length % 2 == 1) {
+            // When odd, it is exactly the middle element
+            median = gradesByCourse[gradesByCourse.length / 2];
+        } else {
+            // Average of the middle two value
+            int middleLeft, middleRight;
+            middleRight = gradesByCourse.length / 2;
+            middleLeft = (gradesByCourse.length / 2) - 1;
+            median = (middleLeft + middleRight) / 2.0;
+        }
+
+        return median;
+    }
+
+    public static double getCourseMode(int courseId) {
+        // Calculate mode of grades of a specific course
+        double mode;
+        // Count the frequencies of all grades (6.0, 7.0, 8.0, 9.0, 10.0)
+        // index 0 is 6.0, index 1 is 7.0, etc.
+        // So we need to subtract 6 from the grade to get its corresponding index in the
+        int[] gradeFrequencies = new int[5];
+        for (int studentId = 0; studentId < grades.length; studentId++) {
+            gradeFrequencies[(int)grades[studentId][courseId] - 6] += 1;
+        }
+
+        // Searches highest frequency
+        int indexHighest = 0;
+        for (int i = 0; i < gradeFrequencies.length; i++) {
+            if (gradeFrequencies[indexHighest] < gradeFrequencies[i]) {
+                indexHighest = i;
+            }
+        }
+        mode = indexHighest + 6;    // automatically cast as double
+
+        return mode;
+    }
 }
 
