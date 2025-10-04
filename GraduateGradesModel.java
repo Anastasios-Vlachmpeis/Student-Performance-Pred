@@ -167,5 +167,19 @@ public class GraduateGradesModel {
         System.out.println(("Median: " + median));
     }
 
+    public static double getCourseMean(int courseId) {
+        // Calculates mean of grades of a specific course
+        double sum = 0;
+        for (int studentId = 0; studentId < grades.length; studentId++) {
+            sum += grades[studentId][courseId];
+        }
+        return sum / grades.length;
+
+    }
+
+    public static double getCourseMedian(int courseId) {
+
+    }
+    public static double getCourseMode(int courseId) {}
 }
 
