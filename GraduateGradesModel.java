@@ -102,31 +102,35 @@ public class GraduateGradesModel {
 		System.out.println("The grade of student with ID 42 at Evolutionary Dynamics is " + grades[42][1]);
 		System.out.println("The course with courseID 25 is " + courses[25]);
 
-        performDescriptiveStatisticOnStudent(2);
+        getStudentMedian(2);
     }
 
-    public static void performDescriptiveStatisticOnStudent(int studentId) {
-        if (studentId < 0 || studentId > 21243) {
-            System.out.println("Student ID doesn't exist");
-            return;
-        }
 
+    public static double getStudentMean(int studentId) {
+        // Calculates average of grades for a specific student
         double[] studentGrades = grades[studentId];
-
-        //MEAN
         double sum = 0;
+
+        // Sum all grades of the student
         for (int i = 0; i < studentGrades.length; i++) {
             double grade = studentGrades[i];
             sum += grade;
         }
+
+        // Divide total sum by number of grades to get mean
         double mean = sum / studentGrades.length;
 
+        return mean;
+    }
 
-        //MODE
-        sum = 0;
+
+    public static double getStudentMode(int studentId) {
+        // Calculates the most frequent for a specific student
+        double[] studentGrades = grades[studentId];
         double mode = studentGrades[0];
         int maxCount = 0;
 
+        // Compare each grade with every other grade and increase the count by one for every similar grade
         for (int i = 0; i < studentGrades.length; i++) {
             double current = studentGrades[i];
             int count = 0;
@@ -137,34 +141,34 @@ public class GraduateGradesModel {
                 }
             }
 
+            // Update mode if this grade appears more
             if (count > maxCount) {
                 maxCount = count;
                 mode = current;
             }
         }
+        return mode;
+    }
 
-        //MEDIAN
-        // Arrays.sort() is in place method => make a copy of student's grades so grades 2D indexing is not messed up
-        // Reuse studentGrades from MODE
+
+    public static double getStudentMedian(int studentId) {
+        // Calculates middle value of grades for a specific student
+        double[] studentGrades = grades[studentId];
+
+        // Sort the array from the smallest number to the largest one
         Arrays.sort(studentGrades);
 
-        // MEDIAN is calculated differently depening if there are even or odd number of elements
         double median;
+
         if (studentGrades.length % 2 == 1) {
-            // When odd, it is exactly the middle element
+            // If odd number of grades, take the middle one
             median = studentGrades[studentGrades.length / 2];
         } else {
-            // Average of the middle two value
-            int middleLeft, middleRight;
-            middleRight = studentGrades.length / 2;
-            middleLeft = (studentGrades.length / 2) - 1;
-            median = (middleLeft + middleRight) / 2.0;
+            // If even, average of the two middle grades
+            median = (studentGrades[(studentGrades.length / 2) - 1] + studentGrades[studentGrades.length / 2]) / 2;
         }
 
-        System.out.println("For the student with the studentId " + studentId + ":");
-        System.out.println("Mean: " + mean);
-        System.out.println("Mode: " + mode);
-        System.out.println(("Median: " + median));
+        return median;
     }
 
     public static double getCourseMean(int courseId) {
