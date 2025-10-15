@@ -153,7 +153,7 @@ public class GraduateGradesModel {
 
     public static double getStudentMedian(int studentId) {
         // Calculates middle value of grades for a specific student
-        double[] studentGrades = grades[studentId];
+        double[] studentGrades = grades[studentId].clone();
 
         // Sort the array from the smallest number to the largest one
         Arrays.sort(studentGrades);
