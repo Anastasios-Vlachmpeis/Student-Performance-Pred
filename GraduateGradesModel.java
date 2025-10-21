@@ -165,7 +165,10 @@ public class GraduateGradesModel {
             median = studentGrades[studentGrades.length / 2];
         } else {
             // If even, average of the two middle grades
-            median = (studentGrades[(studentGrades.length / 2) - 1] + studentGrades[studentGrades.length / 2]) / 2;
+            double middleLeft, middleRight;
+            middleLeft = studentGrades[(studentGrades.length / 2) - 1];
+            middleRight = studentGrades[studentGrades.length / 2];
+            median = (middleLeft + middleRight) / 2.0;
         }
 
         return median;
@@ -200,9 +203,9 @@ public class GraduateGradesModel {
             median = gradesByCourse[gradesByCourse.length / 2];
         } else {
             // Average of the middle two value
-            int middleLeft, middleRight;
-            middleRight = gradesByCourse.length / 2;
-            middleLeft = (gradesByCourse.length / 2) - 1;
+            double middleLeft, middleRight;
+            middleRight = gradesByCourse[gradesByCourse.length / 2];
+            middleLeft = gradesByCourse[(gradesByCourse.length / 2) - 1];
             median = (middleLeft + middleRight) / 2.0;
         }
 
