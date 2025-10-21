@@ -128,7 +128,35 @@ public class CurrentGradesModel {
 
     /** Calculates mode of the grades of a student based on student id. Ignores No Grades.*/
     public static double getStudentMode(int studentId){
-        return 0.0;
+        // convert global student id into local grades[][] index
+        int studentIndex = studentID2index.get(studentId);
+
+        // collect non no grade grades of the course
+        ArrayList<Double> studentGrades = new ArrayList<>();
+        for (int i = 0; i < grades[studentIndex].length; i++) {   // grades.length should be the same as studentCount
+            double grade = grades[studentIndex][i];
+            // ignore NGs (No grades)
+            if (grade == -1) {continue;}
+            studentGrades.add(grade);
+        }
+
+        // warning message when analysing data. so everyone getting zero is not identical to everyone having NG
+        if (studentGrades.isEmpty()) {System.out.println("No grades for all courses for student: " + studentId);}
+
+        // sorting to find median (middle value)
+        studentGrades.sort(null);
+
+        // median is defined depending on the parity of the length of the dataset
+        double median;
+        if (studentGrades.size() % 2 == 1) {
+            median = studentGrades.get(studentGrades.size() / 2);
+        } else {
+            int middleLeft = studentGrades.size() / 2;
+            int middleRight = (studentGrades.size() / 2) + 1;
+            median = (studentGrades.get(middleLeft) + studentGrades.get(middleRight)) / 2.0;
+        }
+
+        return median;
     }
 
     /** Calculates median of the grades of a student based on student id. Ignores No Grades.*/
