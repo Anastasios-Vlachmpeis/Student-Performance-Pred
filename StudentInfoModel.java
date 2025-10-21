@@ -14,10 +14,10 @@ public class StudentInfoModel {
     final static int studentCount = 1522;
     final static int featureCount = 5;
 
+    // an unconventional double array that stores all features of every student
+    // indexed like this: features[studentIndex][featureIndex]
     static ArrayList<ArrayList> features = new ArrayList<>(studentCount);
-
-
-    // links student id to its index in grades[][]
+    // links student id to its index in features[][]
     static HashMap<Integer, Integer> studentID2index = new HashMap<>(studentCount);
 
     // just to store the name of the features as well
