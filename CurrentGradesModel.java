@@ -170,6 +170,25 @@ public class CurrentGradesModel {
 
     /** Calculates mode of the grades of a course based on course id. Ignores No Grades.*/
     public static double getCourseMode(int courseId){
-        return 0.0;
+        // stores frequency (how many times it occurred) of each grade.
+        // grade N has the index of N in the array
+        int[] gradeFrequency = new int[11]; // allows for 0 grade
+        for (int i = 0; i < grades.length; i++){
+            double grade = grades[i][courseId];
+            // ignore NGs (No grades)
+            if (grade == -1) {continue;}
+            gradeFrequency[(int)grade - 1] += 1;
+        }
+
+        // find most frequent lowest grade
+        // TODO: ask the group about this
+        int indexMostFrequent = 0;
+        for (int i = 0; i < gradeFrequency.length; i++) {
+            if (gradeFrequency[i] > gradeFrequency[indexMostFrequent]) {
+                indexMostFrequent = i;
+            }
+        }
+
+        return indexMostFrequent;
     }
 }
