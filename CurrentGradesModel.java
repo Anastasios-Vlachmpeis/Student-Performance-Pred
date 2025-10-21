@@ -121,7 +121,7 @@ public class CurrentGradesModel {
         }
 
         // warning message when analysing data. so everyone getting zero is not identical to everyone having NG
-        if (gradecounter == 0) {System.out.println("No grades for all courses for student: " + studentId);}
+        if (gradecounter == 0) {System.out.println("no grades for all courses for student: " + studentId);}
 
         return sum / (double)gradecounter;
     }
@@ -161,7 +161,34 @@ public class CurrentGradesModel {
 
     /** Calculates mode of the grades of a student based on student id. Ignores No Grades.*/
     public static double getStudentMode(int studentId){
-        return 0.0;
+        // convert global student id into local grades[][] index
+        int studentIndex = studentID2index.get(studentId);
+
+        // stores frequency (how many times it occurred) of each grade.
+        // grade N has the index of N in the array
+        int[] gradeFrequency = new int[11]; // allows for 0 grade
+        for (int i = 0; i < grades[studentIndex].length; i++){
+            double grade = grades[studentIndex][i];
+            // ignore NGs (No grades)
+            if (grade == -1) {continue;}
+            gradeFrequency[(int)grade - 1] += 1;
+        }
+
+        // find most frequent lowest grade
+        // TODO: ask the group about this
+        int indexMostFrequent = 0;
+        for (int i = 0; i < gradeFrequency.length; i++) {
+            if (gradeFrequency[i] > gradeFrequency[indexMostFrequent]) {
+                indexMostFrequent = i;
+            }
+        }
+
+        // warning message when analysing data. no grades at all is an edge case we did not prepare for yet.
+        if (indexMostFrequent == 0 && gradeFrequency[0] == 0) {
+            System.out.println("no grades for all courses for student: " + studentId);
+        }
+
+        return indexMostFrequent;
     }
 
 
