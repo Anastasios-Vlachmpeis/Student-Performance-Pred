@@ -107,7 +107,23 @@ public class CurrentGradesModel {
 
     /** Calculates mean of the grades of a student based on student id. Ignores No Grades.*/
     public static double getStudentMean(int studentId){
-        return 0.0;
+        // convert global student id into local grades[][] index
+        int studentIndex = studentID2index.get(studentId);
+
+        double sum = 0;
+        int gradecounter = 0;
+        for (int i = 0; i < grades[studentIndex].length; i++){
+            double grade = grades[studentIndex][i];
+            // ignore NGs (No grades)
+            if (grade == -1) {continue;}
+            sum += grade;
+            gradecounter++;
+        }
+
+        // warning message when analysing data. so everyone getting zero is not identical to everyone having NG
+        if (gradecounter == 0) {System.out.println("No grades for all courses for student: " + studentId);}
+
+        return sum / (double)gradecounter;
     }
 
     /** Calculates mode of the grades of a student based on student id. Ignores No Grades.*/
