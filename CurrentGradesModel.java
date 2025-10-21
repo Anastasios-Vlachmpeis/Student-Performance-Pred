@@ -152,6 +152,10 @@ public class CurrentGradesModel {
             if (grade == -1) {continue;}
             courseGrades.add(grade);
         }
+
+        // warning message when analysing data. no grades at all is an edge case we did not prepare for yet.
+        if (courseGrades.isEmpty()) {System.out.println("WARNING: No grades for all students for course id: " + courseId);}
+
         // sorting to find median (middle value)
         courseGrades.sort(null);
 
@@ -187,6 +191,11 @@ public class CurrentGradesModel {
             if (gradeFrequency[i] > gradeFrequency[indexMostFrequent]) {
                 indexMostFrequent = i;
             }
+        }
+
+        // warning message when analysing data. no grades at all is an edge case we did not prepare for yet.
+        if (indexMostFrequent == 0 && gradeFrequency[0] == 0) {
+            System.out.println("WARNING: No grades for all students for course id: " + courseId);
         }
 
         return indexMostFrequent;
