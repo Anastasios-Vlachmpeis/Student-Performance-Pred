@@ -103,4 +103,35 @@ public class CurrentGradesModel {
             ex.printStackTrace();
         }
     }
+
+    /** Calculates mean of the grades of a student based on student id. Ignores No Grades.*/
+    public static double getStudentMean(int studentId){
+        return 0.0;
+    }
+
+    /** Calculates mode of the grades of a student based on student id. Ignores No Grades.*/
+    public static double getStudentMode(int studentId){
+        return 0.0;
+    }
+
+    /** Calculates median of the grades of a student based on student id. Ignores No Grades.*/
+    public static double getStudentMedian(int studentId){
+        return 0.0;
+    }
+
+
+    /** Calculates mean of the grades of a course based on course id. Ignores No Grades.*/
+    public static double getCourseMean(int courseId){
+        return 0.0;
+    }
+
+    /** Calculates median of the grades of a course based on course id. Ignores No Grades.*/
+    public static double getCourseMedian(int courseId){
+        return 0.0;
+    }
+
+    /** Calculates mode of the grades of a course based on course id. Ignores No Grades.*/
+    public static double getCourseMode(int courseId){
+        return 0.0;
+    }
 }
