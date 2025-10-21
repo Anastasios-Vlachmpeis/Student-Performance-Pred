@@ -126,8 +126,8 @@ public class CurrentGradesModel {
         return sum / (double)gradecounter;
     }
 
-    /** Calculates mode of the grades of a student based on student id. Ignores No Grades.*/
-    public static double getStudentMode(int studentId){
+    /** Calculates median of the grades of a student based on student id. Ignores No Grades.*/
+    public static double getStudentMedian(int studentId){
         // convert global student id into local grades[][] index
         int studentIndex = studentID2index.get(studentId);
 
@@ -159,8 +159,8 @@ public class CurrentGradesModel {
         return median;
     }
 
-    /** Calculates median of the grades of a student based on student id. Ignores No Grades.*/
-    public static double getStudentMedian(int studentId){
+    /** Calculates mode of the grades of a student based on student id. Ignores No Grades.*/
+    public static double getStudentMode(int studentId){
         return 0.0;
     }
 
