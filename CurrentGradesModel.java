@@ -1,4 +1,5 @@
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Scanner;
@@ -143,7 +144,28 @@ public class CurrentGradesModel {
 
     /** Calculates median of the grades of a course based on course id. Ignores No Grades.*/
     public static double getCourseMedian(int courseId){
-        return 0.0;
+        // collect non no grade grades of the course
+        ArrayList<Double> courseGrades = new ArrayList<>();
+        for (int i = 0; i < grades.length; i++) {   // grades.length should be the same as studentCount
+            double grade = grades[i][courseId];
+            // ignore NGs (No grades)
+            if (grade == -1) {continue;}
+            courseGrades.add(grade);
+        }
+        // sorting to find median (middle value)
+        courseGrades.sort(null);
+
+        // median is defined depending on the parity of the length of the dataset
+        double median;
+        if (courseGrades.size() % 2 == 1) {
+            median = courseGrades.get(courseGrades.size() / 2);
+        } else {
+            int middleLeft = courseGrades.size() / 2;
+            int middleRight = (courseGrades.size() / 2) + 1;
+            median = (courseGrades.get(middleLeft) + courseGrades.get(middleRight)) / 2.0;
+        }
+
+        return median;
     }
 
     /** Calculates mode of the grades of a course based on course id. Ignores No Grades.*/
