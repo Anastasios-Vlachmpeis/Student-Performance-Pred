@@ -9,7 +9,7 @@ import java.util.Scanner;
     As of now it is a static class, and meant to be run on its own.
 */
 public class CurrentGradesModel {
-    final static String pathToCSV = "CurrentGrades.csv";
+    final static String pathToCSV = "src/CurrentGrades.csv";
     final static int studentCount = 1522;
     final static int courseCount = 36;
 

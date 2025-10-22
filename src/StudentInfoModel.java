@@ -8,7 +8,7 @@ import java.util.*;
  * for accessing student info data fields.
  */
 public class StudentInfoModel {
-    final static String pathToCSV = "StudentInfo.csv";
+    final static String pathToCSV = "src/StudentInfo.csv";
     final static int studentCount = 1522;
     final static int featureCount = 5;
 
