@@ -1,4 +1,5 @@
 import java.io.File;
+import java.util.HashMap;
 import java.util.Scanner;
 import java.util.Arrays;
 
@@ -11,15 +12,19 @@ public class GraduateGradesModel {
      */
 
     final static String pathToCSV = "src/GraduateGrades.csv";
+    final static int studentCount = 21243;
+    final static int courseCount = 36;
 
 
     // Contains name of the courses. courseID is equivalent to index in the array
-    static String[] courses = new String[36];
+    static String[] courses = new String[courseCount];
     // Internal representation of student's grades as a table (2D array)
     // First index corresponds to studentID
     // Second index correspond to the courseID
     // Their combination tells a given student's grade at a given course
-    static double[][] grades = new double[21243][36];
+    static double[][] grades = new double[studentCount][courseCount];
+    // links student id to its index in grades[][]
+    static HashMap<Integer, Integer> studentID2index = new HashMap<>(studentCount);
 
     public static void oldCode() {
 
@@ -52,7 +57,7 @@ public class GraduateGradesModel {
             // Since first line of GraduateGrades.csv is only the courses, the code process it separately
             // It is stored in the internal representation for course names where courseID is the course's respective index in the array
             int courseCounter = 0;
-            while (lineScanner.hasNext() && courseCounter < 36) {
+            while (lineScanner.hasNext() && courseCounter < courseCount) {
                 String s = lineScanner.next();
                 // The entry "StudentID" is a placholder so it is skipped
                 if (!s.equals("StudentID")) {
@@ -65,7 +70,7 @@ public class GraduateGradesModel {
             // Then, the code processes students line by line and load their grades into
             // grades that is a 2D array and the internal representation of the grade table.
             int studentCounter = 0;
-            while (fileScanner.hasNextLine() && linesDone < 212245) {
+            while (fileScanner.hasNextLine() && linesDone < studentCount) {
                 // Every line now starts with the student id, but that will be omitted.
                 // This is because the first index in the 2D array serves as the
 
@@ -79,8 +84,9 @@ public class GraduateGradesModel {
                     // Separate entries based on dataype. integer is ID, double is grade.
                     // THERE SHOULD BE NO OTHER DATA TYPES
                     if (lineScanner.hasNextInt()) {
-                        // Do nothing since studentID is ignored
-                        lineScanner.next();
+                        // Save global student id so internal indexing is independent of that.
+                        int studentId = lineScanner.nextInt();
+                        studentID2index.put(studentId, studentCounter);
                     } else if (lineScanner.hasNextDouble()) {
                         double grade = lineScanner.nextDouble();
                         grades[studentCounter][courseCounter] = grade;
