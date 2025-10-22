@@ -34,10 +34,8 @@ public class GraduateGradesModel {
 			Scanner fileScanner = new Scanner(file);
 			int linesDone = 0;
 
-			String line = fileScanner.nextLine();
-			linesDone++;
-			// and one that scans the line entry per entry using the commas as delimiters
-			Scanner lineScanner = new Scanner(line);
+            // and one that scans the line entry per entry using the commas as delimiters
+			Scanner lineScanner = new Scanner(fileScanner.nextLine());
 			lineScanner.useDelimiter(",");
 
 			// Since first line of GraduateGrades.csv is only the courses, the code process it separately
@@ -51,6 +49,7 @@ public class GraduateGradesModel {
 					courseCounter++;
 				}
 			}
+            linesDone++;
 
 			// Then, the code processes students line by line and load their grades into
 			// grades that is a 2D array and the internal representation of the grade table.
@@ -60,8 +59,7 @@ public class GraduateGradesModel {
 				// This is because the first index in the 2D array serves as the 
 
 				// The second scanner is reused
-				line = fileScanner.nextLine();
-				lineScanner = new Scanner(line);
+				lineScanner = new Scanner(fileScanner.nextLine());
 				lineScanner.useDelimiter(",");
 
 				courseCounter = 0;
