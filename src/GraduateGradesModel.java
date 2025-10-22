@@ -10,6 +10,8 @@ public class GraduateGradesModel {
      * that might include missing values and other data types.
      */
 
+    final static String pathToCSV = "src/GraduateGrades.csv";
+
 
     // Contains name of the courses. courseID is equivalent to index in the array
     static String[] courses = new String[36];
@@ -19,77 +21,7 @@ public class GraduateGradesModel {
     // Their combination tells a given student's grade at a given course
     static double[][] grades = new double[21243][36];
 
-    public static void main(String[] args) {
-
-		try {
-			// Adapt this when you want to read and display a different file.
-			String fileName = "GraduateGrades.csv";
-			System.out.println("Start reading file: " + fileName);  // Debug
-			System.out.println("This will take a while...");        // Debug
-
-			File file=new File(fileName);
-			
-			// This code uses two Scanners, one which scans the file line per line
-			Scanner fileScanner = new Scanner(file);
-			int linesDone = 0;
-
-            // and one that scans the line entry per entry using the commas as delimiters
-			Scanner lineScanner = new Scanner(fileScanner.nextLine());
-			lineScanner.useDelimiter(",");
-
-			// Since first line of GraduateGrades.csv is only the courses, the code process it separately
-			// It is stored in the internal representation for course names where courseID is the course's respective index in the array
-			int courseCounter = 0;
-			while (lineScanner.hasNext() && courseCounter < 36) {
-				String s = lineScanner.next();
-				// The entry "StudentID" is a placholder so it is skipped
-				if (!s.equals("StudentID")) {
-					courses[courseCounter] = s;		
-					courseCounter++;
-				}
-			}
-            linesDone++;
-
-			// Then, the code processes students line by line and load their grades into
-			// grades that is a 2D array and the internal representation of the grade table.
-			int studentCounter = 0;
-			while (fileScanner.hasNextLine() && linesDone < 212245) {
-				// Every line now starts with the student id, but that will be omitted.
-				// This is because the first index in the 2D array serves as the 
-
-				// The second scanner is reused
-				lineScanner = new Scanner(fileScanner.nextLine());
-				lineScanner.useDelimiter(",");
-
-				courseCounter = 0;
-
-				while (lineScanner.hasNext()) {
-					// Separate entries based on dataype. integer is ID, double is grade.
-					// THERE SHOULD BE NO OTHER DATA TYPES
-					if (lineScanner.hasNextInt()) {
-						// Do nothing since studentID is ignored
-						lineScanner.next();
-					} else if (lineScanner.hasNextDouble()) {
-						double grade = lineScanner.nextDouble();
-						grades[studentCounter][courseCounter] = grade;
-						courseCounter++;
-					} else {
-						System.out.println("something very strange happened the next string given by the scanner is: " + lineScanner.next());   // DEBUG
-					}
-				}
-				
-				studentCounter++;
-				linesDone++; 
-				lineScanner.close();
-			}
-		
-			// Prevent memory leaks by closing fileScanner
-			fileScanner.close();
-			System.out.println("Finished reading: " + fileName);    // DEBUG
-
-			} catch (Exception ex) {
-				ex.printStackTrace();
-		}	
+    public static void oldCode() {
 
 		//==============================//
 		// POST reading: Put code below //
@@ -99,14 +31,78 @@ public class GraduateGradesModel {
 		System.out.println("The grade of student with ID 42 at Evolutionary Dynamics is " + grades[42][1]);
 		System.out.println("The course with courseID 25 is " + courses[25]);
 
-        /**
-         * Q3: Are there courses that seem similar or related?
-         * Find top 10 most similar course pairs.
-         */
-        int TOP_K = 10; // Take the top 10 course pairs with the highest correlation
-        printTopKCorrelatedCoursePairs(TOP_K);
+    }
 
-        getStudentMedian(2);
+    public static void loadCSV() {
+        try {
+            // Adapt this when you want to read and display a different file.
+            System.out.println("Start reading file: " + pathToCSV);  // Debug
+            System.out.println("This will take a while...");        // Debug
+
+            File file=new File(pathToCSV);
+
+            // This code uses two Scanners, one which scans the file line per line
+            Scanner fileScanner = new Scanner(file);
+            int linesDone = 0;
+
+            // and one that scans the line entry per entry using the commas as delimiters
+            Scanner lineScanner = new Scanner(fileScanner.nextLine());
+            lineScanner.useDelimiter(",");
+
+            // Since first line of GraduateGrades.csv is only the courses, the code process it separately
+            // It is stored in the internal representation for course names where courseID is the course's respective index in the array
+            int courseCounter = 0;
+            while (lineScanner.hasNext() && courseCounter < 36) {
+                String s = lineScanner.next();
+                // The entry "StudentID" is a placholder so it is skipped
+                if (!s.equals("StudentID")) {
+                    courses[courseCounter] = s;
+                    courseCounter++;
+                }
+            }
+            linesDone++;
+
+            // Then, the code processes students line by line and load their grades into
+            // grades that is a 2D array and the internal representation of the grade table.
+            int studentCounter = 0;
+            while (fileScanner.hasNextLine() && linesDone < 212245) {
+                // Every line now starts with the student id, but that will be omitted.
+                // This is because the first index in the 2D array serves as the
+
+                // The second scanner is reused
+                lineScanner = new Scanner(fileScanner.nextLine());
+                lineScanner.useDelimiter(",");
+
+                courseCounter = 0;
+
+                while (lineScanner.hasNext()) {
+                    // Separate entries based on dataype. integer is ID, double is grade.
+                    // THERE SHOULD BE NO OTHER DATA TYPES
+                    if (lineScanner.hasNextInt()) {
+                        // Do nothing since studentID is ignored
+                        lineScanner.next();
+                    } else if (lineScanner.hasNextDouble()) {
+                        double grade = lineScanner.nextDouble();
+                        grades[studentCounter][courseCounter] = grade;
+                        courseCounter++;
+                    } else {
+                        System.out.println("something very strange happened the next string given by the scanner is: " + lineScanner.next());   // DEBUG
+                    }
+                }
+
+                studentCounter++;
+                linesDone++;
+                lineScanner.close();
+            }
+
+            // Prevent memory leaks by closing fileScanner
+            fileScanner.close();
+            System.out.println("Finished reading: " + pathToCSV);    // DEBUG
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
     }
 
 

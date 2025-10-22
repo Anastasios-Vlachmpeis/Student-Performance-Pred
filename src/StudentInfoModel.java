@@ -22,13 +22,6 @@ public class StudentInfoModel {
     static String[] featureNames = new String[featureCount];
 
 
-    public static void main(String[] args) {
-        loadCSV();
-
-        // check how features were loaded
-        System.out.println(features.toString());
-    }
-
     public static void loadCSV() {
 
         try {

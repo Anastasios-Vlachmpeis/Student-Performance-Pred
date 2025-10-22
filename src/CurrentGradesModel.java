@@ -22,12 +22,6 @@ public class CurrentGradesModel {
     static HashMap<Integer, Integer> studentID2index = new HashMap<>(studentCount);
 
 
-    public static void main(String[] args) {
-        loadCSV();
-
-        System.out.println(Arrays.deepToString(grades));
-    }
-
     public static void loadCSV() {
 
         try {
