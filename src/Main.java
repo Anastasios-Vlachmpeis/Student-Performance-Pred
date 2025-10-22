@@ -20,6 +20,8 @@ public class Main {
          */
         int TOP_K = 10; // Take the top 10 course pairs with the highest correlation
         GraduateGradesModel.printTopKCorrelatedCoursePairs(TOP_K);
+        GraduateGradesModel.printBestAndWorstCourse();
+        GraduateGradesModel.printCumLaudeStudents();
 
     }
 }

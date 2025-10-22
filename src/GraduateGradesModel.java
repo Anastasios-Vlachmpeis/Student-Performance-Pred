@@ -365,5 +365,45 @@ public class GraduateGradesModel {
             System.out.println((t + 1) + ") " + nameA + " and " + nameB + " have correlation r = " + p.r);
         }
     }
+
+    public static void printBestAndWorstCourse() {
+        //Set initials for loop to work
+        double bestMean = 0.0;
+        double worstMean = 10.0;
+        int bestCourseId = -1;
+        int worstCourseId = -1;
+
+        //Go through the means for every course
+        for (int i = 0; i < courses.length; i++) {
+            double mean = getCourseMean(i);
+
+            //Detect and update the most difficult and easiest courses on every step of the loop
+            if (mean > bestMean) {
+                bestMean = mean;
+                bestCourseId = i;
+            }
+            if (mean < worstMean) {
+                worstMean = mean;
+                worstCourseId = i;
+            }
+        }
+
+        //Print the most difficult and the easiest course with their means
+        System.out.println("\nMost difficult and easiest courses:");
+        System.out.println("Most difficult course: " + courses[bestCourseId] + " (mean grade = " + bestMean + ")");
+        System.out.println("Easiest course: " + courses[worstCourseId] + " (mean grade = " + worstMean + ")");
+    }
+
+    public static void printCumLaudeStudents() {
+
+        System.out.println("\nThe students graduated cum-laude(above 9.0 mean grade):");
+        for (int i = 0; i < grades.length; i++) {
+            if (getStudentMean(i) > 9.0) {
+                System.out.println("Student ID: " +i + " (mean grade = " + getStudentMean(i) + ")");
+            }
+
+        }
+
+    }
 }
 
