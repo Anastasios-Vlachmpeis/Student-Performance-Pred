@@ -9,7 +9,7 @@ import java.util.*;
  */
 public class StudentInfoModel {
     final static String pathToCSV = "src/StudentInfo.csv";
-    final static int studentCount = 1522;
+    final static int studentCount = 1522 - 1;
     final static int featureCount = 5;
 
     // an unconventional double array that stores all features of every student
@@ -21,6 +21,8 @@ public class StudentInfoModel {
     // just to store the name of the features as well
     static String[] featureNames = new String[featureCount];
 
+    // maps feature names and abbreviation of their names onto internal index used by this class
+    static HashMap<String, Integer> featureName2Index = new HashMap<>();
 
     public static void loadCSV() {
 
@@ -41,10 +43,20 @@ public class StudentInfoModel {
             // Since first line of GraduateGrades.csv is only the feature names, the code process it separately
             int featureCounter = 0;
             while (lineScanner.hasNext() && featureCounter < featureCount) {
-                String s = lineScanner.next();
+                String s = lineScanner.next().trim();
                 // The entry "StudentID" is a placholder so it is skipped
                 if (!s.equals("StudentID")) {
                     featureNames[featureCounter] = s;
+                    // adds full featureName to mapping
+                    featureName2Index.put(s, featureCounter);
+                    // adds abbreviation of featureName to mapping
+                    String sAbbreviated = "";
+                    for (char c : s.toCharArray()) {
+                        if (Character.isUpperCase(c)) {
+                            sAbbreviated += c;
+                        }
+                    }
+                    featureName2Index.put(sAbbreviated, featureCounter);
                     featureCounter++;
                 }
             }
@@ -57,7 +69,7 @@ public class StudentInfoModel {
             // Then, the code processes students line by line and load their various features
             // into the features "double array"
             int studentCounter = 0;
-            while (fileScanner.hasNextLine() && linesDone < studentCount) {
+            while (fileScanner.hasNextLine()) {
                 // Every line now starts with the student id, but that will be omitted.
                 // This is because the first index in the 2D array serves as the
 
@@ -114,4 +126,15 @@ public class StudentInfoModel {
             ex.printStackTrace();
         }
     }
+
+    public static Object getFeatureOfStudent(int studentId, int featureId) {
+        return features.get(studentID2index.get(studentId)).get(featureId);
+    }
+    public static Object getFeatureOfStudent(int studentId, String featureName) {
+        // do not check if feature name is valid, so misspelling is "caught" as a runtime error:3
+        // (which should be fine as long as this code is used only
+        // for analysing student data by group 28 in the mini project)
+        return features.get(studentID2index.get(studentId)).get(featureName2Index.get(featureName));
+    }
+
 }
