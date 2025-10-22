@@ -80,11 +80,11 @@ public class StudentInfoModel {
 
                 // we know that there is the student id followed by exactly 5 features in every line
                 int studentId;  // the global id of given student
-                String QC;      // Quantum Coherence Threshold
-                String SNC;     // Symbiotic Network Compatibility
-                double ATDR;    // Astro-Temporal Drift Resistance
-                double PIT;     // Psionic Interference Tolerance
-                String BLT;     // Bio-Luminal Transmission
+                String QC;      // Quantum Coherence Threshold (Chaotic Coherent Fractured Resonant Stable)
+                String SNC;     // Symbiotic Network Compatibility (Harmonized None)
+                double ATDR;    // Astro-Temporal Drift Resistance (1 2 3)
+                double PIT;     // Psionic Interference Tolerance (range between -1 and 1 inclusive/exclusive?)
+                String BLT;     // Bio-Luminal Transmission (Crimson Silver Turquoise Violet White Blue)
 
                 // map global student id to local feature representation's indexing
                 studentId = lineScanner.nextInt();
