@@ -27,11 +27,21 @@ public class Main {
         /*
         Testing the first task of step 3 in phase 1.
          */
-        System.out.println(Arrays.toString(
-                tabulateCourseByStudentFeature(
-                        0,
-                        new FeatureSplit("SNC", "Harmonized"))
-        ));
+        System.out.println(
+                Arrays.deepToString(
+                        tabulateCourseByStudentFeature(
+                                0,
+                                new FeatureSplit("SNC", "Harmonized")
+                        ).toArray()
+                )
+        );
+        /*
+            Testing the second task of step 3 in phase 1.
+        */
+        System.out.println(
+                findBestPropertyToGuessGrade(0).toString()
+        );
+
 
     }
 
@@ -46,7 +56,7 @@ public class Main {
      * If student's property IS the boundary value (or above in case of doubles) then it
      * is in the subgroup that satisfies the splitting criteria.
      * */
-    public static double[] tabulateCourseByStudentFeature(int courseId, FeatureSplit featureSplit) {
+    public static ArrayList<ArrayList<Double>> tabulateCourseByStudentFeature(int courseId, FeatureSplit featureSplit) {
         /*
         * Elements:
         *   0. - mean of subgroup not in splitting criteria
@@ -59,10 +69,8 @@ public class Main {
         // all students' grades in the given course
         int[] studentIds = CurrentGradesModel.getAllStudentIdsOfCourse(courseId);
 
-        int satisfyCounter = 0;
-        int notSatisfyCounter = 0;
-        double satisfySum = 0;
-        double notSatisfySum = 0;
+        ArrayList<Double> subSetSatisfy = new ArrayList<>();
+        ArrayList<Double> subSetNotSatisfy = new ArrayList<>();
         for (int studentId: studentIds) {
             // property can be String and double depending on type of feature
             var property = StudentInfoModel.getFeatureOfStudent(studentId, featureSplit.name);
@@ -82,31 +90,16 @@ public class Main {
 
             // evaluate splitting criteria
             if (isSplitConditionSatisfied) {
-                satisfySum += grade;
-                satisfyCounter++;
+                subSetSatisfy.add(grade);
             } else {
-                notSatisfySum += grade;
-                notSatisfyCounter++;
+                subSetNotSatisfy.add(grade);
             }
         }
 
-        // handle cases where one subgroup has no members (would result in division by 0)
-        if (notSatisfyCounter == 0) {
-            tabulation[0] = -1;
-        } else {
-            tabulation[0] = notSatisfySum / (double) notSatisfyCounter;
-        }
-        if (satisfyCounter == 0) {
-            tabulation[1] = -1;
-        } else {
-            tabulation[1] = satisfySum / (double) satisfyCounter;
-        }
-
-        // add size of subgroups
-        tabulation[2] = notSatisfyCounter;
-        tabulation[3] = satisfyCounter;
-
-        return tabulation;
+        ArrayList<ArrayList<Double>> results = new ArrayList<>();
+        results.add(subSetNotSatisfy);
+        results.add(subSetSatisfy);
+        return results;
     }
 
     /**
@@ -126,7 +119,9 @@ public class Main {
            sum += courseGrade;
         }
         double initialVariance = sum / courseGrades.size();
-
+        System.out.println("Initial variance after initiation: " + initialVariance);
+        System.out.println("sum: " + sum);
+        System.out.println("courseGrades.size(): " + courseGrades.size());
 
         //-------------------------------------------------------------//
         // iterate over all possible splitting options of all features //
@@ -158,10 +153,12 @@ public class Main {
         int[] numericalFeatureIndexes = {2, 3};
         for (int featureIndex : numericalFeatureIndexes) {
             // checks all possible categorical splits of a feature and saves the best
-            for (Object element : StudentInfoModel.featureRanges.get(featureIndex)) {
+            double rangeBottom = (double) StudentInfoModel.featureRanges.get(featureIndex).get(0);
+            double rangeTop = (double) StudentInfoModel.featureRanges.get(featureIndex).get(1);
+            double stepSize = Math.abs(rangeBottom - rangeTop) / 1000;
+            for (double splitThreshold = rangeBottom; splitThreshold < rangeTop; splitThreshold += stepSize) {
                 // this will be used as the splitting criteria
-                double featureProperty = (double) element;
-                FeatureSplit split = new FeatureSplit(StudentInfoModel.featureNames[featureIndex], featureProperty);
+                FeatureSplit split = new FeatureSplit(StudentInfoModel.featureNames[featureIndex], splitThreshold);
                 double reducedVariance = calculateVarianceReduction(
                         tabulateCourseByStudentFeature(courseId, split),
                         initialVariance);
@@ -179,12 +176,48 @@ public class Main {
 
     /**
      * Helper function to calculate variance for tabulations working with the results from
-     * tabulateCourseByStudentFeature(). (So the first 2 elements in the array are the new
-     * variances while the next 2 elements are the size of the subgroups after the split.
-     * This lambda function calculates the weighted variance which will be subtracted from initial variance
+     * tabulateCourseByStudentFeature().
+     * So it takes a list of lists that contain the grades of each subpart after splitting
      */
-    public static double calculateVarianceReduction(double[] tabulationResults, double initialVariance) {
-        double originalSize = tabulationResults[2] + tabulationResults[3];
-        return initialVariance - (tabulationResults[0] / originalSize + tabulationResults[1] / originalSize);
+    public static double calculateVarianceReduction(ArrayList<ArrayList<Double>> tabulationResults, double initialVariance) {
+        /// Formula for variance reduction:
+        ///     VarianceReduction = InitialVariance - sum(subgroupVariance * subgroupSize / totalSize)
+        /// Variance for any group (including total dataset before splitting):
+        ///     Variance = (sum of (groupMean - individual item)^2 )/ totalSize
+
+        // knowing the size before the split is needed to calculate variance reduction
+        int sizeBeforeSplit = 0;
+        for (ArrayList<Double> subGroup : tabulationResults) {
+            sizeBeforeSplit += subGroup.size();
+        }
+        // empty dataset's variance cannot be reduced
+        if (sizeBeforeSplit == 0) {return 0.0;}
+
+        double sumWeightedSubGroupVariances = 0;
+        for (ArrayList<Double> subGroup : tabulationResults) {
+            // skip empty splits, as they would not contribute to the weighted subgroup variance sum after all
+            if (subGroup.isEmpty()) {continue;}
+
+            // first calculate mean of subgroup
+            double sum = 0;
+            for (double grade: subGroup) {
+                sum += grade;
+            }
+           double subGroupMeanGrade = sum / subGroup.size();
+
+            // calculate weighted variance of subgroup
+            double sumOfSubGroupSquareOfDifferences = 0; //  sum of (groupMean - individual item)^2
+            for (double grade: subGroup) {
+                sumOfSubGroupSquareOfDifferences += Math.pow((subGroupMeanGrade - grade), 2);
+            }
+            double subGroupVariance = sumOfSubGroupSquareOfDifferences / subGroup.size();
+
+            // add subgroup variance to the weighted sum
+            sumWeightedSubGroupVariances += subGroupVariance * subGroup.size() / sizeBeforeSplit;
+        }
+
+        // finish computing variance reduction
+        System.out.println(sumWeightedSubGroupVariances + " " + initialVariance);
+        return initialVariance - sumWeightedSubGroupVariances;
     }
 }
