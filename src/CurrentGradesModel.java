@@ -204,7 +204,7 @@ public class CurrentGradesModel {
         // warning message when analysing data. so everyone getting zero is not identical to everyone having NG
         if (gradecounter == 0) {
             System.out.println("No grades for all student for course id: " + courseId);
-            return 0;
+            return -1;
         }
 
         return sum / (double)gradecounter;
@@ -224,7 +224,7 @@ public class CurrentGradesModel {
         // warning message when analysing data. no grades at all is an edge case we did not prepare for yet.
         if (courseGrades.isEmpty()) {
             System.out.println("WARNING: No grades for all students for course id: " + courseId);
-            return 0;
+            return -1;
         }
 
         // sorting to find median (middle value)
@@ -267,6 +267,7 @@ public class CurrentGradesModel {
         // warning message when analysing data. no grades at all is an edge case we did not prepare for yet.
         if (indexMostFrequent == 0 && gradeFrequency[0] == 0) {
             System.out.println("WARNING: No grades for all students for course id: " + courseId);
+            return -1;
         }
 
         return indexMostFrequent;
