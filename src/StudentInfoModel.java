@@ -1,5 +1,6 @@
 import java.io.File;
 import java.util.*;
+import java.util.Arrays;
 
 /**
  * Reads CurrentGrades.csv, stores it internally, computes statistics
@@ -45,7 +46,7 @@ public class StudentInfoModel {
 
             // Since first line of GraduateGrades.csv is only the feature names, the code process it separately
             int featureCounter = 0;
-            while (lineScanner.hasNext() && featureCounter < featureCount) {
+            while (lineScanner.hasNext()) {
                 String s = lineScanner.next().trim();
                 // The entry "StudentID" is a placholder so it is skipped
                 if (!s.equals("StudentID")) {
@@ -69,8 +70,8 @@ public class StudentInfoModel {
             featureRanges.clear();
             featureRanges.add(new ArrayList<String>());
             featureRanges.add(new ArrayList<String>());
-            featureRanges.add(new ArrayList<Double>());
-            featureRanges.add(new ArrayList<Double>());
+            featureRanges.add(new ArrayList<Double>(Arrays.asList(0.0, 0.0)));
+            featureRanges.add(new ArrayList<Double>(Arrays.asList(0.0, 0.0)));
             featureRanges.add(new ArrayList<String>());
 
 
@@ -85,7 +86,7 @@ public class StudentInfoModel {
                 // This is because the first index in the 2D array serves as the
 
                 // The second scanner is reused
-                lineScanner = new Scanner(fileScanner.nextLine());
+                lineScanner = new Scanner(fileScanner.nextLine().trim());
                 lineScanner.useDelimiter(",");
 
 
@@ -161,7 +162,9 @@ public class StudentInfoModel {
         // do not check if feature name is valid, so misspelling is "caught" as a runtime error:3
         // (which should be fine as long as this code is used only
         // for analysing student data by group 28 in the mini project)
-        return features.get(studentID2index.get(studentId)).get(featureName2Index.get(featureName));
+        int studentIndex = studentID2index.get(studentId);
+        int featureIndex = featureName2Index.get(featureName);
+        return features.get(studentIndex).get(featureIndex);
     }
 
 }
