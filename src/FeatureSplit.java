@@ -46,4 +46,20 @@ public class FeatureSplit {
 
         return sb.toString();
     }
+
+    /**
+     * format's feature split into the first part of a rule sentence described in the project manual:
+     * If X then grade Y, else grade Z
+     *  where X is a thresholded student property and Y and Z are the mean scores of
+     *  student with and without property X, respectively.
+     * This method return the first part of the rule til the word then and a whitespace.
+     */
+    public String asRule() {
+        if (this.isFeatureACategory) {
+            return "If " + this.name + " > " + this.threshHoldValue + "then ";
+        } else {
+            return "If " + this.name + " is " + this.selectionCategory + "then ";
+        }
+
+    }
 }
