@@ -119,9 +119,6 @@ public class Main {
            sum += courseGrade;
         }
         double initialVariance = sum / courseGrades.size();
-        System.out.println("Initial variance after initiation: " + initialVariance);
-        System.out.println("sum: " + sum);
-        System.out.println("courseGrades.size(): " + courseGrades.size());
 
         //-------------------------------------------------------------//
         // iterate over all possible splitting options of all features //
@@ -217,7 +214,6 @@ public class Main {
         }
 
         // finish computing variance reduction
-        System.out.println(sumWeightedSubGroupVariances + " " + initialVariance);
         return initialVariance - sumWeightedSubGroupVariances;
     }
 }
