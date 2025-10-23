@@ -30,21 +30,13 @@ public class FeatureSplit {
         this.selectionCategory = null;
     }
 
+    /**
+     * Pythonic way of representing the split with its feature and boundary.
+     */
     @Override
     public String toString() {
-        // it is rumored that string concatenation can use memory issues
-        // so the string builder is used to make a human readable toString()
-        StringBuilder sb = new StringBuilder();
-        sb.append(getClass().getName());
-        sb.append('(');
-        sb.append("Feature: ");
-        sb.append(this.name);
-        sb.append(", ");
-        sb.append("Split Boundary: ");
-        sb.append(this.isFeatureACategory ? this.selectionCategory : this.threshHoldValue);
-        sb.append(')');
-
-        return sb.toString();
+        String splitBoundaryRep = this.isFeatureACategory ? this.selectionCategory : this.threshHoldValue.toString();
+        return getClass().getName() + "(Feature: " + this.name + ", Split Boundary: " + splitBoundaryRep +")";
     }
 
     /**
