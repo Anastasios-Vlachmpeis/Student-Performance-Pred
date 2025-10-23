@@ -1,3 +1,5 @@
+import java.lang.reflect.Field;
+
 /**
  * Simple "struct" that encompasses data necessary for a split into 2 groups:
  *  - name of the feature the split is based on
@@ -26,5 +28,22 @@ public class FeatureSplit {
         this.isFeatureACategory = false;
         this.threshHoldValue = threshHoldValue;
         this.selectionCategory = null;
+    }
+
+    @Override
+    public String toString() {
+        // it is rumored that string concatenation can use memory issues
+        // so the string builder is used to make a human readable toString()
+        StringBuilder sb = new StringBuilder();
+        sb.append(getClass().getName());
+        sb.append('(');
+        sb.append("Feature: ");
+        sb.append(this.name);
+        sb.append(", ");
+        sb.append("Split Boundary: ");
+        sb.append(this.isFeatureACategory ? this.selectionCategory : this.threshHoldValue);
+        sb.append(')');
+
+        return sb.toString();
     }
 }
