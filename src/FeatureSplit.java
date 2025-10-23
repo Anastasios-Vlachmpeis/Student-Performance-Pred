@@ -56,9 +56,9 @@ public class FeatureSplit {
      */
     public String asRule() {
         if (this.isFeatureACategory) {
-            return "If " + this.name + " > " + this.threshHoldValue + "then";
+            return "If " + this.name + " is " + this.selectionCategory + " then";
         } else {
-            return "If " + this.name + " is " + this.selectionCategory + "then";
+            return "If " + this.name + " > " + this.threshHoldValue + " then";
         }
 
     }
