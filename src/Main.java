@@ -253,8 +253,21 @@ public class Main {
             double[] tabulatedMeans = meanGradesOfTabulation(courseId, bestSplit);
             // judge the student based on its property
             boolean isSplitConditionSatisfied = StudentInfoModel.evaluateSplitOnStudent(studentId, bestSplit);
-            // save predicted mean grade
-            predictions[1][i] = isSplitConditionSatisfied ? tabulatedMeans[1] : tabulatedMeans [0];
+            // the subgroup that the given student falls in (the variable stores the index that points to the
+            // mean of student's subgroup according to their feature property)
+            int subgroupIndex = isSplitConditionSatisfied ? 1 : 0;
+            // sometimes the best split (according to variance reduction) is to make no split at all
+            // when this is the case the empty subgroup's mean is a -1. and we should choose the other mean
+            if (tabulatedMeans[subgroupIndex] == -1) {
+                subgroupIndex = (subgroupIndex + 1) % 2;}    // modular arithmetic black magic
+            // sometimes a course has no grades whatsoever in the current grades
+            // at cases like that, we are predicting the mean of the mean grade of every course with at least one no NG
+            if (tabulatedMeans[subgroupIndex] == -1) {
+                predictions[1][i] = CurrentGradesModel.getCourseMeansMean();
+            } else {
+                predictions[1][i] = tabulatedMeans[subgroupIndex];
+            }
+
         }
 
         return predictions;
