@@ -167,4 +167,21 @@ public class StudentInfoModel {
         return features.get(studentIndex).get(featureIndex);
     }
 
+    /**
+     * Given a student id and a split condition, this method evaluates if the student
+     * is within the boundary defined in the split condition or not.*/
+    public static boolean evaluateSplitOnStudent(int studentId, FeatureSplit featureSplit) {
+        // property can be String and double depending on type of feature
+        var property = getFeatureOfStudent(studentId, featureSplit.name);
+
+        // splitting criteria depends on the type of the feature
+        boolean isSplitConditionSatisfied;
+        if (featureSplit.isFeatureACategory) {
+            isSplitConditionSatisfied = featureSplit.selectionCategory.equals((String) property);
+        } else {
+            isSplitConditionSatisfied = featureSplit.threshHoldValue > (double) property;
+        }
+
+        return isSplitConditionSatisfied;
+    }
 }
