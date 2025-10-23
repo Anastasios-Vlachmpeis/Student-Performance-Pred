@@ -23,6 +23,7 @@ public class Main {
         //GraduateGradesModel.printBestAndWorstCourse();  //Q1
         //GraduateGradesModel.printCumLaudeStudents();  //Q2
         //CurrentGradesModel.printStudentNGcount();
-        CurrentGradesModel.printCourseNGcount();
+        //CurrentGradesModel.printCourseNGcount();
+        //CurrentGradesModel.printFailedCourses();
     }
 }

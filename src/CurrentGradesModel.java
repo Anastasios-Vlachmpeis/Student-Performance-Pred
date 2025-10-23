@@ -268,7 +268,7 @@ public class CurrentGradesModel {
 
     public static void printStudentNGcount() {
         int count = 0;
-        for (int i = 0; i < grades.length; i++) {
+        for (int i = 0; i < grades.length - 1; i++) {
 
             for (int j = 0; j < grades[i].length; j++) {
                 if (grades[i][j] == -1) {
@@ -276,7 +276,7 @@ public class CurrentGradesModel {
                 }
             }
 
-            System.out.println("Number of NG for the student " +grades[i] + " : " + count);
+            System.out.println("Number of NG for the student " + i +" : " + count);
             count = 0;
         }
 
@@ -298,4 +298,22 @@ public class CurrentGradesModel {
 
     }
 
+    public static void printFailedCourses() {
+        int count = 0;
+        for (int i = 0; i < grades.length - 1; i++) {
+            for (int j = 0; j < grades[i].length; j++) {
+                if (grades[i][j] < 6.0 && grades[i][j] != -1) {
+                    count++;
+                }
+            }
+            System.out.println("Student: " + i + " has failed " + count + " courses.");
+            count = 0;
+
+
+        }
+
+    }
+
 }
+
+
