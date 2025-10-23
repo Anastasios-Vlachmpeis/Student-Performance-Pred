@@ -19,9 +19,10 @@ public class Main {
          * Find top 10 most similar course pairs.
          */
         int TOP_K = 10; // Take the top 10 course pairs with the highest correlation
-        GraduateGradesModel.printTopKCorrelatedCoursePairs(TOP_K);
-        GraduateGradesModel.printBestAndWorstCourse();
-        GraduateGradesModel.printCumLaudeStudents();
-
+        //GraduateGradesModel.printTopKCorrelatedCoursePairs(TOP_K);  //Q3
+        //GraduateGradesModel.printBestAndWorstCourse();  //Q1
+        //GraduateGradesModel.printCumLaudeStudents();  //Q2
+        //CurrentGradesModel.printStudentNGcount();
+        CurrentGradesModel.printCourseNGcount();
     }
 }

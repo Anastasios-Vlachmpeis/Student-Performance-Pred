@@ -265,4 +265,37 @@ public class CurrentGradesModel {
 
         return indexMostFrequent;
     }
+
+    public static void printStudentNGcount() {
+        int count = 0;
+        for (int i = 0; i < grades.length; i++) {
+
+            for (int j = 0; j < grades[i].length; j++) {
+                if (grades[i][j] == -1) {
+                    count++;
+                }
+            }
+
+            System.out.println("Number of NG for the student " +grades[i] + " : " + count);
+            count = 0;
+        }
+
+    }
+
+    public static void printCourseNGcount() {
+        int count = 0;
+        for (int i = 0; i < grades[0].length; i++) {
+
+            for (int j = 0; j < grades.length; j++) {
+                if (grades[j][i] == -1) {
+                    count++;
+                }
+            }
+
+            System.out.println("Number of NG for the course " +i + " : " + count);
+            count = 0;
+        }
+
+    }
+
 }
