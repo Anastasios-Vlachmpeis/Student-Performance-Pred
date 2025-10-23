@@ -55,6 +55,8 @@ public class Main {
 
         // QExtra: Adjusted Q3 from graduate grade for current grades!
         CurrentGradesModel.printTopKCorrelatedCoursePairsIgnoreNG(TOP_K);
+        // QExtra: Adjusted Q4 for current grades
+        CurrentGradesModel.analyzeStudentPerformanceHardVsEasyNG();
 
         /*###########
           # PHASE 3 #
