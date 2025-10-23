@@ -343,7 +343,7 @@ public class CurrentGradesModel {
         ArrayList<Integer> studentIds = new ArrayList<>();
         for (int studentId : studentID2index.keySet()){
             // ignore students with NoGrade
-            if (studentID2index.get(studentId) == -1) {continue;}
+            if (grades[studentID2index.get(studentId)][courseId] == -1) {continue;}
             studentIds.add(studentId);
         }
         return studentIds;
