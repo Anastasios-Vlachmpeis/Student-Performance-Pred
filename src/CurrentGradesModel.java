@@ -202,7 +202,10 @@ public class CurrentGradesModel {
         }
 
         // warning message when analysing data. so everyone getting zero is not identical to everyone having NG
-        if (gradecounter == 0) {System.out.println("No grades for all student for course id: " + courseId);}
+        if (gradecounter == 0) {
+            System.out.println("No grades for all student for course id: " + courseId);
+            return 0;
+        }
 
         return sum / (double)gradecounter;
     }
@@ -219,7 +222,10 @@ public class CurrentGradesModel {
         }
 
         // warning message when analysing data. no grades at all is an edge case we did not prepare for yet.
-        if (courseGrades.isEmpty()) {System.out.println("WARNING: No grades for all students for course id: " + courseId);}
+        if (courseGrades.isEmpty()) {
+            System.out.println("WARNING: No grades for all students for course id: " + courseId);
+            return 0;
+        }
 
         // sorting to find median (middle value)
         courseGrades.sort(null);
@@ -229,8 +235,8 @@ public class CurrentGradesModel {
         if (courseGrades.size() % 2 == 1) {
             median = courseGrades.get(courseGrades.size() / 2);
         } else {
-            int middleLeft = courseGrades.size() / 2;
-            int middleRight = (courseGrades.size() / 2) + 1;
+            int middleRight = courseGrades.size() / 2;
+            int middleLeft = middleRight - 1;
             median = (courseGrades.get(middleLeft) + courseGrades.get(middleRight)) / 2.0;
         }
 
@@ -301,7 +307,7 @@ public class CurrentGradesModel {
         }
 
     }
-   //comment
+
     public static void printFailedCourses() {
         //Prints the number of failed courses per student
         int count = 0;
@@ -351,6 +357,191 @@ public class CurrentGradesModel {
     public static double getGrade(int studentId, int courseId) {
         return grades[studentID2index.get(studentId)][courseId];
     }
+
+    /**
+     * Q1 : Which courses are the most difficult/easy?
+     * Prints the 5 hardest and 5 easiest courses based on mean grades.
+     * If more than 75% of students have NGs for a course,
+     * it uses the average of mean and median instead.
+     */
+    public static void printHardestAndEasiestCourses() {
+
+        int C = courseCount;  // total number of courses
+        double[] means = new double[C];
+        double[] medians = new double[C];
+        int[] ngCounts = new int[C];
+
+        // Compute mean, median, and NG count for all courses
+        for (int c = 0; c < C; c++) {
+            means[c] = getCourseMean(c);
+            medians[c] = getCourseMedian(c);
+
+            int ngCount = 0;
+            for (int s = 0; s < studentCount; s++) {
+                if (grades[s][c] == -1) ngCount++;
+            }
+            ngCounts[c] = ngCount;
+        }
+
+        // Compute effective score (mean or mean+median if >75% NGs)
+        ArrayList<CourseMean> courseMeanList = new ArrayList<>();
+        for (int c = 0; c < C; c++) {
+            double ngRatio = (double) ngCounts[c] / studentCount;
+            double effectiveScore;
+            if (ngRatio > 0.75) {
+                if (!Double.isNaN(medians[c])) {
+                    effectiveScore = (means[c] + medians[c]) / 2.0;
+                } else {
+                    effectiveScore = means[c];
+                }
+            } else {
+                effectiveScore = means[c];
+            }
+            if (effectiveScore > 0) {
+                courseMeanList.add(new CourseMean(c, effectiveScore));
+            }
+        }
+        CourseMean[] courseMeans = courseMeanList.toArray(new CourseMean[0]);
+
+        // Sort by ascending score (hardest first)
+        Arrays.sort(courseMeans, (a, b) -> Double.compare(a.mean, b.mean));
+
+        // Only output up to 5, or as many as we have
+        int outputCount = Math.min(5, courseMeans.length);
+
+        // Print hardest courses
+        System.out.println("\nHardest " + outputCount + " courses for current students:");
+        for (int i = 0; i < outputCount; i++) {
+            int id = courseMeans[i].courseId;
+            System.out.println((i + 1) + ") " + courses[id]
+                    + " (mean = " + String.format("%.2f", courseMeans[i].mean) + ")");
+        }
+
+        // Print easiest courses
+        System.out.println("\nEasiest " + outputCount + " courses for current grades:");
+        for (int i = 0; i < outputCount; i++) {
+            int idx = courseMeans.length - 1 - i;
+            int id = courseMeans[idx].courseId;
+            System.out.println((i + 1) + ") " + courses[id]
+                    + " (mean = " + String.format("%.2f", courseMeans[idx].mean) + ")");
+        }
+    }
+
+    //Helper class that stores a course's mean and id
+    static class CourseMean {
+        int courseId;
+        double mean;
+        CourseMean(int courseId, double mean) {
+            this.courseId = courseId;
+            this.mean = mean;
+        }
+    }
+
+    /**
+     * Q3: "Are there courses that seem similar or related?"
+     * Computes Pearson correlation between all pairs of courses,
+     * but only considers students who have valid (non-NG) grades
+     * in both courses. Displays the top positively correlated course
+     * pairs as the most "similar" courses, while skipping NG entries.
+     */
+
+    // Compute Pearson correlation for a pair of courses, considering only students with grades in both
+    static double pearsonBetweenCoursesIgnoreNG(int i, int j) {
+        // Gathers pairs of grades only when both courses have a grade for the same student
+        ArrayList<Double> gradesA = new ArrayList<>();
+        ArrayList<Double> gradesB = new ArrayList<>();
+        for (int s = 0; s < grades.length; s++) {
+            double gradeA = grades[s][i];
+            double gradeB = grades[s][j];
+            if (gradeA != -1 && gradeB != -1) {
+                gradesA.add(gradeA);
+                gradesB.add(gradeB);
+            }
+        }
+        int n = gradesA.size();
+        if (n <= 1) return Double.NaN;
+
+        // calculate means
+        double sumA = 0, sumB = 0;
+        for (int k = 0; k < n; k++) {
+            sumA += gradesA.get(k);
+            sumB += gradesB.get(k);
+        }
+        double meanA = sumA / n;
+        double meanB = sumB / n;
+
+        // calculate std deviations
+        double sumSqA = 0, sumSqB = 0;
+        for (int k = 0; k < n; k++) {
+            double diffA = gradesA.get(k) - meanA;
+            double diffB = gradesB.get(k) - meanB;
+            sumSqA += diffA * diffA;
+            sumSqB += diffB * diffB;
+        }
+        double stdA = Math.sqrt(sumSqA / (n - 1));
+        double stdB = Math.sqrt(sumSqB / (n - 1));
+
+        // avoid division by zero or missing variability
+        if (stdA == 0.0 || stdB == 0.0) return Double.NaN;
+
+        // calculate pearson correlation
+        double covSum = 0;
+        for (int k = 0; k < n; k++) {
+            covSum += (gradesA.get(k) - meanA) * (gradesB.get(k) - meanB);
+        }
+        double cov = covSum / (n - 1);
+        return cov / (stdA * stdB);
+    }
+
+    static CoursePairCorrelation[] computeAllCourseCorrelationsIgnoreNG() {
+        final int C = courses.length; //should be courseCount
+        ArrayList<CoursePairCorrelation> pairList = new ArrayList<>();
+
+        //Go through every unique unordered pair
+        for (int i = 0; i < C; i++) {
+            for (int j = i + 1; j < C; j++) {
+                double r = pearsonBetweenCoursesIgnoreNG(i, j);
+                pairList.add(new CoursePairCorrelation(i, j, r));
+            }
+        }
+        // Convert to array for sorting/printing
+        return pairList.toArray(new CoursePairCorrelation[0]);
+    }
+
+    static void printTopKCorrelatedCoursePairsIgnoreNG(int k) {
+        CoursePairCorrelation[] pairs = computeAllCourseCorrelationsIgnoreNG();
+
+        // Keep only r > 0 (positive correlations)
+        pairs = Arrays.stream(pairs)
+                .filter(p -> !Double.isNaN(p.r) && p.r > 0)
+                .toArray(CoursePairCorrelation[]::new);
+
+        //Sort by descending r value
+        Arrays.sort(pairs, (a, b) -> Double.compare(b.r, a.r));
+
+        int limit = Math.min(k, pairs.length);
+        System.out.println("\nTop " + limit + " most similar course pairs for current grades:");
+        for (int t = 0; t < limit; t++) {
+            CoursePairCorrelation p = pairs[t];
+            String nameA = (p.courseA >= 0 && p.courseA < courses.length) ? courses[p.courseA] : ("Course " + p.courseA);
+            String nameB = (p.courseB >= 0 && p.courseB < courses.length) ? courses[p.courseB] : ("Course " + p.courseB);
+
+            System.out.println((t + 1) + ") " + nameA + " and " + nameB + " have correlation r = " + String.format("%.3f", p.r));
+        }
+    }
+
+    static class CoursePairCorrelation {
+        int courseA;
+        int courseB;
+        double r;
+
+        CoursePairCorrelation(int a, int b, double r) {
+            this.courseA = a;
+            this.courseB = b;
+            this.r = r;
+        }
+    }
+
 }
 
 
