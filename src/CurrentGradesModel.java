@@ -351,6 +351,19 @@ public class CurrentGradesModel {
     public static double getGrade(int studentId, int courseId) {
         return grades[studentID2index.get(studentId)][courseId];
     }
+
+    /**Calculates the mean of the mean of the courses. Ignoring NGs and ignoring courses that have only NGs*/
+    public static double getCourseMeansMean () {
+        double sumMean = 0;     // sum of the means
+        int counterMean = 0;    // number of means summed
+        for (int i = 0; i < courseCount; i++){
+            double mean = getCourseMean(i);
+            if (mean == -1) {continue;}
+            sumMean += mean;
+            counterMean += 1;
+        }
+        return sumMean / counterMean;   // division by zero if and only if all courses have only NGs
+    }
 }
 
 
