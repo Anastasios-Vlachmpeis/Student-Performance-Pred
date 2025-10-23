@@ -16,12 +16,19 @@ public class Main {
         // PUT CODE HERE //
         // You can invoke methods of Model Static Classes
         // or just use them in methods of this class
-        /*
+
+        /**
          * Q3: Are there courses that seem similar or related?
          * Find top 10 most similar course pairs.
          */
         int TOP_K = 10; // Take the top 10 course pairs with the highest correlation
         GraduateGradesModel.printTopKCorrelatedCoursePairs(TOP_K);
+
+        /**
+         * Q4: Which students performed significantly better in the difficult courses, compared to the easy ones?
+         * Find the top 10 best performing ones.
+         */
+        GraduateGradesModel.analyzeStudentPerformanceHardVsEasy();
 
         System.out.println(CurrentGradesModel.getCourseMean(0));
         /*
@@ -46,6 +53,12 @@ public class Main {
         */
         printBestRulesForGradePrediction();
 
+        /**
+         * Adjusted Q1 for current grades
+         */
+        CurrentGradesModel.printHardestAndEasiestCourses();
+
+        CurrentGradesModel.printTopKCorrelatedCoursePairsIgnoreNG(TOP_K);
     }
 
     /** First Task from Phase 1: Step 3.
