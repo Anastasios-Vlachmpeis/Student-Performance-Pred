@@ -1,5 +1,6 @@
 import java.io.File;
 import java.util.*;
+import java.util.Arrays;
 
 /**
  * Reads CurrentGrades.csv, stores it internally, computes statistics
@@ -24,6 +25,9 @@ public class StudentInfoModel {
     // maps feature names and abbreviation of their names onto internal index used by this class
     static HashMap<String, Integer> featureName2Index = new HashMap<>();
 
+    // stores the ranges of possible values for each feature. internal index is used
+    static ArrayList<ArrayList> featureRanges = new ArrayList<>(5);
+
     public static void loadCSV() {
 
         try {
@@ -42,7 +46,7 @@ public class StudentInfoModel {
 
             // Since first line of GraduateGrades.csv is only the feature names, the code process it separately
             int featureCounter = 0;
-            while (lineScanner.hasNext() && featureCounter < featureCount) {
+            while (lineScanner.hasNext()) {
                 String s = lineScanner.next().trim();
                 // The entry "StudentID" is a placholder so it is skipped
                 if (!s.equals("StudentID")) {
@@ -62,6 +66,14 @@ public class StudentInfoModel {
             }
             linesDone++;
 
+            // reset feature ranges
+            featureRanges.clear();
+            featureRanges.add(new ArrayList<String>());
+            featureRanges.add(new ArrayList<String>());
+            featureRanges.add(new ArrayList<Double>(Arrays.asList(0.0, 0.0)));
+            featureRanges.add(new ArrayList<Double>(Arrays.asList(0.0, 0.0)));
+            featureRanges.add(new ArrayList<String>());
+
 
             // if by mistake this method is run twice, this way we avoid redundant/double data
             features.clear();
@@ -74,7 +86,7 @@ public class StudentInfoModel {
                 // This is because the first index in the 2D array serves as the
 
                 // The second scanner is reused
-                lineScanner = new Scanner(fileScanner.nextLine());
+                lineScanner = new Scanner(fileScanner.nextLine().trim());
                 lineScanner.useDelimiter(",");
 
 
@@ -111,6 +123,22 @@ public class StudentInfoModel {
                 // put student's features into the features "double array"
                 features.add(new ArrayList<>(Arrays.asList(QC, SNC, ATDR, PIT, BLT)));
 
+                // update feature ranges if necessary
+                // first the ENUM like categories that are stored as string
+                if (!featureRanges.get(0).contains(QC)) {featureRanges.get(0).add(QC);}
+                if (!featureRanges.get(1).contains(SNC)) {featureRanges.get(1).add(SNC);}
+                if (!featureRanges.get(4).contains(BLT)) {featureRanges.get(4).add(BLT);}
+                // then update real values properties
+                if (ATDR < (double)featureRanges.get(2).getFirst()) {
+                    featureRanges.get(2).set(0, ATDR);  // real value ranges have only 2 element
+                } else if (ATDR > (double)featureRanges.get(2).getLast()) {
+                    featureRanges.get(2).set(1, ATDR);  // real value ranges have only 2 element
+                }
+                if (PIT < (double)featureRanges.get(3).getFirst()) {
+                    featureRanges.get(3).set(0, PIT);
+                } else if (PIT > (double)featureRanges.get(3).getLast()) {
+                    featureRanges.get(3).set(1, PIT);
+                }
 
                 // move to next student and terminate current line's scanning
                 studentCounter++;
@@ -134,7 +162,9 @@ public class StudentInfoModel {
         // do not check if feature name is valid, so misspelling is "caught" as a runtime error:3
         // (which should be fine as long as this code is used only
         // for analysing student data by group 28 in the mini project)
-        return features.get(studentID2index.get(studentId)).get(featureName2Index.get(featureName));
+        int studentIndex = studentID2index.get(studentId);
+        int featureIndex = featureName2Index.get(featureName);
+        return features.get(studentIndex).get(featureIndex);
     }
 
 }

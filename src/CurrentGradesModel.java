@@ -180,7 +180,6 @@ public class CurrentGradesModel {
         // warning message when analysing data. no grades at all is an edge case we did not prepare for yet.
         if (indexMostFrequent == 0 && gradeFrequency[0] == 0) {
             System.out.println("no grades for all courses for student: " + studentId);
-            return -1;
         }
 
         return indexMostFrequent;
@@ -205,7 +204,7 @@ public class CurrentGradesModel {
         // warning message when analysing data. so everyone getting zero is not identical to everyone having NG
         if (gradecounter == 0) {
             System.out.println("No grades for all student for course id: " + courseId);
-            return -1;
+            return 0;
         }
 
         return sum / (double)gradecounter;
@@ -225,7 +224,7 @@ public class CurrentGradesModel {
         // warning message when analysing data. no grades at all is an edge case we did not prepare for yet.
         if (courseGrades.isEmpty()) {
             System.out.println("WARNING: No grades for all students for course id: " + courseId);
-            return -1;
+            return 0;
         }
 
         // sorting to find median (middle value)
@@ -327,10 +326,12 @@ public class CurrentGradesModel {
 
     }
 
-    public static double[] getAllGradesOfCourse(int courseId) {
-        double[] courseGrades = new double[studentCount];
+    public static ArrayList<Double> getAllGradesOfCourse(int courseId) {
+        ArrayList<Double> courseGrades = new ArrayList<>();
         for (int i = 0; i < studentCount; i++) {
-            courseGrades[i] = grades[i][courseId];
+            // skip no grades
+            if (grades[i][courseId] == -1) {continue;}
+            courseGrades.add(grades[i][courseId]);
         }
         return courseGrades;
     }
@@ -344,7 +345,15 @@ public class CurrentGradesModel {
         }
         return studentIds;
     }
-
+    public static ArrayList<Integer> getAllStudentIdsOfCourseWithGrade(int courseId) {
+        ArrayList<Integer> studentIds = new ArrayList<>();
+        for (int studentId : studentID2index.keySet()){
+            // ignore students with NoGrade
+            if (studentID2index.get(studentId) == -1) {continue;}
+            studentIds.add(studentId);
+        }
+        return studentIds;
+    }
     public static double getGrade(int studentId, int courseId) {
         return grades[studentID2index.get(studentId)][courseId];
     }
@@ -374,21 +383,20 @@ public class CurrentGradesModel {
             ngCounts[c] = ngCount;
         }
 
-        //Compute effective score (mean or mean + median if >75% NGs)
+        // Compute effective score (mean or mean+median if >75% NGs)
         ArrayList<CourseMean> courseMeanList = new ArrayList<>();
         for (int c = 0; c < C; c++) {
             double ngRatio = (double) ngCounts[c] / studentCount;
             double effectiveScore;
-            if (ngRatio > 0.75) { //If NGs are more than 75% of the course grades
-                if (!Double.isNaN(medians[c])) { //if course mean is not NaN, make the mean be the average of mean + median
+            if (ngRatio > 0.75) {
+                if (!Double.isNaN(medians[c])) {
                     effectiveScore = (means[c] + medians[c]) / 2.0;
-                } else { //else let it be, it will be filtered out later
+                } else {
                     effectiveScore = means[c];
                 }
             } else {
                 effectiveScore = means[c];
             }
-            //Filter to add only courses with a positive mean to the list
             if (effectiveScore > 0) {
                 courseMeanList.add(new CourseMean(c, effectiveScore));
             }
