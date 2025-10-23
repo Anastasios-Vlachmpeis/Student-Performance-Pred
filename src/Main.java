@@ -23,6 +23,12 @@ public class Main {
         int TOP_K = 10; // Take the top 10 course pairs with the highest correlation
         GraduateGradesModel.printTopKCorrelatedCoursePairs(TOP_K);
 
+        /**
+         * Q4: Which students performed significantly better in the difficult courses, compared to the easy ones?
+         * Find the top 10 best performing ones.
+         */
+        GraduateGradesModel.analyzeStudentPerformanceHardVsEasy();
+
         System.out.println(CurrentGradesModel.getCourseMean(0));
         /*
         Testing the first task of step 3 in phase 1.
