@@ -180,6 +180,7 @@ public class CurrentGradesModel {
         // warning message when analysing data. no grades at all is an edge case we did not prepare for yet.
         if (indexMostFrequent == 0 && gradeFrequency[0] == 0) {
             System.out.println("no grades for all courses for student: " + studentId);
+            return -1;
         }
 
         return indexMostFrequent;
@@ -204,7 +205,7 @@ public class CurrentGradesModel {
         // warning message when analysing data. so everyone getting zero is not identical to everyone having NG
         if (gradecounter == 0) {
             System.out.println("No grades for all student for course id: " + courseId);
-            return 0;
+            return -1;
         }
 
         return sum / (double)gradecounter;
@@ -224,7 +225,7 @@ public class CurrentGradesModel {
         // warning message when analysing data. no grades at all is an edge case we did not prepare for yet.
         if (courseGrades.isEmpty()) {
             System.out.println("WARNING: No grades for all students for course id: " + courseId);
-            return 0;
+            return -1;
         }
 
         // sorting to find median (middle value)
@@ -373,20 +374,21 @@ public class CurrentGradesModel {
             ngCounts[c] = ngCount;
         }
 
-        // Compute effective score (mean or mean+median if >75% NGs)
+        //Compute effective score (mean or mean + median if >75% NGs)
         ArrayList<CourseMean> courseMeanList = new ArrayList<>();
         for (int c = 0; c < C; c++) {
             double ngRatio = (double) ngCounts[c] / studentCount;
             double effectiveScore;
-            if (ngRatio > 0.75) {
-                if (!Double.isNaN(medians[c])) {
+            if (ngRatio > 0.75) { //If NGs are more than 75% of the course grades
+                if (!Double.isNaN(medians[c])) { //if course mean is not NaN, make the mean be the average of mean + median
                     effectiveScore = (means[c] + medians[c]) / 2.0;
-                } else {
+                } else { //else let it be, it will be filtered out later
                     effectiveScore = means[c];
                 }
             } else {
                 effectiveScore = means[c];
             }
+            //Filter to add only courses with a positive mean to the list
             if (effectiveScore > 0) {
                 courseMeanList.add(new CourseMean(c, effectiveScore));
             }
