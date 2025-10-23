@@ -320,10 +320,11 @@ public class CurrentGradesModel {
 
     }
 
-    public static double[] getAllGradesOfCourse(int courseId) {
-        double[] courseGrades = new double[studentCount];
+    public static ArrayList<Double> getAllGradesOfCourse(int courseId) {
+        ArrayList<Double> courseGrades = new ArrayList<>();
         for (int i = 0; i < studentCount; i++) {
-            courseGrades[i] = grades[i][courseId];
+            // skip no grades
+            if (grades[i][courseId] == -1) {continue;}
         }
         return courseGrades;
     }
@@ -337,7 +338,15 @@ public class CurrentGradesModel {
         }
         return studentIds;
     }
-
+    public static ArrayList<Integer> getAllStudentIdsOfCourseWithGrade(int courseId) {
+        ArrayList<Integer> studentIds = new ArrayList<>();
+        for (int studentId : studentID2index.keySet()){
+            // ignore students with NoGrade
+            if (studentID2index.get(studentId) == -1) {continue;}
+            studentIds.add(studentId);
+        }
+        return studentIds;
+    }
     public static double getGrade(int studentId, int courseId) {
         return grades[studentID2index.get(studentId)][courseId];
     }
