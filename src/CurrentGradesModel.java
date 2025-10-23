@@ -177,9 +177,8 @@ public class CurrentGradesModel {
             }
         }
 
-        // warning message when analysing data. no grades at all is an edge case we did not prepare for yet.
         if (indexMostFrequent == 0 && gradeFrequency[0] == 0) {
-            System.out.println("no grades for all courses for student: " + studentId);
+            return -1;
         }
 
         return indexMostFrequent;
@@ -203,7 +202,6 @@ public class CurrentGradesModel {
 
         // warning message when analysing data. so everyone getting zero is not identical to everyone having NG
         if (gradecounter == 0) {
-            System.out.println("No grades for all student for course id: " + courseId);
             return -1;
         }
 
@@ -223,7 +221,6 @@ public class CurrentGradesModel {
 
         // warning message when analysing data. no grades at all is an edge case we did not prepare for yet.
         if (courseGrades.isEmpty()) {
-            System.out.println("WARNING: No grades for all students for course id: " + courseId);
             return -1;
         }
 
@@ -266,7 +263,6 @@ public class CurrentGradesModel {
 
         // warning message when analysing data. no grades at all is an edge case we did not prepare for yet.
         if (indexMostFrequent == 0 && gradeFrequency[0] == 0) {
-            System.out.println("WARNING: No grades for all students for course id: " + courseId);
             return -1;
         }
 
@@ -554,6 +550,7 @@ public class CurrentGradesModel {
             sumMean += mean;
             counterMean += 1;
         }
+        if (true) {System.out.println("SCREAM " + sumMean + " " + counterMean);}
         return sumMean / counterMean;   // division by zero if and only if all courses have only NGs
     }
 }
