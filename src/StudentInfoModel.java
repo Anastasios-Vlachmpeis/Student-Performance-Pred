@@ -24,6 +24,9 @@ public class StudentInfoModel {
     // maps feature names and abbreviation of their names onto internal index used by this class
     static HashMap<String, Integer> featureName2Index = new HashMap<>();
 
+    // stores the ranges of possible values for each feature. internal index is used
+    static ArrayList<ArrayList> featureRanges = new ArrayList<>(5);
+
     public static void loadCSV() {
 
         try {
@@ -61,6 +64,14 @@ public class StudentInfoModel {
                 }
             }
             linesDone++;
+
+            // reset feature ranges
+            featureRanges.clear();
+            featureRanges.add(new ArrayList<String>());
+            featureRanges.add(new ArrayList<String>());
+            featureRanges.add(new ArrayList<Double>());
+            featureRanges.add(new ArrayList<Double>());
+            featureRanges.add(new ArrayList<String>());
 
 
             // if by mistake this method is run twice, this way we avoid redundant/double data
@@ -111,6 +122,22 @@ public class StudentInfoModel {
                 // put student's features into the features "double array"
                 features.add(new ArrayList<>(Arrays.asList(QC, SNC, ATDR, PIT, BLT)));
 
+                // update feature ranges if necessary
+                // first the ENUM like categories that are stored as string
+                if (!featureRanges.get(0).contains(QC)) {featureRanges.get(0).add(QC);}
+                if (!featureRanges.get(1).contains(SNC)) {featureRanges.get(1).add(SNC);}
+                if (!featureRanges.get(4).contains(BLT)) {featureRanges.get(4).add(BLT);}
+                // then update real values properties
+                if (ATDR < (double)featureRanges.get(2).getFirst()) {
+                    featureRanges.get(2).set(0, ATDR);  // real value ranges have only 2 element
+                } else if (ATDR > (double)featureRanges.get(2).getLast()) {
+                    featureRanges.get(2).set(1, ATDR);  // real value ranges have only 2 element
+                }
+                if (PIT < (double)featureRanges.get(3).getFirst()) {
+                    featureRanges.get(3).set(0, PIT);
+                } else if (PIT > (double)featureRanges.get(3).getLast()) {
+                    featureRanges.get(3).set(1, PIT);
+                }
 
                 // move to next student and terminate current line's scanning
                 studentCounter++;
