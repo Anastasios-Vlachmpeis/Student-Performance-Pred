@@ -550,7 +550,6 @@ public class CurrentGradesModel {
             sumMean += mean;
             counterMean += 1;
         }
-        if (true) {System.out.println("SCREAM " + sumMean + " " + counterMean);}
         return sumMean / counterMean;   // division by zero if and only if all courses have only NGs
     }
 }
