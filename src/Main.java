@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Locale;
+import java.util.function.Consumer;
 
 /** Entry point of the project. You can access the data models from here.*/
 public class Main {
@@ -42,7 +43,7 @@ public class Main {
      * If student's property IS the boundary value (or above in case of doubles) then it
      * is in the subgroup that satisfies the splitting criteria.
      * */
-    public static double[] tabulateCourseByStudentFeature(int courseId, String featureName, String splittingCriteria) {
+    public static double[] tabulateCourseByStudentFeature(int courseId, FeatureSplit featureSplit) {
         double[] tabulation = new double[2];
 
         // all students' grades in the given course
@@ -53,14 +54,24 @@ public class Main {
         double satisfySum = 0;
         double notSatisfySum = 0;
         for (int studentId: studentIds) {
-            String property = (String) StudentInfoModel.getFeatureOfStudent(studentId, featureName);
+            // property can be String and double depending on type of feature
+            var property = StudentInfoModel.getFeatureOfStudent(studentId, featureSplit.name);
             double grade = CurrentGradesModel.getGrade(studentId, courseId);
+
             // skip no grades
             if (grade == -1) {
                 continue;
             }
-            // in this signature we are testing string-ish properties so the criteria is just if they are equal
-            if (splittingCriteria.equals(property)) {
+            // splitting criteria depends on the type of the feature
+            boolean isSplitConditionSatisfied;
+            if (featureSplit.isFeatureACategory) {
+                isSplitConditionSatisfied = featureSplit.selectionCategory.equals((String) property);
+            } else {
+                isSplitConditionSatisfied = featureSplit.threshHoldValue > (double) property;
+            }
+
+            // evaluate splitting criteria
+            if (isSplitConditionSatisfied) {
                 satisfySum += grade;
                 satisfyCounter++;
             } else {
@@ -82,48 +93,6 @@ public class Main {
         }
 
         System.out.println("(notSatisfySum + satisfySum)/(satisfyCounter + notSatisfyCounter) = " + (notSatisfySum + satisfySum)/(satisfyCounter + notSatisfyCounter));
-
-        return tabulation;
-    }
-
-    public static double[] tabulateCourseByStudentFeature(int courseId, String featureName, double splittingCriteria) {
-        double[] tabulation = new double[2];
-
-        // all students' grades in the given course
-        int[] studentIds = CurrentGradesModel.getAllStudentIdsOfCourse(courseId);
-
-        int satisfyCounter = 0;
-        int notSatisfyCounter = 0;
-        double satisfySum = 0;
-        double notSatisfySum = 0;
-        for (int studentId: studentIds) {
-            double property = (double) StudentInfoModel.getFeatureOfStudent(studentId, featureName);
-            double grade = CurrentGradesModel.getGrade(studentId, courseId);
-            // skip no grades
-            if (grade == -1) {
-                continue;
-            }
-            // in this signature we are testing string-ish properties so the criteria is just if they are equal
-            if (splittingCriteria <= property) {
-                satisfySum += grade;
-                satisfyCounter++;
-            } else {
-                notSatisfySum += grade;
-                notSatisfyCounter++;
-            }
-        }
-
-        // handle cases where one subgroup has no members (would result in division by 0)
-        if (notSatisfyCounter == 0) {
-            tabulation[0] = -1;
-        } else {
-            tabulation[0] = notSatisfySum / (double) notSatisfyCounter;
-        }
-        if (satisfyCounter == 0) {
-            tabulation[1] = -1;
-        } else {
-            tabulation[1] = satisfySum / (double) satisfyCounter;
-        }
 
         return tabulation;
     }

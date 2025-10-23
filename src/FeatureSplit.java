@@ -9,7 +9,7 @@
  * One group has all the objects with the feature-property less or equal to the threshold,
  * while the other group has objects with feature-properties greater than the threshold.*/
 public class FeatureSplit {
-    String featureName;
+    String name;
     boolean isFeatureACategory;
     double threshHoldValue;
     String selectionCategory;
