@@ -44,7 +44,7 @@ public class Main {
         /*
           Testing the third task of step 3 in phase 1.
         */
-
+        printBestRulesForGradePrediction();
 
     }
 
@@ -69,31 +69,20 @@ public class Main {
             for (double grade: subGroup) {
                sum += grade;
             }
-            means[i] = sum / subGroup.size();
+            // mean of an empty dataset is undefined so we are going to make it a -1
+            means[i] = subGroup.isEmpty() ? -1 : sum / subGroup.size();
         }
         return means;
     }
     public static ArrayList<ArrayList<Double>> tabulateCourseByStudentFeature(int courseId, FeatureSplit featureSplit) {
-        /*
-        * Elements:
-        *   0. - mean of subgroup not in splitting criteria
-        *   1. - mean of subgroup within splitting criteria
-        *   2. - size of subgroup not in splitting criteria
-        *   3. - size of subgroup withing splitting criteria
-        * */
-        double[] tabulation = new double[4];
 
-        // all students' grades in the given course
-        int[] studentIds = CurrentGradesModel.getAllStudentIdsOfCourse(courseId);
+        // all students' grades (no NG) in the given course
+        ArrayList<Integer> studentIds = CurrentGradesModel.getAllStudentIdsOfCourseWithGrade(courseId);
 
         ArrayList<Double> subSetSatisfy = new ArrayList<>();
         ArrayList<Double> subSetNotSatisfy = new ArrayList<>();
         for (int studentId: studentIds) {
             double grade = CurrentGradesModel.getGrade(studentId, courseId);
-            // skip no grades
-            if (grade == -1) {
-                continue;
-            }
 
             // decides if the split condition is satisfied (can handle numeric and category type features as well)
             if (StudentInfoModel.evaluateSplitOnStudent(studentId, featureSplit)) {
@@ -224,6 +213,42 @@ public class Main {
         return initialVariance - sumWeightedSubGroupVariances;
     }
 
+    /**
+     * Generates a 2D array of the
+     * */
+    public static void printBestRulesForGradePrediction() {
+        // go through all curses
+        for (int courseId = 0; courseId < CurrentGradesModel.courseCount; courseId++) {
+            // start with naming the course
+            // this is the best feature to split
+            FeatureSplit bestSplit = findBestPropertyToGuessGrade(courseId);
+            // and this is the mean grade below and above the split that will be incorporated into the rule (Y and Z)
+            double[] tabulatedMeans = meanGradesOfTabulation(courseId, bestSplit);
+            /*
+             We must handle some edge cases because of the missing data.
+                1. sometimes the best split is to have no split. at times like this
+                   the empty upper or below split's mean is -1, and we automatically use the other one
+                2. sometimes we cannot split the data because all grades are NGs so both the below and upper
+                   split set is empty. so both means are -1.
+                   At times like this, we use the mean of the mean of the other courses that have grades besides NGs
+            */
+            double gradePredictionY = tabulatedMeans[1];    // the grade predicted if student satisfies the criteria
+                                                            // (upper split)
+            double gradePredictionZ = tabulatedMeans[0];    // the grade predicted if student does not satisfy the
+                                                            // criteria (below and equal split)
+
+            if (gradePredictionY == -1) {gradePredictionY = gradePredictionZ;}
+            if (gradePredictionZ == -1) {gradePredictionZ = gradePredictionY;}
+            if (gradePredictionY == -1 && gradePredictionZ == -1) {
+                gradePredictionY = gradePredictionZ = CurrentGradesModel.getCourseMeansMean();
+            }
+
+            // Print out the whole rule as specified in project manual and enter into new line
+            System.out.print(CurrentGradesModel.courses[courseId] + ": " + bestSplit.asRule());
+            System.out.print("then grade " + gradePredictionY + ", else grade " + gradePredictionZ);
+            System.out.println();
+        }
+    }
     /** Implementing last question of step 3 of phase 1:
      * Then write code that uses the previous method to produce the best single guess for
      * the future performance of a student.
