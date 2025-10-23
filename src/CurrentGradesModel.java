@@ -325,6 +325,7 @@ public class CurrentGradesModel {
         for (int i = 0; i < studentCount; i++) {
             // skip no grades
             if (grades[i][courseId] == -1) {continue;}
+            courseGrades.add(grades[i][courseId]);
         }
         return courseGrades;
     }
