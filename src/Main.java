@@ -253,12 +253,14 @@ public class Main {
             if (gradePredictionY == -1) {gradePredictionY = gradePredictionZ;}
             if (gradePredictionZ == -1) {gradePredictionZ = gradePredictionY;}
             if (gradePredictionY == -1 && gradePredictionZ == -1) {
-                gradePredictionY = gradePredictionZ = CurrentGradesModel.getCourseMeansMean();
+                double meanOfCourseGradeMeans = CurrentGradesModel.getCourseMeansMean();
+                gradePredictionY = meanOfCourseGradeMeans;
+                gradePredictionZ = meanOfCourseGradeMeans;
             }
 
             // Print out the whole rule as specified in project manual and enter into new line
             System.out.print(CurrentGradesModel.courses[courseId] + ": " + bestSplit.asRule());
-            System.out.print("then grade " + gradePredictionY + ", else grade " + gradePredictionZ);
+            System.out.print(" then grade " + gradePredictionY + ", else grade " + gradePredictionZ);
             System.out.println();
         }
     }
