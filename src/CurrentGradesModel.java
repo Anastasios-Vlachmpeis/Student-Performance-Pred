@@ -10,7 +10,7 @@ import java.util.Scanner;
 */
 public class CurrentGradesModel {
     final static String pathToCSV = "src/CurrentGrades.csv";
-    final static int studentCount = 1522;
+    final static int studentCount = 1522 - 1;
     final static int courseCount = 36;
 
 
@@ -54,7 +54,7 @@ public class CurrentGradesModel {
             // Then, the code processes students line by line and load their grades into
             // grades that is a 2D array and the internal representation of the grade table.
             int studentCounter = 0;
-            while (fileScanner.hasNextLine() && linesDone < studentCount) {
+            while (fileScanner.hasNextLine()) {
                 // Every line now starts with the student id, but that will be omitted.
                 // This is because the first index in the 2D array serves as the
 
@@ -320,6 +320,27 @@ public class CurrentGradesModel {
 
     }
 
+    public static double[] getAllGradesOfCourse(int courseId) {
+        double[] courseGrades = new double[studentCount];
+        for (int i = 0; i < studentCount; i++) {
+            courseGrades[i] = grades[i][courseId];
+        }
+        return courseGrades;
+    }
+
+    public static int[] getAllStudentIdsOfCourse(int courseId) {
+        int[] studentIds = new int[studentCount];
+        int i = 0;
+        for (int studentId : studentID2index.keySet()){
+            studentIds[i] = studentId;
+            i++;
+        }
+        return studentIds;
+    }
+
+    public static double getGrade(int studentId, int courseId) {
+        return grades[studentID2index.get(studentId)][courseId];
+    }
 }
 
 
