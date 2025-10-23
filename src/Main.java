@@ -16,7 +16,8 @@ public class Main {
         // PUT CODE HERE //
         // You can invoke methods of Model Static Classes
         // or just use them in methods of this class
-        /*
+
+        /**
          * Q3: Are there courses that seem similar or related?
          * Find top 10 most similar course pairs.
          */
@@ -35,6 +36,12 @@ public class Main {
          */
         System.out.println(Arrays.toString(tabulateCourseByStudentFeature(0, "SNC", "Harmonized")));
 
+        /**
+         * Adjusted Q1 for current grades
+         */
+        CurrentGradesModel.printHardestAndEasiestCourses();
+
+        CurrentGradesModel.printTopKCorrelatedCoursePairsIgnoreNG(TOP_K);
     }
 
     /** First Task from Phase 1: Step 3.
