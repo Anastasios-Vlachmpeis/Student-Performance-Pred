@@ -13,52 +13,70 @@ public class Main {
         CurrentGradesModel.loadCSV();
         StudentInfoModel.loadCSV();
 
+        //---------------//
         // PUT CODE HERE //
+        //---------------//
         // You can invoke methods of Model Static Classes
         // or just use them in methods of this class
 
-        /**
-         * Q3: Are there courses that seem similar or related?
-         * Find top 10 most similar course pairs.
-         */
+        /*###########
+          # PHASE 1 #
+          ###########*/
+        // Question 1
+        GraduateGradesModel.printBestAndWorstCourse();
+
+        // Question 2
+        GraduateGradesModel.printCumLaudeStudents();
+
+        // Q3: Are there courses that seem similar or related?
+        //     Find top 10 most similar course pairs.
         int TOP_K = 10; // Take the top 10 course pairs with the highest correlation
         GraduateGradesModel.printTopKCorrelatedCoursePairs(TOP_K);
 
-        /**
-         * Q4: Which students performed significantly better in the difficult courses, compared to the easy ones?
-         * Find the top 10 best performing ones.
-         */
+         // Q4: Which students performed significantly better in the difficult courses, compared to the easy ones?
+         //     Find the top 10 best performing ones.
         GraduateGradesModel.analyzeStudentPerformanceHardVsEasy();
 
-        System.out.println(CurrentGradesModel.getCourseMean(0));
-        /*
-        Testing the first task of step 3 in phase 1.
-         */
-        System.out.println(
-                Arrays.deepToString(
-                        tabulateCourseByStudentFeature(
-                                0,
-                                new FeatureSplit("SNC", "Harmonized")
-                        ).toArray()
-                )
-        );
-        /*
-            Testing the second task of step 3 in phase 1.
-        */
-        System.out.println(
-                findBestPropertyToGuessGrade(0).toString()
-        );
-        /*
-          Testing the third task of step 3 in phase 1.
-        */
-        printBestRulesForGradePrediction();
-
-        /**
-         * Adjusted Q1 for current grades
-         */
+         /*###########
+          # PHASE 2 #
+          ###########*/
+        // Q0: Adjusted Q1 from graduate grades for current grades
+        //     (Compute some of the same statistics you did in step 1 for current grades
         CurrentGradesModel.printHardestAndEasiestCourses();
 
+        // Q1:
+        // MISSING
+
+        // Q2:
+        // MISSING
+
+        // QPrediction:
+        // Missing
+
+        // QExtra: Adjusted Q3 from graduate grade for current grades!
         CurrentGradesModel.printTopKCorrelatedCoursePairsIgnoreNG(TOP_K);
+
+        /*###########
+          # PHASE 3 #
+          ###########*/
+//        // Testing the first task of step 3 in phase 1.
+//        System.out.println(
+//                Arrays.deepToString(
+//                        tabulateCourseByStudentFeature(
+//                                0,
+//                                new FeatureSplit("SNC", "Harmonized")
+//                        ).toArray()
+//                )
+//        );
+//        // Testing the second task of step 3 in phase 1.
+//        System.out.println(
+//                findBestPropertyToGuessGrade(0).toString()
+//        );
+
+        // The actual question of step 3
+        printBestRulesForGradePrediction();
+
+
     }
 
     /** First Task from Phase 1: Step 3.
