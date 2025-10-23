@@ -41,6 +41,9 @@ public class Main {
         System.out.println(
                 findBestPropertyToGuessGrade(0).toString()
         );
+        /*
+          Testing the third task of step 3 in phase 1.
+        */
 
 
     }
@@ -56,6 +59,20 @@ public class Main {
      * If student's property IS the boundary value (or above in case of doubles) then it
      * is in the subgroup that satisfies the splitting criteria.
      * */
+    public static double[] meanGradesOfTabulation(int courseId, FeatureSplit featureSplit) {
+        ArrayList<ArrayList<Double>> tabulation = tabulateCourseByStudentFeature(courseId, featureSplit);
+        // the mean grade of the two groups after the tabulations
+        double[] means = new double[2];
+        for (int i = 0; i < 2; i++) {
+            ArrayList<Double> subGroup = tabulation.get(i);
+            double sum = 0;
+            for (double grade: subGroup) {
+               sum += grade;
+            }
+            means[i] = sum / subGroup.size();
+        }
+        return means;
+    }
     public static ArrayList<ArrayList<Double>> tabulateCourseByStudentFeature(int courseId, FeatureSplit featureSplit) {
         /*
         * Elements:
@@ -72,24 +89,14 @@ public class Main {
         ArrayList<Double> subSetSatisfy = new ArrayList<>();
         ArrayList<Double> subSetNotSatisfy = new ArrayList<>();
         for (int studentId: studentIds) {
-            // property can be String and double depending on type of feature
-            var property = StudentInfoModel.getFeatureOfStudent(studentId, featureSplit.name);
             double grade = CurrentGradesModel.getGrade(studentId, courseId);
-
             // skip no grades
             if (grade == -1) {
                 continue;
             }
-            // splitting criteria depends on the type of the feature
-            boolean isSplitConditionSatisfied;
-            if (featureSplit.isFeatureACategory) {
-                isSplitConditionSatisfied = featureSplit.selectionCategory.equals((String) property);
-            } else {
-                isSplitConditionSatisfied = featureSplit.threshHoldValue > (double) property;
-            }
 
-            // evaluate splitting criteria
-            if (isSplitConditionSatisfied) {
+            // decides if the split condition is satisfied (can handle numeric and category type features as well)
+            if (StudentInfoModel.evaluateSplitOnStudent(studentId, featureSplit)) {
                 subSetSatisfy.add(grade);
             } else {
                 subSetNotSatisfy.add(grade);
@@ -215,5 +222,41 @@ public class Main {
 
         // finish computing variance reduction
         return initialVariance - sumWeightedSubGroupVariances;
+    }
+
+    /** Implementing last question of step 3 of phase 1:
+     * Then write code that uses the previous method to produce the best single guess for
+     * the future performance of a student.
+     * Returns a 2D array where first row contains the courseIds of the future courses, and
+     * the second row contains the predicted grade for the given future course.
+     * */
+    public static double[][] guessStudentFuturePerformance(int studentId) {
+        // find future courses first
+        ArrayList<Integer> futureCourseIds = new ArrayList<>();
+        for (int courseId = 0; courseId < CurrentGradesModel.courseCount; courseId++) {
+           double grade = CurrentGradesModel.getGrade(studentId, courseId);
+           // NG means the student had not taken the exam yet. (NG is encoded as -1.)
+           if (grade == -1) {
+               futureCourseIds.add(courseId);
+           }
+        }
+
+        // first row is course ids
+        // second row is prediction for course
+        double[][] predictions = new double[2][futureCourseIds.size()];
+        for (int i = 0; i < futureCourseIds.size(); i++) {
+            int courseId = futureCourseIds.get(i);
+            predictions[0][i] = courseId;
+
+            FeatureSplit bestSplit = findBestPropertyToGuessGrade(courseId);
+            // this is Y and Z in the rule if X then grade Y, else grade Z (X is the bestSplit)
+            double[] tabulatedMeans = meanGradesOfTabulation(courseId, bestSplit);
+            // judge the student based on its property
+            boolean isSplitConditionSatisfied = StudentInfoModel.evaluateSplitOnStudent(studentId, bestSplit);
+            // save predicted mean grade
+            predictions[1][i] = isSplitConditionSatisfied ? tabulatedMeans[1] : tabulatedMeans [0];
+        }
+
+        return predictions;
     }
 }
