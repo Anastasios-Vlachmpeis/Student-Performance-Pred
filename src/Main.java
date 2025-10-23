@@ -126,6 +126,5 @@ public class Main {
         }
 
         return tabulation;
-
     }
 }

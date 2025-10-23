@@ -266,6 +266,60 @@ public class CurrentGradesModel {
         return indexMostFrequent;
     }
 
+    public static void printStudentNGcount() {
+        //Prints the number of NG per student
+        //This may be used to understand which students are their last year, by looking at their number of NG's
+        int count = 0;
+        for (int i = 0; i < grades.length - 1; i++) {
+
+            for (int j = 0; j < grades[i].length; j++) {
+                if (grades[i][j] == -1) {
+                    count++;
+                }
+            }
+
+            System.out.println("Number of NG for the student " + i +" : " + count);
+            count = 0;
+        }
+
+    }
+
+    public static void printCourseNGcount() {
+        //Print the number of NG per course
+        //This is to assume the order of taking the courses
+        int count = 0;
+        for (int i = 0; i < grades[0].length; i++) {
+
+            for (int j = 0; j < grades.length; j++) {
+                if (grades[j][i] == -1) {
+                    count++;
+                }
+            }
+
+            System.out.println("Number of NG for the course " +i + " : " + count);
+            count = 0;
+        }
+
+    }
+
+    public static void printFailedCourses() {
+        //Prints the number of failed courses per student
+        int count = 0;
+        for (int i = 0; i < grades.length - 1; i++) {
+            for (int j = 0; j < grades[i].length; j++) {
+                //Doesn't take NG into consideration since we assume that they are not taken yet, hence not failed
+                if (grades[i][j] < 6.0 && grades[i][j] != -1) {
+                    count++;
+                }
+            }
+            System.out.println("Student: " + i + " has failed " + count + " courses.");
+            count = 0;
+
+
+        }
+
+    }
+
     public static double[] getAllGradesOfCourse(int courseId) {
         double[] courseGrades = new double[studentCount];
         for (int i = 0; i < studentCount; i++) {
@@ -288,3 +342,5 @@ public class CurrentGradesModel {
         return grades[studentID2index.get(studentId)][courseId];
     }
 }
+
+
