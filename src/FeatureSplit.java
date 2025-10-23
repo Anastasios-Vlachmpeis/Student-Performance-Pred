@@ -11,7 +11,20 @@
 public class FeatureSplit {
     String name;
     boolean isFeatureACategory;
-    double threshHoldValue;
+    Double threshHoldValue;
     String selectionCategory;
-}
 
+    public FeatureSplit(String featureName, String selectionCategory) {
+        this.name = featureName;
+        this.isFeatureACategory = true;
+        this.threshHoldValue = null;
+        this.selectionCategory = selectionCategory;
+    }
+
+    public FeatureSplit(String featureName, double threshHoldValue) {
+        this.name = featureName;
+        this.isFeatureACategory = false;
+        this.threshHoldValue = threshHoldValue;
+        this.selectionCategory = null;
+    }
+}

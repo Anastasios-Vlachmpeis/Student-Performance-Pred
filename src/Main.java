@@ -1,7 +1,6 @@
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Locale;
-import java.util.function.Consumer;
 
 /** Entry point of the project. You can access the data models from here.*/
 public class Main {
@@ -28,7 +27,11 @@ public class Main {
         /*
         Testing the first task of step 3 in phase 1.
          */
-        System.out.println(Arrays.toString(tabulateCourseByStudentFeature(0, "SNC", "Harmonized")));
+        System.out.println(Arrays.toString(
+                tabulateCourseByStudentFeature(
+                        0,
+                        new FeatureSplit("SNC", "Harmonized"))
+        ));
 
     }
 
@@ -44,7 +47,14 @@ public class Main {
      * is in the subgroup that satisfies the splitting criteria.
      * */
     public static double[] tabulateCourseByStudentFeature(int courseId, FeatureSplit featureSplit) {
-        double[] tabulation = new double[2];
+        /*
+        * Elements:
+        *   0. - mean of subgroup not in splitting criteria
+        *   1. - mean of subgroup within splitting criteria
+        *   2. - size of subgroup not in splitting criteria
+        *   3. - size of subgroup withing splitting criteria
+        * */
+        double[] tabulation = new double[4];
 
         // all students' grades in the given course
         int[] studentIds = CurrentGradesModel.getAllStudentIdsOfCourse(courseId);
@@ -92,8 +102,89 @@ public class Main {
             tabulation[1] = satisfySum / (double) satisfyCounter;
         }
 
-        System.out.println("(notSatisfySum + satisfySum)/(satisfyCounter + notSatisfyCounter) = " + (notSatisfySum + satisfySum)/(satisfyCounter + notSatisfyCounter));
+        // add size of subgroups
+        tabulation[2] = notSatisfyCounter;
+        tabulation[3] = satisfyCounter;
 
         return tabulation;
+    }
+
+    /**
+     * Write code that for a given course, finds the best property to help guess the grade
+     * a student will get for that course. In this case, you can define best according to a
+     * measure called variance reduction.
+     * -----------------------------------------------
+     * Variance reduction is very simple to information gain, but it calculates variance, and then
+     * subtracts the weighted variance of the datasets after the split.
+     */
+    public static FeatureSplit findBestPropertyToGuessGrade(int courseId) {
+        ArrayList<Double> courseGrades = CurrentGradesModel.getAllGradesOfCourse(courseId);
+
+        // calculate initial variance
+        double sum = 0;
+        for (double courseGrade: courseGrades) {
+           sum += courseGrade;
+        }
+        double initialVariance = sum / courseGrades.size();
+
+
+        //-------------------------------------------------------------//
+        // iterate over all possible splitting options of all features //
+        //-------------------------------------------------------------//
+        double bestReducedVariance = -1;    // if all splits give a zero reduction then the first one will be the "best"
+        FeatureSplit bestSplit = null;
+
+        // first the categorical features (they have index 0, 1, 4)
+        int[] categoricalFeatureIndexes = {0, 1, 4};
+        for (int featureIndex : categoricalFeatureIndexes) {
+            // checks all possible categorical splits of a feature and saves the best
+            for (Object element : StudentInfoModel.featureRanges.get(featureIndex)) {
+                // this will be used as the splitting criteria
+                String featureProperty = (String) element;
+                FeatureSplit split = new FeatureSplit(StudentInfoModel.featureNames[featureIndex], featureProperty);
+                double reducedVariance = calculateVarianceReduction(
+                        tabulateCourseByStudentFeature(courseId, split),
+                        initialVariance);
+
+                if (reducedVariance > bestReducedVariance) {
+                    bestReducedVariance = reducedVariance;
+                    bestSplit = split;
+                }
+            }
+        }
+        // Then we check the numerical feature checks.
+        // Have to have a stepsize. which will be the range length divided by 1000.
+        // The indexes of these features are 2 and 3
+        int[] numericalFeatureIndexes = {2, 3};
+        for (int featureIndex : numericalFeatureIndexes) {
+            // checks all possible categorical splits of a feature and saves the best
+            for (Object element : StudentInfoModel.featureRanges.get(featureIndex)) {
+                // this will be used as the splitting criteria
+                double featureProperty = (double) element;
+                FeatureSplit split = new FeatureSplit(StudentInfoModel.featureNames[featureIndex], featureProperty);
+                double reducedVariance = calculateVarianceReduction(
+                        tabulateCourseByStudentFeature(courseId, split),
+                        initialVariance);
+
+                if (reducedVariance > bestReducedVariance) {
+                    bestReducedVariance = reducedVariance;
+                    bestSplit = split;
+                }
+            }
+        }
+
+        // now we have the best split
+        return bestSplit;
+    }
+
+    /**
+     * Helper function to calculate variance for tabulations working with the results from
+     * tabulateCourseByStudentFeature(). (So the first 2 elements in the array are the new
+     * variances while the next 2 elements are the size of the subgroups after the split.
+     * This lambda function calculates the weighted variance which will be subtracted from initial variance
+     */
+    public static double calculateVarianceReduction(double[] tabulationResults, double initialVariance) {
+        double originalSize = tabulationResults[2] + tabulationResults[3];
+        return initialVariance - (tabulationResults[0] / originalSize + tabulationResults[1] / originalSize);
     }
 }
