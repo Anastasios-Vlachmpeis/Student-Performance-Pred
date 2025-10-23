@@ -54,8 +54,14 @@ public class Main {
          * Adjusted Q1 for current grades
          */
         CurrentGradesModel.printHardestAndEasiestCourses();
-
+        /**
+         * Adjusted Q3 for current grades
+         */
         CurrentGradesModel.printTopKCorrelatedCoursePairsIgnoreNG(TOP_K);
+        /**
+         * Adjusted Q4 for current grades
+         */
+        CurrentGradesModel.analyzeStudentPerformanceHardVsEasyNG();
     }
 
     /** First Task from Phase 1: Step 3.
