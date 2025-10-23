@@ -267,6 +267,8 @@ public class CurrentGradesModel {
     }
 
     public static void printStudentNGcount() {
+        //Prints the number of NG per student
+        //This may be used to understand which students are their last year, by looking at their number of NG's
         int count = 0;
         for (int i = 0; i < grades.length - 1; i++) {
 
@@ -283,6 +285,8 @@ public class CurrentGradesModel {
     }
 
     public static void printCourseNGcount() {
+        //Print the number of NG per course
+        //This is to assume the order of taking the courses
         int count = 0;
         for (int i = 0; i < grades[0].length; i++) {
 
@@ -299,9 +303,11 @@ public class CurrentGradesModel {
     }
 
     public static void printFailedCourses() {
+        //Prints the number of failed courses per student
         int count = 0;
         for (int i = 0; i < grades.length - 1; i++) {
             for (int j = 0; j < grades[i].length; j++) {
+                //Doesn't take NG into consideration since we assume that they are not taken yet, hence not failed
                 if (grades[i][j] < 6.0 && grades[i][j] != -1) {
                     count++;
                 }
