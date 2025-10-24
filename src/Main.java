@@ -286,7 +286,7 @@ public class Main {
 
             // Print out the whole rule as specified in project manual and enter into new line
             System.out.print(CurrentGradesModel.courses[courseId] + ": " + bestSplit.asRule());
-            System.out.print(" then grade " + String.format("%.3f", gradePredictionY) + ", else grade " + String.format("%.3f", gradePredictionZ));
+            System.out.print("grade " + String.format("%.3f", gradePredictionY) + ", else grade " + String.format("%.3f", gradePredictionZ));
             System.out.println();
         }
     }
