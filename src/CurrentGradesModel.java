@@ -709,6 +709,76 @@ public class CurrentGradesModel {
         }
         return sumMean / counterMean;   // division by zero if and only if all courses have only NGs
     }
+
+    /**
+     * Answering the final question of step 3: HOW MANY STUDENTS GRADUATE THIS YEAR?
+     *      Graduation criteria (from graduate grades): have a passing grade from all courses
+     * This approach assumes that every current student can graduate this year, and does not consider
+     * whether they are in year 1 or year 2 (maybe there are no years system at the alien school even)
+     * Run monte carlo simulations for all NGs to decide if they are a failing grade or not, and then
+     * count the students eligible for graduation. Repeat, and average out the results.
+     * */
+    public static double predictGraduateAmountMonteCarloSimulation(int numberOfIterations) {
+
+        // so simulate if an NG in a course will fail or pass, we need to have passing rates first
+        double[] passingRates = new double[courseCount];
+        // course that have less than 30 actual grades (no NGs) are not significant enough
+        // to extrapolate their passing rate into the NGs of their course. These will inherit
+        // the mean of the passing rates.
+        ArrayList<Integer> nonSignificantCourses = new ArrayList<>();
+        for (int courseId = 0; courseId < courseCount; courseId++) {
+            // this already filters out the NGs.
+            ArrayList<Double> courseGrades = getAllGradesOfCourse(courseId);
+            int countPassing = 0;
+            for (double grade : courseGrades) {
+                if (grade >= 6) {
+                    countPassing++;
+                }
+            }
+            // store passing rate if it is significant
+            if (countPassing >= 30) {
+                passingRates[courseId] = countPassing / (double) courseGrades.size();
+            } else {
+                passingRates[courseId] = -1;
+            }
+        }
+        // calculate the mean of the passing rates (ignoring insignificant passing rates marked with -1)
+        double sumPassingRates = 0;
+        int countPassingRates = 0;
+        for (int i = 0; i < passingRates.length; i++) {
+            if (passingRates[i] == -1) {continue;}
+            sumPassingRates += passingRates[i];
+            countPassingRates++;
+        }
+        double meanPassingRate = sumPassingRates / countPassingRates;
+        // assing mean passing rate to courses with insignificant passing rates
+        for (int i = 0; i < passingRates.length; i++) {
+            if (passingRates[i] == -1) {
+                passingRates[i] = meanPassingRate;
+            }
+        }
+        // preparations for Monte Carlo Simulation are done
+
+        // MONTE CARLO SIMULATION PART:
+        // keep track the sum of all eligible graduates across all simulations
+        // so at the end we can take its average. (saves memory not having to keep
+        // the individual amounts in an array just to take their average later)
+        long sumOfGraduates = 0;
+        for (int iteration = 1; iteration <= numberOfIterations; iteration++) {
+            int numberOfGraduates = 0;
+            // Go through each student
+                // count failing
+                // if there is a NG make a simulation to decide it passes or not
+                // if a student has no failing course increment the graduate counter
+
+
+            // add this iteration's number of graduates to the big sum for calculating the mean at the end
+            sumOfGraduates += numberOfGraduates;
+        }
+
+        // Finally, take the mean of all iterations as promised
+        return sumOfGraduates / (double)numberOfIterations;
+    }
 }
 
 
