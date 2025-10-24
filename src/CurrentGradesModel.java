@@ -1,9 +1,5 @@
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Scanner;
-import java.util.List;
+import java.util.*;
 
 /** Reads CurrentGrades.csv, stores it internally, computes statistics
     on itself via public methods
@@ -764,13 +760,32 @@ public class CurrentGradesModel {
         // so at the end we can take its average. (saves memory not having to keep
         // the individual amounts in an array just to take their average later)
         long sumOfGraduates = 0;
+        Random random = new Random();
         for (int iteration = 1; iteration <= numberOfIterations; iteration++) {
             int numberOfGraduates = 0;
-            // Go through each student
-                // count failing
-                // if there is a NG make a simulation to decide it passes or not
-                // if a student has no failing course increment the graduate counter
-
+            // Go through each student's grade
+            for (int studentIndex = 0; studentIndex < studentCount; studentIndex++) {
+                // count failing grades of the student
+                int countFailingGrades = 0;
+                for (int courseIndex = 0; courseIndex < courseCount; courseIndex++) {
+                    double grade = grades[studentIndex][courseIndex];
+                    // student has a grade but it is failing
+                    if (grade != -1 && grade < 6) {
+                       countFailingGrades++;
+                    }
+                    // student has NG make a simulation to decide it passes or not
+                    else {
+                        double coursePassingRate = passingRates[courseIndex];
+                        if (random.nextDouble() < coursePassingRate) {
+                            countFailingGrades++;
+                        }
+                    }
+                }
+                // if the student has no failing grades then they graduate
+                if (countFailingGrades == 0) {
+                    numberOfGraduates++;
+                }
+            }
 
             // add this iteration's number of graduates to the big sum for calculating the mean at the end
             sumOfGraduates += numberOfGraduates;
