@@ -178,6 +178,7 @@ public class CurrentGradesModel {
             }
         }
 
+        // warning message when analysing data. no grades at all is an edge case we did not prepare for yet.
         if (indexMostFrequent == 0 && gradeFrequency[0] == 0) {
             return -1;
         }
