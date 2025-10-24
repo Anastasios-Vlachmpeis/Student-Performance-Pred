@@ -40,7 +40,8 @@ public class Main {
          /*###########
           # PHASE 2 #
           ###########*/
-        // Q0: Adjusted Q1 from graduate grades for current grades
+        // Q0: Computing basic statistics we did for step 1
+        //     Adjusted Q1 from graduate grades for current grades
         //     (Compute some of the same statistics you did in step 1 for current grades
         CurrentGradesModel.printHardestAndEasiestCourses();
 
@@ -49,6 +50,11 @@ public class Main {
 
         // Q2:
         CurrentGradesModel.getGraduatingStudents();
+
+        // Q3 (extra): Adjusted Q3 from graduate grade for current grades!
+        CurrentGradesModel.printTopKCorrelatedCoursePairsIgnoreNG(TOP_K);
+        // Q4 (extra): Adjusted Q4 for current grades
+        CurrentGradesModel.analyzeStudentPerformanceHardVsEasyNG();
 
         // QPrediction:
         // Missing
@@ -60,29 +66,11 @@ public class Main {
         int MAX_RESITS = 3;
         System.out.println(CurrentGradesModel.predictGraduateAmountMonteCarloSimulation(ITERATIONS, MAX_RESITS) );
 
-        // QExtra: Adjusted Q3 from graduate grade for current grades!
-        CurrentGradesModel.printTopKCorrelatedCoursePairsIgnoreNG(TOP_K);
-        // QExtra: Adjusted Q4 for current grades
-        CurrentGradesModel.analyzeStudentPerformanceHardVsEasyNG();
 
         /*###########
           # PHASE 3 #
           ###########*/
-//        // Testing the first task of step 3 in phase 1.
-//        System.out.println(
-//                Arrays.deepToString(
-//                        tabulateCourseByStudentFeature(
-//                                0,
-//                                new FeatureSplit("SNC", "Harmonized")
-//                        ).toArray()
-//                )
-//        );
-//        // Testing the second task of step 3 in phase 1.
-//        System.out.println(
-//                findBestPropertyToGuessGrade(0).toString()
-//        );
-
-        // The actual question of step 3
+        // The actual question of step 3: finding the rules for grade prediction
         printBestRulesForGradePrediction();
 
 
