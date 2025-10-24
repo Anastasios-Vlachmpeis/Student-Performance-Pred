@@ -776,7 +776,12 @@ public class CurrentGradesModel {
                     // student has NG make a simulation to decide it passes or not
                     else {
                         double coursePassingRate = passingRates[courseIndex];
-                        if (random.nextDouble() < coursePassingRate) {
+                        // black magic to make a random decision between 2 options but with differing chances
+                        // think of it like this:
+                        //  - random.NextDouble < coursePassingRate => student passed
+                        //  - but we are looking for failing grades. so we should invert the condition
+                        //  - this is how we get random.nextDouble >= coursePassingRate
+                        if (random.nextDouble() >= coursePassingRate) {
                             countFailingGrades++;
                         }
                     }
