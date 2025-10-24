@@ -57,6 +57,7 @@ public class Main {
 
         // Q2:
         System.out.println("Answering Step 2 - Question 2");
+        System.out.println("Students graduation soon have the least amount of NGs (less than 5), and have no failing grades:");
         CurrentGradesModel.getGraduatingStudents();
 
         // Q3 (extra): Adjusted Q3 from graduate grade for current grades!
