@@ -714,7 +714,7 @@ public class CurrentGradesModel {
      * Run monte carlo simulations for all NGs to decide if they are a failing grade or not, and then
      * count the students eligible for graduation. Repeat, and average out the results.
      * */
-    public static double predictGraduateAmountMonteCarloSimulation(int numberOfIterations) {
+    public static double predictGraduateAmountMonteCarloSimulation(int numberOfIterations, int maxResitsAllowed) {
 
         // so simulate if an NG in a course will fail or pass, we need to have passing rates first
         double[] passingRates = new double[courseCount];
@@ -787,7 +787,7 @@ public class CurrentGradesModel {
                     }
                 }
                 // if the student has no failing grades then they graduate
-                if (countFailingGrades == 0) {
+                if (countFailingGrades > maxResitsAllowed) {
                     numberOfGraduates++;
                 }
             }
@@ -797,6 +797,9 @@ public class CurrentGradesModel {
         }
 
         // Finally, take the mean of all iterations as promised
+        System.out.println("sumOfGraduates = " + sumOfGraduates);
+        System.out.println("Passing rates: " + Arrays.toString(passingRates));
+        System.out.println("meanPassingRate = " + meanPassingRate);
         return sumOfGraduates / (double)numberOfIterations;
     }
 }
