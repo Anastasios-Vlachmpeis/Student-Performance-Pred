@@ -116,8 +116,8 @@ public class CurrentGradesModel {
             gradecounter++;
         }
 
-        // warning message when analysing data. so everyone getting zero is not identical to everyone having NG
-        if (gradecounter == 0) {System.out.println("no grades for all courses for student: " + studentId);}
+        // mean is not defined for empty dataset
+        if (gradecounter == 0) {return -1;}
 
         return sum / (double)gradecounter;
     }
@@ -203,9 +203,8 @@ public class CurrentGradesModel {
            gradecounter++;
         }
 
-        // warning message when analysing data. so everyone getting zero is not identical to everyone having NG
+        // mean is not defined for empty dataset
         if (gradecounter == 0) {
-            System.out.println("No grades for all student for course id: " + courseId);
             return -1;
         }
 
@@ -726,7 +725,7 @@ public class CurrentGradesModel {
             int ngs = getStudentNGCount(i);
 
             if (fails == 0 && ngs < 5) {
-                System.out.println("Possible graduation of the student: " + i);
+                // System.out.println("Possible graduation of the student: " + i);  // DEBUG
                 count++;
             }
         }
@@ -840,15 +839,17 @@ public class CurrentGradesModel {
         Random random = new Random();
         for (int iteration = 1; iteration <= numberOfIterations; iteration++) {
             int numberOfGraduates = 0;
+            int resitsRemaining = maxResitsAllowed;
             // Go through each student's grade
             for (int studentIndex = 0; studentIndex < studentCount; studentIndex++) {
                 // count failing grades of the student
                 int countFailingGrades = 0;
                 for (int courseIndex = 0; courseIndex < courseCount; courseIndex++) {
                     double grade = grades[studentIndex][courseIndex];
+                    boolean isFail = false;
                     // student has a grade but it is failing
                     if (grade != -1 && grade < 6) {
-                       countFailingGrades++;
+                        isFail = true;
                     }
                     // student has NG make a simulation to decide it passes or not
                     else {
@@ -859,12 +860,19 @@ public class CurrentGradesModel {
                         //  - but we are looking for failing grades. so we should invert the condition
                         //  - this is how we get random.nextDouble >= coursePassingRate
                         if (random.nextDouble() >= coursePassingRate) {
-                            countFailingGrades++;
+                            isFail = true;
                         }
                     }
+                    // students can retry failed exams's once if they can take a resit
+                    if (resitsRemaining > 0 && isFail) {
+                        isFail = random.nextDouble() >= passingRates[courseIndex];
+                    }
+
+                    // increment failed grade counter
+                    countFailingGrades += isFail ? 1 : 0;
                 }
                 // if the student has no failing grades then they graduate
-                if (countFailingGrades > maxResitsAllowed) {
+                if (countFailingGrades > 0) {
                     numberOfGraduates++;
                 }
             }
@@ -874,9 +882,6 @@ public class CurrentGradesModel {
         }
 
         // Finally, take the mean of all iterations as promised
-        System.out.println("sumOfGraduates = " + sumOfGraduates);
-        System.out.println("Passing rates: " + Arrays.toString(passingRates));
-        System.out.println("meanPassingRate = " + meanPassingRate);
         return sumOfGraduates / (double)numberOfIterations;
     }
 }
