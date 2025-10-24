@@ -56,8 +56,8 @@ public class Main {
         System.out.println("Answering Step 2 - Question 1");
 
         // Q2:
-        CurrentGradesModel.getGraduatingStudents();
         System.out.println("Answering Step 2 - Question 2");
+        CurrentGradesModel.getGraduatingStudents();
 
         // Q3 (extra): Adjusted Q3 from graduate grade for current grades!
         System.out.println("Answering Step 2 - Question 3");
