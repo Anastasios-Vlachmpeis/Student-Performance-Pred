@@ -882,9 +882,6 @@ public class CurrentGradesModel {
         }
 
         // Finally, take the mean of all iterations as promised
-        System.out.println("sumOfGraduates = " + sumOfGraduates);
-        System.out.println("Passing rates: " + Arrays.toString(passingRates));
-        System.out.println("meanPassingRate = " + meanPassingRate);
         return sumOfGraduates / (double)numberOfIterations;
     }
 }
