@@ -74,7 +74,7 @@ public class Main {
         System.out.println("Prediction of number of graduates via Monte Carlo Simulation and resits:");
         int ITERATIONS = 10000;
         int MAX_RESITS = 3;
-        System.out.println(CurrentGradesModel.predictGraduateAmountMonteCarloSimulation(ITERATIONS, MAX_RESITS) );
+        System.out.println("Guess: " + CurrentGradesModel.predictGraduateAmountMonteCarloSimulation(ITERATIONS, MAX_RESITS) + " will graduate.");
 
 
         /*###########
