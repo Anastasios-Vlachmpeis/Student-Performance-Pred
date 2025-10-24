@@ -53,6 +53,13 @@ public class Main {
         // QPrediction:
         // Missing
 
+        // QPrediction: Alice approach
+        //              Monte Carlo simulate NGs based on passing rates
+        System.out.println("Prediction of number of graduates via Monte Carlo Simulation and resits:");
+        int ITERATIONS = 10000;
+        int MAX_RESITS = 3;
+        System.out.println(CurrentGradesModel.predictGraduateAmountMonteCarloSimulation(ITERATIONS, MAX_RESITS) );
+
         // QExtra: Adjusted Q3 from graduate grade for current grades!
         CurrentGradesModel.printTopKCorrelatedCoursePairsIgnoreNG(TOP_K);
         // QExtra: Adjusted Q4 for current grades
