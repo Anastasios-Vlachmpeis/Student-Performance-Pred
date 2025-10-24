@@ -50,8 +50,8 @@ public class FeatureSplit {
         if (this.isFeatureACategory) {
             return "If " + this.name + " is " + this.selectionCategory + " then";
         } else {
-            // format threshold value up to 3 decimal places
-            return "If " + this.name + " > " + String.format("%.3f", this.threshHoldValue) + " then";
+            // format threshold value up to 2 decimal places
+            return "If " + this.name + " > " + String.format("%.2f", this.threshHoldValue) + " then";
         }
 
     }
