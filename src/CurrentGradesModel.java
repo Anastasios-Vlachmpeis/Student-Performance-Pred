@@ -115,8 +115,8 @@ public class CurrentGradesModel {
             gradecounter++;
         }
 
-        // warning message when analysing data. so everyone getting zero is not identical to everyone having NG
-        if (gradecounter == 0) {System.out.println("no grades for all courses for student: " + studentId);}
+        // mean is not defined for empty dataset
+        if (gradecounter == 0) {return -1;}
 
         return sum / (double)gradecounter;
     }
@@ -135,8 +135,8 @@ public class CurrentGradesModel {
             studentGrades.add(grade);
         }
 
-        // warning message when analysing data. so everyone getting zero is not identical to everyone having NG
-        if (studentGrades.isEmpty()) {System.out.println("No grades for all courses for student: " + studentId);}
+        // median is not defined for empty dataset
+        if (studentGrades.isEmpty()) {return -1;}
 
         // sorting to find median (middle value)
         studentGrades.sort(null);
@@ -178,7 +178,7 @@ public class CurrentGradesModel {
             }
         }
 
-        // warning message when analysing data. no grades at all is an edge case we did not prepare for yet.
+        // mode is not defined for empty dataset
         if (indexMostFrequent == 0 && gradeFrequency[0] == 0) {
             return -1;
         }
@@ -202,9 +202,8 @@ public class CurrentGradesModel {
            gradecounter++;
         }
 
-        // warning message when analysing data. so everyone getting zero is not identical to everyone having NG
+        // mean is not defined for empty dataset
         if (gradecounter == 0) {
-            System.out.println("No grades for all student for course id: " + courseId);
             return -1;
         }
 
@@ -222,7 +221,7 @@ public class CurrentGradesModel {
             courseGrades.add(grade);
         }
 
-        // warning message when analysing data. no grades at all is an edge case we did not prepare for yet.
+        // median is not defined for empty dataset
         if (courseGrades.isEmpty()) {
             return -1;
         }
@@ -264,7 +263,7 @@ public class CurrentGradesModel {
             }
         }
 
-        // warning message when analysing data. no grades at all is an edge case we did not prepare for yet.
+        // mode is not defined for empty dataset
         if (indexMostFrequent == 0 && gradeFrequency[0] == 0) {
             return -1;
         }
