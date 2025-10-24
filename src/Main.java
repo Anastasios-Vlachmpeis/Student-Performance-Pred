@@ -56,7 +56,7 @@ public class Main {
         // QPrediction: Alice approach
         //              Monte Carlo simulate NGs based on passing rates
         System.out.println("Prediction of number of graduates via MonteCarlo and no Year 1, Year 2, Year 3");
-        int ITERATIONS = 1000;
+        int ITERATIONS = 10000;
         System.out.println(
                 "# of graduates this year: " + CurrentGradesModel.predictGraduateAmountMonteCarloSimulation(ITERATIONS)
         );
