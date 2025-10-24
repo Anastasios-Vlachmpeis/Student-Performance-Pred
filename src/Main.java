@@ -45,10 +45,10 @@ public class Main {
         CurrentGradesModel.printHardestAndEasiestCourses();
 
         // Q1:
-        // MISSING
+        // it is done with graphics will be in report
 
         // Q2:
-        // MISSING
+        CurrentGradesModel.getGraduatingStudents();
 
         // QPrediction:
         // Missing
