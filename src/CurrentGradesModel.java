@@ -116,8 +116,8 @@ public class CurrentGradesModel {
             gradecounter++;
         }
 
-        // mean is not defined for empty dataset
-        if (gradecounter == 0) {return -1;}
+        // warning message when analysing data. so everyone getting zero is not identical to everyone having NG
+        if (gradecounter == 0) {System.out.println("no grades for all courses for student: " + studentId);}
 
         return sum / (double)gradecounter;
     }
