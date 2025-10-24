@@ -20,7 +20,7 @@ public class Main {
         // or just use them in methods of this class
 
         /*###########
-          # PHASE 1 #
+          # STEP 1 #
           ###########*/
         // Question 1
         GraduateGradesModel.printBestAndWorstCourse();
@@ -38,7 +38,7 @@ public class Main {
         GraduateGradesModel.analyzeStudentPerformanceHardVsEasy();
 
          /*###########
-          # PHASE 2 #
+          # STEP 2 #
           ###########*/
         // Q0: Computing basic statistics we did for step 1
         //     Adjusted Q1 from graduate grades for current grades
@@ -68,7 +68,7 @@ public class Main {
 
 
         /*###########
-          # PHASE 3 #
+          # STEP 3 #
           ###########*/
         // The actual question of step 3: finding the rules for grade prediction
         printBestRulesForGradePrediction();
