@@ -394,13 +394,20 @@ public class GraduateGradesModel {
 
     public static void printCumLaudeStudents() {
 
-        System.out.println("\nThe students graduated cum-laude(above 9.0 mean grade):");
+        double sumCumLaud = 0;
+        System.out.println("\nThe students graduated cum-laude (above 8 mean grade):");
         for (int i = 0; i < grades.length; i++) {
-            if (getStudentMean(i) > 9.0) {
-                System.out.println("Student ID: " +i + " (mean grade = " + getStudentMean(i) + ")");
+            if (getStudentMean(i) > 8) {
+                System.out.println("Student ID: " +i + " (mean grade = " + String.format("%.2f", getStudentMean(i)) + ")");
+                sumCumLaud++;
             }
 
+
         }
+        double percentCumLaud = sumCumLaud / grades.length * 100;
+        System.out.println("Total Cum Laude Students : " + (int)sumCumLaud);
+        System.out.println("Percentage of Cum Laude Students relative to total graduates : " + String.format("%.2f", percentCumLaud) + "%");
+
 
     }
 
