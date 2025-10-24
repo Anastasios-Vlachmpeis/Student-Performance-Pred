@@ -725,7 +725,7 @@ public class CurrentGradesModel {
             int ngs = getStudentNGCount(i);
 
             if (fails == 0 && ngs < 5) {
-                System.out.println("Possible graduation of the student: " + i);
+                // System.out.println("Possible graduation of the student: " + i);  // DEBUG
                 count++;
             }
         }
