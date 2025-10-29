@@ -26,7 +26,7 @@ public class GraduateGradesModel {
 
 
     // Contains name of the courses. courseID is equivalent to index in the array
-    static String[] courses = new String[courseCount];
+    private static String[] courses = new String[courseCount];
     // Internal representation of student's grades as a table (2D array)
     // First index corresponds to studentID
     // Second index correspond to the courseID
@@ -108,6 +108,41 @@ public class GraduateGradesModel {
 
     }
 
+    /**
+     * Gives the list of the names of all courses.
+     * @return array of the course names where index is the course's id.
+     */
+    public static String[] getCourses() {return courses;}
+
+    /**
+     * Gives all grades of a graduate student.
+     * @param studentId global id of the student
+     * @return array containing all grades of the student where index equals to course's id
+     */
+    public static double[] getAllGradesStudent(int studentId) {
+        double[] studentGrades = new double[courseCount];
+        // has to convert global student id into local representation
+        int studentIndex = studentID2index.get(studentId);
+        for (int i = 0; i < courseCount; i++) {
+            studentGrades[i] = grades[studentIndex][i];
+        }
+        return studentGrades;
+    }
+
+    /**
+     * Gives all grades of a graduate student.
+     * @param courseId global id of the course
+     * @return array containing all grades of the course (id of the students are not preserved)
+     */
+    public static double[] getAllGradesCourse(int courseId) {
+        double[] courseGrades = new double[studentCount];
+        // has to convert global student id into local representation
+        int courseIndex = courseId; // course id and course index is the same
+        for (int i = 0; i < courseCount; i++) {
+            courseGrades[i] = grades[i][courseIndex];
+        }
+        return courseGrades;
+    }
 
     public static double calcStudentMean(int studentId) {
         // Calculates average of grades for a specific student

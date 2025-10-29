@@ -18,10 +18,10 @@ public class CurrentGradesModel {
 
     // stores the grade table of all students for all courses
     // NG is encoded as -1
-    static double[][] grades = new double[studentCount][courseCount];
-    static String[] courses = new String[courseCount];
+    private static double[][] grades = new double[studentCount][courseCount];
+    private static String[] courses = new String[courseCount];
     // links student id to its index in grades[][]
-    static HashMap<Integer, Integer> studentID2index = new HashMap<>(studentCount);
+    private static HashMap<Integer, Integer> studentID2index = new HashMap<>(studentCount);
 
 
     public static void loadCSV() {
