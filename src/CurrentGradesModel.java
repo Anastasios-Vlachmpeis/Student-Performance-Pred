@@ -764,7 +764,7 @@ public class CurrentGradesModel {
         //This value is used to determine passing rate of the courses without any data.
         double correlationValue = 0;
         for (int i = 0; i < grades[0].length; i++) {
-            correlationValue = correlationValue + getPassingRate(i)/GraduateGradesModel.getCourseMean(i);
+            correlationValue = correlationValue + getPassingRate(i)/GraduateGradesModel.calcCourseMean(i);
         }
         return correlationValue/36;
     }
@@ -776,7 +776,7 @@ public class CurrentGradesModel {
         //Calculates mean passing rate of the courses based on the correlation value and course mean data from graduate grades.
         double sum = 0;
         for (int i = 0; i < grades[0].length; i++) {
-            sum = sum + passingCorrelationValue()*GraduateGradesModel.getCourseMean(i);
+            sum = sum + passingCorrelationValue()*GraduateGradesModel.calcCourseMean(i);
         }
         return sum / grades[0].length;
     }

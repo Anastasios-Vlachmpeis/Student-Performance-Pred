@@ -1,6 +1,17 @@
 import java.io.File;
 import java.util.*;
 
+/**
+ * DataModel class for the graduate grades dataset. Currently it is populated with
+ * methods that perform analysis on its data,created in early phases of the development.
+ * These methods will go to their designated classes, but till then beside them this class
+ * implements the following methods that makes it a DataModel class:
+ *      - getGrade(int StudentId, int courseId)
+ *      - getAllGradesStudent(int StudentId)
+ *      - getAllGradesCourse(int courseId)
+ * Also, it must have a hashmaps that maps the global student ids to the local indexing. (not yet for course Ids)
+ * All variables that are not final are private!
+ */
 public class GraduateGradesModel {
     /* This class was specifically made for the "GraduateGrades.csv" file.
      * Originally was a FileDisplayer provided by UM, but it got modified to specialize on previously mentioned .csv
@@ -20,21 +31,9 @@ public class GraduateGradesModel {
     // First index corresponds to studentID
     // Second index correspond to the courseID
     // Their combination tells a given student's grade at a given course
-    static double[][] grades = new double[studentCount][courseCount];
+    private static double[][] grades = new double[studentCount][courseCount];
     // links student id to its index in grades[][]
-    static HashMap<Integer, Integer> studentID2index = new HashMap<>(studentCount);
-
-    public static void oldCode() {
-
-		//==============================//
-		// POST reading: Put code below //
-		//==============================//
-
-		// Example: Printing the grade of studentID 42 at Evolutionary Dynamics (courseID 1)
-		System.out.println("The grade of student with ID 42 at Evolutionary Dynamics is " + grades[42][1]);
-		System.out.println("The course with courseID 25 is " + courses[25]);
-
-    }
+    private static HashMap<Integer, Integer> studentID2index = new HashMap<>(studentCount);
 
     public static void loadCSV() {
         try {
@@ -110,7 +109,7 @@ public class GraduateGradesModel {
     }
 
 
-    public static double getStudentMean(int studentId) {
+    public static double calcStudentMean(int studentId) {
         // Calculates average of grades for a specific student
         double[] studentGrades = grades[studentId];
         double sum = 0;
@@ -126,9 +125,7 @@ public class GraduateGradesModel {
 
         return mean;
     }
-
-
-    public static double getStudentMode(int studentId) {
+    public static double calcStudentMode(int studentId) {
         // Calculates the most frequent for a specific student
         double[] studentGrades = grades[studentId];
         double mode = studentGrades[0];
@@ -153,9 +150,7 @@ public class GraduateGradesModel {
         }
         return mode;
     }
-
-
-    public static double getStudentMedian(int studentId) {
+    public static double calcStudentMedian(int studentId) {
         // Calculates middle value of grades for a specific student
         double[] studentGrades = grades[studentId].clone();
 
@@ -178,7 +173,7 @@ public class GraduateGradesModel {
         return median;
     }
 
-    public static double getCourseMean(int courseId) {
+    public static double calcCourseMean(int courseId) {
         // Calculates mean of grades of a specific course
         double sum = 0;
         for (int studentId = 0; studentId < grades.length; studentId++) {
@@ -187,8 +182,7 @@ public class GraduateGradesModel {
         return sum / grades.length;
 
     }
-
-    public static double getCourseMedian(int courseId) {
+    public static double calcCourseMedian(int courseId) {
         // Calculate median of grades of a specific course
 
         // Since grades stores arrays of grades of student's. The array of grades of courses is vertical
@@ -215,8 +209,7 @@ public class GraduateGradesModel {
 
         return median;
     }
-
-    public static double getCourseMode(int courseId) {
+    public static double calcCourseMode(int courseId) {
         // Calculate mode of grades of a specific course
         double mode;
         // Count the frequencies of all grades (6.0, 7.0, 8.0, 9.0, 10.0)
@@ -240,14 +233,8 @@ public class GraduateGradesModel {
     }
 
     /**
-     * Q3: "Are there courses that seem similar or related?"
-     * We compute Pearson correlation between courses, and
-     * display the positively correlated course pairs - these are the
-     * most "similar" courses
-     */
-
-    /**
      * A helper class to store pairs of courses and their correlation r
+     * for Q3 "Are there courses that seem similar or related?
      */
     static class CoursePairCorrelation {
         int courseA;
@@ -261,10 +248,9 @@ public class GraduateGradesModel {
         }
     }
 
-    /**
+    /*
      * Methods to compute standard deviation and pearson correlation
      */
-
     /**
      * Sample standard deviation of a course’s grades
      */
@@ -281,8 +267,6 @@ public class GraduateGradesModel {
         if (n <= 1) return 0.0;
         return Math.sqrt(sumSq / (n - 1));
     }
-
-
     /**
      * Pearson correlation between two course columns i and j
      */
@@ -307,7 +291,6 @@ public class GraduateGradesModel {
         //Divide the covariance by the product of the standard deviations
         return cov / (stdI * stdJ);
     }
-
     /**
      * Build all pair correlations between courses
      */
@@ -318,7 +301,7 @@ public class GraduateGradesModel {
 
         //Store per-course stats for each course
         for (int c = 0; c < C; c++) {
-            means[c] = getCourseMean(c);
+            means[c] = calcCourseMean(c);
             stds[c]  = courseStd(c, means[c]);
         }
 
@@ -338,7 +321,6 @@ public class GraduateGradesModel {
         //Return list
         return pairs;
     }
-
     /**
      * Print the top-k(10) most similar course pairs
      */
@@ -373,7 +355,7 @@ public class GraduateGradesModel {
 
         //Go through the means for every course
         for (int i = 0; i < courses.length; i++) {
-            double mean = getCourseMean(i);
+            double mean = calcCourseMean(i);
 
             //Detect and update the most difficult and easiest courses on every step of the loop
             if (mean > bestMean) {
@@ -397,8 +379,8 @@ public class GraduateGradesModel {
         double sumCumLaud = 0;
         System.out.println("\nThe students graduated cum-laude (above 8 mean grade):");
         for (int i = 0; i < grades.length; i++) {
-            if (getStudentMean(i) > 8) {
-                System.out.println("Student ID: " +i + " (mean grade = " + String.format("%.2f", getStudentMean(i)) + ")");
+            if (calcStudentMean(i) > 8) {
+                System.out.println("Student ID: " +i + " (mean grade = " + String.format("%.2f", calcStudentMean(i)) + ")");
                 sumCumLaud++;
             }
 
@@ -425,16 +407,16 @@ public class GraduateGradesModel {
         final int S = grades.length; //total number of students
 
 
-        /**
+        /*
          * We compute the mean for all courses
          */
         double[] means = new double[C];
         for (int c = 0; c < C; c++) {
-            means[c] = getCourseMean(c);  //compute course mean
+            means[c] = calcCourseMean(c);  //compute course mean
         }
 
 
-        /**
+        /*
          * We store the course id + mean pairs
          */
         CourseMean[] courseMeans = new CourseMean[C];
@@ -443,13 +425,13 @@ public class GraduateGradesModel {
         }
 
 
-        /**
+        /*
          * Sorting of courses by ascending mean
          */
         Arrays.sort(courseMeans, (a, b) -> Double.compare(a.mean, b.mean));  // lowest to highest
 
 
-        /**
+        /*
          * Select the 5 hardest and 5 easiest courses
          */
         int[] hardest = new int[5]; //store hardest course IDs
@@ -476,7 +458,7 @@ public class GraduateGradesModel {
         }
 
 
-        /**
+        /*
          * We compute the average difference in hard and easy courses, for each student
          */
         StudentPerformance[] studentResults = new StudentPerformance[S]; // store student performance
@@ -507,7 +489,7 @@ public class GraduateGradesModel {
         }
 
 
-        /**
+        /*
          * Filtering and sorting of students who perform significantly better in hard courses
          */
         List<StudentPerformance> betterStudents = new ArrayList<>();
@@ -523,15 +505,15 @@ public class GraduateGradesModel {
 
 
             // secondary tiebreaker: overall mean grade (descending)
-            double meanA = getStudentMean(a.studentId);
-            double meanB = getStudentMean(b.studentId);
+            double meanA = calcStudentMean(a.studentId);
+            double meanB = calcStudentMean(b.studentId);
             return Double.compare(meanB, meanA);
         });
 
 
 
 
-        /**
+        /*
          * We print our results (top 10 students)
          */
         System.out.println("\nTop 10 students performing significantly better in hard courses:");
