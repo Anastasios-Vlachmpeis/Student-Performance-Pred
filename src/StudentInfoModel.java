@@ -1,5 +1,7 @@
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Scanner;
 
 /**
  * DataModel class for the student info dataset. Implements the following methods
