@@ -30,7 +30,7 @@ public class StudentInfoModel {
     static HashMap<String, Integer> featureName2Index = new HashMap<>();
 
     // stores the ranges of possible values for each feature. internal index is used
-    static ArrayList<ArrayList> featureRanges = new ArrayList<>(5);
+    public static ArrayList<ArrayList> featureRanges = new ArrayList<>(5);
 
     // ensure .csv is loaded before DataModel class is accessed
     static {loadCSV();}
