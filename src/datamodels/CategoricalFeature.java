@@ -1,3 +1,5 @@
+package datamodels;
+
 /**
  * Implements categorical feature (e.g. colors, gender, Bio-Luminal transmission)
  * @author alicehamori
@@ -14,6 +16,6 @@ public class CategoricalFeature extends AbstractFeature {
 
     @Override
     public String toString() {
-        return "CategoricalFeature(featureId=" + this.getFeatureId() + ", category=" + this.category + ")";
+        return "datamodels.CategoricalFeature(featureId=" + this.getFeatureId() + ", category=" + this.category + ")";
     }
 }

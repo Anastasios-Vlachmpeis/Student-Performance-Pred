@@ -1,3 +1,5 @@
+package datamodels;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,7 +24,7 @@ import java.util.Random;
  * @implNote NGs (no grades) are encoded as -1. getAllValidGrades methods only return grades that are not NGs
 */
 public class CurrentGradesModel {
-    final static String pathToCSV = "src/CurrentGrades.csv";
+    final static String pathToCSV = "src/datamodels/CurrentGrades.csv";
     final static int studentCount = 1522 - 1;
     final static int courseCount = 36;
 
@@ -43,6 +45,8 @@ public class CurrentGradesModel {
             System.out.println("This will take a while...");        // Debug
 
             File file=new File(pathToCSV);
+            System.out.println(file.getCanonicalPath());
+            System.out.println(file.getCanonicalFile());
 
             // This code uses two Scanners, one which scans the file line per line
             Scanner fileScanner = new Scanner(file);
@@ -518,7 +522,7 @@ public class CurrentGradesModel {
         return pairList.toArray(new CoursePairCorrelation[0]);
     }
 
-    static void printTopKCorrelatedCoursePairsIgnoreNG(int k) {
+    public static void printTopKCorrelatedCoursePairsIgnoreNG(int k) {
         CoursePairCorrelation[] pairs = computeAllCourseCorrelationsIgnoreNG();
 
         // Keep only r > 0 (positive correlations)
@@ -559,7 +563,7 @@ public class CurrentGradesModel {
      * course mean/median and NG handling). We only consider students who have valid grades
      * for all 5 hardest and 5 easiest courses.
      */
-    static void analyzeStudentPerformanceHardVsEasyNG() {
+    public static void analyzeStudentPerformanceHardVsEasyNG() {
 
         final int C = courseCount;  // total number of courses
         final int S = studentCount; // total number of students
@@ -807,7 +811,7 @@ public class CurrentGradesModel {
         //This value is used to determine passing rate of the courses without any data.
         double correlationValue = 0;
         for (int i = 0; i < grades[0].length; i++) {
-            correlationValue = correlationValue + getPassingRate(i)/GraduateGradesModel.calcCourseMean(i);
+            correlationValue = correlationValue + getPassingRate(i)/ GraduateGradesModel.calcCourseMean(i);
         }
         return correlationValue/36;
     }
@@ -819,7 +823,7 @@ public class CurrentGradesModel {
         //Calculates mean passing rate of the courses based on the correlation value and course mean data from graduate grades.
         double sum = 0;
         for (int i = 0; i < grades[0].length; i++) {
-            sum = sum + passingCorrelationValue()*GraduateGradesModel.calcCourseMean(i);
+            sum = sum + passingCorrelationValue()* GraduateGradesModel.calcCourseMean(i);
         }
         return sum / grades[0].length;
     }

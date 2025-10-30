@@ -1,3 +1,5 @@
+package datamodels;
+
 import java.io.File;
 import java.util.*;
 
@@ -20,7 +22,7 @@ public class GraduateGradesModel {
      * that might include missing values and other data types.
      */
 
-    final static String pathToCSV = "src/GraduateGrades.csv";
+    final static String pathToCSV = "src/datamodels/GraduateGrades.csv";
     final static int studentCount = 21243;
     final static int courseCount = 36;
 
@@ -383,7 +385,7 @@ public class GraduateGradesModel {
     /**
      * Print the top-k(10) most similar course pairs
      */
-    static void printTopKCorrelatedCoursePairs(int k) {
+    public static void printTopKCorrelatedCoursePairs(int k) {
         CoursePairCorrelation[] pairs = computeAllCourseCorrelations();
 
         // Keep only r > 0 (positive correlations)
@@ -459,7 +461,7 @@ public class GraduateGradesModel {
      * courses based on their mean grade, and we identify the top 10 students who performed
      * significantly better in hard courses, compared to their performance in the easy ones.
      */
-    static void analyzeStudentPerformanceHardVsEasy() {
+    public static void analyzeStudentPerformanceHardVsEasy() {
 
 
         final int C = courses.length; //total number of courses

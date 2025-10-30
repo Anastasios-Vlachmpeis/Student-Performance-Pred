@@ -1,3 +1,5 @@
+package datamodels;
+
 /**
  * Manages splitting student datasets based on features.
  * @author alicehamori
@@ -22,5 +24,19 @@ public class SplitCondition {
      */
     public static boolean evaluate(NumericalFeature studentFeature, NumericalFeature splitFeature) {
         return splitFeature.getValue() < studentFeature.getValue();
+    }
+
+    public static boolean evaluate(AbstractFeature studentFeature, AbstractFeature splitFeature) {
+        // we don't know the type of the feature so we try all we know
+        if (studentFeature instanceof CategoricalFeature && splitFeature instanceof CategoricalFeature) {
+            return evaluate((CategoricalFeature) studentFeature, (CategoricalFeature) splitFeature);
+        }
+        else if (studentFeature instanceof NumericalFeature && splitFeature instanceof NumericalFeature) {
+            return evaluate((NumericalFeature) studentFeature, (NumericalFeature) splitFeature);
+        }
+        else {
+            throw new IllegalArgumentException("The two features must have the same type!");
+        }
+
     }
 }

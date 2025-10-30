@@ -1,5 +1,8 @@
+package datamodels;
+
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Scanner;
 
@@ -11,7 +14,7 @@ import java.util.Scanner;
  *      - getAllStudentIds()
  */
 public class StudentInfoModel {
-    final static String pathToCSV = "src/StudentInfo.csv";
+    final static String pathToCSV = "src/datamodels/StudentInfo.csv";
     final static int studentCount = 1522 - 1;
     final static int featureCount = 5;
 
@@ -68,6 +71,15 @@ public class StudentInfoModel {
                 }
             }
             linesDone++;
+
+            // reset feature ranges
+            featureRanges.clear();
+            featureRanges.add(new ArrayList<String>());
+            featureRanges.add(new ArrayList<String>());
+            featureRanges.add(new ArrayList<Double>(Arrays.asList(0.0, 0.0)));
+            featureRanges.add(new ArrayList<Double>(Arrays.asList(0.0, 0.0)));
+            featureRanges.add(new ArrayList<String>());
+
 
             // Then, the code processes students line by line and load their various features
             // into the features "double array"
