@@ -5,7 +5,7 @@
  * @see SplitCondition
  * @author alicehamori
  */
-abstract class AbstractFeature {
+public abstract class AbstractFeature {
     private final int featureId;  // global feature id StudentInfoModel can be used to get the feature name
 
     public AbstractFeature(int featureId) {

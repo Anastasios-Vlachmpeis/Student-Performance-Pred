@@ -1,12 +1,12 @@
 import java.io.File;
 import java.util.*;
-import java.util.Arrays;
 
 /**
- * Reads CurrentGrades.csv, stores it internally, computes statistics
- * on itself via public methods.
- * As of now it is a static class, and meant to serve as an "interface"
- * for accessing student info data fields.
+ * DataModel class for the student info dataset. Implements the following methods
+ * to access feature data of students:
+ *      - getFeature(int StudentId, int featureId)
+ *      - getAllFeatures(int StudentId)
+ *      - getAllStudentIds()
  */
 public class StudentInfoModel {
     final static String pathToCSV = "src/StudentInfo.csv";
@@ -15,13 +15,12 @@ public class StudentInfoModel {
 
     // an unconventional double array that stores all features of every student
     // indexed like this: features[studentIndex][featureIndex]
-    static ArrayList<ArrayList> features = new ArrayList<>(studentCount);
+    private static AbstractFeature[][] features = new AbstractFeature[studentCount][featureCount];
     // links student id to its index in features[][]
     static HashMap<Integer, Integer> studentID2index = new HashMap<>(studentCount);
 
     // just to store the name of the features as well
     static String[] featureNames = new String[featureCount];
-
     // maps feature names and abbreviation of their names onto internal index used by this class
     static HashMap<String, Integer> featureName2Index = new HashMap<>();
 
@@ -66,18 +65,6 @@ public class StudentInfoModel {
             }
             linesDone++;
 
-            // reset feature ranges
-            featureRanges.clear();
-            featureRanges.add(new ArrayList<String>());
-            featureRanges.add(new ArrayList<String>());
-            featureRanges.add(new ArrayList<Double>(Arrays.asList(0.0, 0.0)));
-            featureRanges.add(new ArrayList<Double>(Arrays.asList(0.0, 0.0)));
-            featureRanges.add(new ArrayList<String>());
-
-
-            // if by mistake this method is run twice, this way we avoid redundant/double data
-            features.clear();
-
             // Then, the code processes students line by line and load their various features
             // into the features "double array"
             int studentCounter = 0;
@@ -102,26 +89,33 @@ public class StudentInfoModel {
                 studentId = lineScanner.nextInt();
                 studentID2index.put(studentId, studentCounter);
 
-                // this feature is just a string (ENUM?)
+                // this feature is just a string (category)
                 QC = lineScanner.next();
+                CategoricalFeature QCNew = new CategoricalFeature(0, QC);
+                features[studentCounter][0] = QCNew;
 
-                // this feature is just a string (BOOLEAN?)
+                // this feature is just a string (category)
                 SNC = lineScanner.next();
+                CategoricalFeature SNCNew = new CategoricalFeature(1, SNC);
+                features[studentCounter][1] = SNCNew;
 
                 // this feature is in the form "[number] ns/ms"
                 // we extract only the number
                 String rawFeature = lineScanner.next();
                 ATDR = Double.parseDouble(rawFeature.split(" ")[0]);
+                NumericalFeature ATDRNew = new NumericalFeature(2, ATDR);
+                features[studentCounter][2] = ATDRNew;
 
                 // this feature is just a number
                 PIT = lineScanner.nextDouble();
+                NumericalFeature PITNew = new NumericalFeature(3, PIT);
+                features[studentCounter][3] = PITNew;
 
-                // this feature is just a string (ENUM?)
+                // this feature is just a string (category)
                 // there is a trailing whitespace at the end which should be removed
                 BLT = lineScanner.next().trim();
-
-                // put student's features into the features "double array"
-                features.add(new ArrayList<>(Arrays.asList(QC, SNC, ATDR, PIT, BLT)));
+                CategoricalFeature BLTNew = new CategoricalFeature(3, BLT);
+                features[studentCounter][4] = BLTNew;
 
                 // update feature ranges if necessary
                 // first the ENUM like categories that are stored as string
@@ -155,33 +149,27 @@ public class StudentInfoModel {
         }
     }
 
-    public static Object getFeatureOfStudent(int studentId, int featureId) {
-        return features.get(studentID2index.get(studentId)).get(featureId);
+    public static AbstractFeature getFeature(int studentId, int featureId) {
+        return features[studentID2index.get(studentId)][featureId];
     }
-    public static Object getFeatureOfStudent(int studentId, String featureName) {
+    public static AbstractFeature getFeature(int studentId, String featureName) {
         // do not check if feature name is valid, so misspelling is "caught" as a runtime error:3
         // (which should be fine as long as this code is used only
         // for analysing student data by group 28 in the mini project)
         int studentIndex = studentID2index.get(studentId);
         int featureIndex = featureName2Index.get(featureName);
-        return features.get(studentIndex).get(featureIndex);
+        return features[studentIndex][featureIndex];
     }
-
-    /**
-     * Given a student id and a split condition, this method evaluates if the student
-     * is within the boundary defined in the split condition or not.*/
-    public static boolean evaluateSplitOnStudent(int studentId, FeatureSplit featureSplit) {
-        // property can be String and double depending on type of feature
-        var property = getFeatureOfStudent(studentId, featureSplit.name);
-
-        // splitting criteria depends on the type of the feature
-        boolean isSplitConditionSatisfied;
-        if (featureSplit.isFeatureACategory) {
-            isSplitConditionSatisfied = featureSplit.selectionCategory.equals((String) property);
-        } else {
-            isSplitConditionSatisfied = featureSplit.threshHoldValue > (double) property;
+    public static AbstractFeature[] getAllFeatures(int studentId) {
+        // converting student id into local indexing
+        return features[studentID2index.get(studentId)];
+    }
+    public static int[] getAllStudentIds() {
+        int[] studentIds = new int[studentCount];
+        int i = 0;
+        for (int studentId : studentID2index.keySet()) {
+            studentIds[i++] = studentId;
         }
-
-        return isSplitConditionSatisfied;
+        return studentIds;
     }
 }
