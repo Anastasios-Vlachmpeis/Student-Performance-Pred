@@ -41,6 +41,7 @@ public class GraduateGradesModel {
     static {loadCSV();}
     private static void loadCSV() {
         try {
+            Locale.setDefault(Locale.US);
             // Adapt this when you want to read and display a different file.
             System.out.println("Start reading file: " + pathToCSV);  // Debug
             System.out.println("This will take a while...");        // Debug

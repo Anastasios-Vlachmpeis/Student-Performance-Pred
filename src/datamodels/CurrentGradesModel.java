@@ -1,12 +1,7 @@
 package datamodels;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Scanner;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 /**
  * DataModel class for the current grades' dataset. Currently, it is populated with
@@ -41,6 +36,7 @@ public class CurrentGradesModel {
     private static void loadCSV() {
 
         try {
+            Locale.setDefault(Locale.US);
             System.out.println("Start reading file: " + pathToCSV);  // Debug
             System.out.println("This will take a while...");        // Debug
 

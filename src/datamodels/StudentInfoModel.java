@@ -1,10 +1,7 @@
 package datamodels;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Scanner;
+import java.util.*;
 
 /**
  * DataModel class for the student info dataset. Implements the following methods
@@ -37,6 +34,7 @@ public class StudentInfoModel {
     private static void loadCSV() {
 
         try {
+            Locale.setDefault(Locale.US);
             System.out.println("Start reading file: " + pathToCSV);  // Debug
             System.out.println("This will take a while...");        // Debug
 
