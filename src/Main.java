@@ -1,6 +1,7 @@
 import datamodels.CurrentGradesModel;
 import datamodels.GraduateGradesModel;
 import datamodels.StudentInfoModel;
+import solutions.Phase1Step2PredictionMonteCarlo;
 import solutions.Phase1Step3;
 
 import java.util.Locale;
@@ -73,7 +74,7 @@ public class Main {
         System.out.println("Prediction of number of graduates via Monte Carlo Simulation and resits:");
         int ITERATIONS = 10000;
         int MAX_RESITS = 3;
-        System.out.println("Guess: " + CurrentGradesModel.predictGraduateAmountMonteCarloSimulation(ITERATIONS, MAX_RESITS) + " will graduate.");
+        System.out.println("Guess: " + Phase1Step2PredictionMonteCarlo.predictGraduateAmountMonteCarloSimulation(ITERATIONS, MAX_RESITS) + " will graduate.");
 
 
         /*###########
