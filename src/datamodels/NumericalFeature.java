@@ -18,6 +18,6 @@ public class NumericalFeature extends AbstractFeature {
 
     @Override
     public String toString() {
-        return "datamodels.NumericalFeature(featureId=" + this.getFeatureId() + ", category=" + String.format("%.2f", this.value) + ")";
+        return "NumericalFeature(id=" + this.getFeatureId() + ", value=" + String.format("%.2f", this.value) + ")";
     }
 }

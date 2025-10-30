@@ -25,7 +25,7 @@ public class StudentInfoModel {
     static HashMap<Integer, Integer> studentID2index = new HashMap<>(studentCount);
 
     // just to store the name of the features as well
-    static String[] featureNames = new String[featureCount];
+    public static String[] featureNames = new String[featureCount];
     // maps feature names and abbreviation of their names onto internal index used by this class
     static HashMap<String, Integer> featureName2Index = new HashMap<>();
 

@@ -25,8 +25,8 @@ import java.util.Random;
 */
 public class CurrentGradesModel {
     final static String pathToCSV = "src/datamodels/CurrentGrades.csv";
-    final static int studentCount = 1522 - 1;
-    final static int courseCount = 36;
+    public final static int studentCount = 1522 - 1;
+    public final static int courseCount = 36;
 
 
     // stores the grade table of all students for all courses
@@ -45,8 +45,6 @@ public class CurrentGradesModel {
             System.out.println("This will take a while...");        // Debug
 
             File file=new File(pathToCSV);
-            System.out.println(file.getCanonicalPath());
-            System.out.println(file.getCanonicalFile());
 
             // This code uses two Scanners, one which scans the file line per line
             Scanner fileScanner = new Scanner(file);

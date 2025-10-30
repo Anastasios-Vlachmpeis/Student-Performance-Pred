@@ -16,6 +16,6 @@ public class CategoricalFeature extends AbstractFeature {
 
     @Override
     public String toString() {
-        return "datamodels.CategoricalFeature(featureId=" + this.getFeatureId() + ", category=" + this.category + ")";
+        return "CategoricalFeature(id=" + this.getFeatureId() + ", category=" + this.category + ")";
     }
 }

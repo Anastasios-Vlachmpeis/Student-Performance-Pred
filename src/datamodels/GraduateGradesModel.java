@@ -23,8 +23,8 @@ public class GraduateGradesModel {
      */
 
     final static String pathToCSV = "src/datamodels/GraduateGrades.csv";
-    final static int studentCount = 21243;
-    final static int courseCount = 36;
+    public final static int studentCount = 21243;
+    public final static int courseCount = 36;
 
 
     // Contains name of the courses. courseID is equivalent to index in the array
