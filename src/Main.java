@@ -8,10 +8,6 @@ public class Main {
         // US uses dots.
         Locale.setDefault(Locale.US);
 
-        GraduateGradesModel.loadCSV();
-        CurrentGradesModel.loadCSV();
-        StudentInfoModel.loadCSV();
-
         //---------------//
         // PUT CODE HERE //
         //---------------//

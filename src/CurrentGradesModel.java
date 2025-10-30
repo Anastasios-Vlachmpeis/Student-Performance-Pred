@@ -34,8 +34,9 @@ public class CurrentGradesModel {
     // links student id to its index in grades[][]
     private static HashMap<Integer, Integer> studentID2index = new HashMap<>(studentCount);
 
-
-    public static void loadCSV() {
+    // ensure .csv is loaded before DataModel class is accessed
+    static {loadCSV();}
+    private static void loadCSV() {
 
         try {
             System.out.println("Start reading file: " + pathToCSV);  // Debug
@@ -174,6 +175,10 @@ public class CurrentGradesModel {
         return studentIds;
     }
 
+    //=================================================//
+    // LEFTOVER METHODS FROM PHASE 1                   //
+    // SOON TO BE PLACED INTO THEIR RESPECTIVE CLASSES //
+    //=================================================//
     /** Calculates mean of the grades of a student based on student id. Ignores No Grades.*/
     public static double calcStudentMean(int studentId){
         // convert global student id into local grades[][] index

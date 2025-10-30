@@ -27,7 +27,9 @@ public class StudentInfoModel {
     // stores the ranges of possible values for each feature. internal index is used
     static ArrayList<ArrayList> featureRanges = new ArrayList<>(5);
 
-    public static void loadCSV() {
+    // ensure .csv is loaded before DataModel class is accessed
+    static {loadCSV();}
+    private static void loadCSV() {
 
         try {
             System.out.println("Start reading file: " + pathToCSV);  // Debug
@@ -149,6 +151,9 @@ public class StudentInfoModel {
         }
     }
 
+    //====================//
+    // DATA MODEL METHODS //
+    //====================//
     public static AbstractFeature getFeature(int studentId, int featureId) {
         return features[studentID2index.get(studentId)][featureId];
     }

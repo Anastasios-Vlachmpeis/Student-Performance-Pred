@@ -35,7 +35,9 @@ public class GraduateGradesModel {
     // links student id to its index in grades[][]
     private static HashMap<Integer, Integer> studentID2index = new HashMap<>(studentCount);
 
-    public static void loadCSV() {
+    // ensure .csv is loaded before DataModel class is accessed
+    static {loadCSV();}
+    private static void loadCSV() {
         try {
             // Adapt this when you want to read and display a different file.
             System.out.println("Start reading file: " + pathToCSV);  // Debug
@@ -108,6 +110,10 @@ public class GraduateGradesModel {
 
     }
 
+
+    //====================//
+    // DATA MODEL METHODS //
+    //====================//
     /**
      * Gives the list of the names of all courses.
      * @return array of the course names where index is the course's id.
@@ -144,6 +150,24 @@ public class GraduateGradesModel {
         return courseGrades;
     }
 
+    /**
+     * Gives all students' id that are contained in this DataModel class
+     * @return an array containing all the ids of the students found in this dataset
+     */
+    public static int[] getAllStudentIds() {
+        int[] studentIds = new int[studentCount];
+        int i = 0;
+        for (int studentId : studentID2index.keySet()) {
+            studentIds[i++] = studentId;
+        }
+        return studentIds;
+    }
+
+
+    //=================================================//
+    // LEFTOVER METHODS FROM PHASE 1                   //
+    // SOON TO BE PLACED INTO THEIR RESPECTIVE CLASSES //
+    //=================================================//
     public static double calcStudentMean(int studentId) {
         // Calculates average of grades for a specific student
         double[] studentGrades = grades[studentId];
