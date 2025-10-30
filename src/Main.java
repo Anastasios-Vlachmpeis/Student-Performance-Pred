@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Locale;
 
 /** Entry point of the project. You can access the data models from here.*/
@@ -146,7 +145,7 @@ public class Main {
      * subtracts the weighted variance of the datasets after the split.
      */
     public static FeatureSplit findBestPropertyToGuessGrade(int courseId) {
-        ArrayList<Double> courseGrades = CurrentGradesModel.getAllGradesOfCourse(courseId);
+        ArrayList<Double> courseGrades = CurrentGradesModel.getAllValidGradesCourse(courseId);
 
         // calculate initial variance
         double sum = 0;
