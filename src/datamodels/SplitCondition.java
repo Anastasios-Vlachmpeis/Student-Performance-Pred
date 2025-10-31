@@ -26,7 +26,7 @@ public class SplitCondition {
         return splitFeature.getValue() < studentFeature.getValue();
     }
 
-    public static boolean evaluate(AbstractFeature studentFeature, AbstractFeature splitFeature) {
+    public static boolean evaluate(Feature studentFeature, Feature splitFeature) {
         // we don't know the type of the feature so we try all we know
         if (studentFeature instanceof CategoricalFeature && splitFeature instanceof CategoricalFeature) {
             return evaluate((CategoricalFeature) studentFeature, (CategoricalFeature) splitFeature);

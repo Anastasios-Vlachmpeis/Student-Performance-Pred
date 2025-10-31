@@ -7,10 +7,10 @@ package datamodels;
  * @see SplitCondition
  * @author alicehamori
  */
-public abstract class AbstractFeature {
+public abstract class Feature {
     private final int featureId;  // global feature id datamodels.StudentInfoModel can be used to get the feature name
 
-    public AbstractFeature(int featureId) {
+    public Feature(int featureId) {
         this.featureId = featureId;
     }
 
