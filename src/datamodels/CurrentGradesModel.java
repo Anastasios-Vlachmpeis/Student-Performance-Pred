@@ -1,32 +1,42 @@
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Scanner;
-import java.util.List;
-import java.util.Random;
+package datamodels;
 
-/** Reads CurrentGrades.csv, stores it internally, computes statistics
-    on itself via public methods
-    As of now it is a static class, and meant to be run on its own.
+import java.io.File;
+import java.util.*;
+
+/**
+ * DataModel class for the current grades' dataset. Currently, it is populated with
+ * methods that perform analysis on its data,created in early phases of the development.
+ * These methods will go to their designated classes, but till then beside them this class
+ * implements the following methods that makes it a DataModel class:
+ *      - getGrade(int StudentId, int courseId)
+ *      - getAllGradesStudent(int StudentId)
+ *      - getAllGradesCourse(int courseId)
+ *      - getAllValidGradesStudent(int studentId)
+ *      - getAllValidGradesCourse(int courseId)
+ *      - getAllStudentIds()
+ * Also, it must have a hashmaps that maps the global student ids to the local indexing. (not yet for course Ids)
+ * All variables that are not final are private!ic class, and meant to be run on its own.
+ * @implNote NGs (no grades) are encoded as -1. getAllValidGrades methods only return grades that are not NGs
 */
 public class CurrentGradesModel {
-    final static String pathToCSV = "src/CurrentGrades.csv";
-    final static int studentCount = 1522 - 1;
-    final static int courseCount = 36;
+    final static String pathToCSV = "src/datamodels/CurrentGrades.csv";
+    public final static int studentCount = 1522 - 1;
+    public final static int courseCount = 36;
 
 
     // stores the grade table of all students for all courses
     // NG is encoded as -1
-    static double[][] grades = new double[studentCount][courseCount];
-    static String[] courses = new String[courseCount];
+    private static double[][] grades = new double[studentCount][courseCount];
+    public static String[] courses = new String[courseCount];
     // links student id to its index in grades[][]
-    static HashMap<Integer, Integer> studentID2index = new HashMap<>(studentCount);
+    private static HashMap<Integer, Integer> studentID2index = new HashMap<>(studentCount);
 
-
-    public static void loadCSV() {
+    // ensure .csv is loaded before DataModel class is accessed
+    static {loadCSV();}
+    private static void loadCSV() {
 
         try {
+            Locale.setDefault(Locale.US);
             System.out.println("Start reading file: " + pathToCSV);  // Debug
             System.out.println("This will take a while...");        // Debug
 
@@ -101,8 +111,74 @@ public class CurrentGradesModel {
         }
     }
 
+    //====================//
+    // DATA MODEL METHODS //
+    //====================//
+    public static double getGrade(int studentId, int courseId) {
+        return grades[studentID2index.get(studentId)][courseId];
+    }
+    public static double[] getAllGradesStudent(int studentId) {
+        double[] studentGrades = new double[courseCount];
+        // has to convert global student id into local representation
+        int studentIndex = studentID2index.get(studentId);
+        for (int i = 0; i < courseCount; i++) {
+            studentGrades[i] = grades[studentIndex][i];
+        }
+        return studentGrades;
+    }
+    public static double[] getAllGradesCourse(int courseId) {
+        double[] courseGrades = new double[studentCount];
+        // has to convert global student id into local representation
+        int courseIndex = courseId; // course id and course index is the same
+        for (int i = 0; i < courseCount; i++) {
+            courseGrades[i] = grades[i][courseIndex];
+        }
+        return courseGrades;
+    }
+    public static ArrayList<Double> getAllValidGradesStudent(int studentId) {
+        ArrayList<Double> courseGrades = new ArrayList<>();
+        // first convert global student id into local student index
+        int studentIndex = studentID2index.get(studentId);
+        for (int i = 0; i < courseCount; i++) {
+            // skip no grades
+            if (grades[studentId][i] == -1) {continue;}
+            courseGrades.add(grades[studentIndex][i]);
+        }
+        return courseGrades;
+    }
+    public static ArrayList<Double> getAllValidGradesCourse(int courseId) {
+        ArrayList<Double> courseGrades = new ArrayList<>();
+        for (int i = 0; i < studentCount; i++) {
+            // skip no grades
+            if (grades[i][courseId] == -1) {continue;}
+            courseGrades.add(grades[i][courseId]);
+        }
+        return courseGrades;
+    }
+    public static int[] getAllStudentIds() {
+        int[] studentIds = new int[studentCount];
+        int i = 0;
+        for (int studentId : studentID2index.keySet()) {
+            studentIds[i++] = studentId;
+        };
+        return studentIds;
+    }
+    public static ArrayList<Integer> getAllStudentIdsOfCourseWithGrade(int courseId) {
+        ArrayList<Integer> studentIds = new ArrayList<>();
+        for (int studentId : studentID2index.keySet()){
+            // ignore students with NoGrade
+            if (grades[studentID2index.get(studentId)][courseId] == -1) {continue;}
+            studentIds.add(studentId);
+        }
+        return studentIds;
+    }
+
+    //=================================================//
+    // LEFTOVER METHODS FROM PHASE 1                   //
+    // SOON TO BE PLACED INTO THEIR RESPECTIVE CLASSES //
+    //=================================================//
     /** Calculates mean of the grades of a student based on student id. Ignores No Grades.*/
-    public static double getStudentMean(int studentId){
+    public static double calcStudentMean(int studentId){
         // convert global student id into local grades[][] index
         int studentIndex = studentID2index.get(studentId);
 
@@ -123,7 +199,7 @@ public class CurrentGradesModel {
     }
 
     /** Calculates median of the grades of a student based on student id. Ignores No Grades.*/
-    public static double getStudentMedian(int studentId){
+    public static double calcStudentMedian(int studentId){
         // convert global student id into local grades[][] index
         int studentIndex = studentID2index.get(studentId);
 
@@ -156,7 +232,7 @@ public class CurrentGradesModel {
     }
 
     /** Calculates mode of the grades of a student based on student id. Ignores No Grades.*/
-    public static double getStudentMode(int studentId){
+    public static double calcStudentMode(int studentId){
         // convert global student id into local grades[][] index
         int studentIndex = studentID2index.get(studentId);
 
@@ -189,7 +265,7 @@ public class CurrentGradesModel {
 
 
     /** Calculates mean of the grades of a course based on course id. Ignores No Grades.*/
-    public static double getCourseMean(int courseId){
+    public static double calcCourseMean(int courseId){
         double grade, sum;
         int gradecounter;
 
@@ -212,7 +288,7 @@ public class CurrentGradesModel {
     }
 
     /** Calculates median of the grades of a course based on course id. Ignores No Grades.*/
-    public static double getCourseMedian(int courseId){
+    public static double calcCourseMedian(int courseId){
         // collect non no grade grades of the course
         ArrayList<Double> courseGrades = new ArrayList<>();
         for (int i = 0; i < grades.length; i++) {   // grades.length should be the same as studentCount
@@ -244,7 +320,7 @@ public class CurrentGradesModel {
     }
 
     /** Calculates mode of the grades of a course based on course id. Ignores No Grades.*/
-    public static double getCourseMode(int courseId){
+    public static double calcCourseMode(int courseId){
         // stores frequency (how many times it occurred) of each grade.
         // grade N has the index of N in the array
         int[] gradeFrequency = new int[11]; // allows for 0 grade
@@ -290,41 +366,6 @@ public class CurrentGradesModel {
 
     }
 
-
-
-
-    public static ArrayList<Double> getAllGradesOfCourse(int courseId) {
-        ArrayList<Double> courseGrades = new ArrayList<>();
-        for (int i = 0; i < studentCount; i++) {
-            // skip no grades
-            if (grades[i][courseId] == -1) {continue;}
-            courseGrades.add(grades[i][courseId]);
-        }
-        return courseGrades;
-    }
-
-    public static int[] getAllStudentIdsOfCourse(int courseId) {
-        int[] studentIds = new int[studentCount];
-        int i = 0;
-        for (int studentId : studentID2index.keySet()){
-            studentIds[i] = studentId;
-            i++;
-        }
-        return studentIds;
-    }
-    public static ArrayList<Integer> getAllStudentIdsOfCourseWithGrade(int courseId) {
-        ArrayList<Integer> studentIds = new ArrayList<>();
-        for (int studentId : studentID2index.keySet()){
-            // ignore students with NoGrade
-            if (grades[studentID2index.get(studentId)][courseId] == -1) {continue;}
-            studentIds.add(studentId);
-        }
-        return studentIds;
-    }
-    public static double getGrade(int studentId, int courseId) {
-        return grades[studentID2index.get(studentId)][courseId];
-    }
-
     /**
      * Q1 : Which courses are the most difficult/easy?
      * Prints the 5 hardest and 5 easiest courses based on mean grades.
@@ -340,8 +381,8 @@ public class CurrentGradesModel {
 
         // Compute mean, median, and NG count for all courses
         for (int c = 0; c < C; c++) {
-            means[c] = getCourseMean(c);
-            medians[c] = getCourseMedian(c);
+            means[c] = calcCourseMean(c);
+            medians[c] = calcCourseMedian(c);
 
             int ngCount = 0;
             for (int s = 0; s < studentCount; s++) {
@@ -475,7 +516,7 @@ public class CurrentGradesModel {
         return pairList.toArray(new CoursePairCorrelation[0]);
     }
 
-    static void printTopKCorrelatedCoursePairsIgnoreNG(int k) {
+    public static void printTopKCorrelatedCoursePairsIgnoreNG(int k) {
         CoursePairCorrelation[] pairs = computeAllCourseCorrelationsIgnoreNG();
 
         // Keep only r > 0 (positive correlations)
@@ -516,7 +557,7 @@ public class CurrentGradesModel {
      * course mean/median and NG handling). We only consider students who have valid grades
      * for all 5 hardest and 5 easiest courses.
      */
-    static void analyzeStudentPerformanceHardVsEasyNG() {
+    public static void analyzeStudentPerformanceHardVsEasyNG() {
 
         final int C = courseCount;  // total number of courses
         final int S = studentCount; // total number of students
@@ -527,8 +568,8 @@ public class CurrentGradesModel {
         int[] ngCounts = new int[C];
 
         for (int c = 0; c < C; c++) {
-            means[c] = getCourseMean(c);
-            medians[c] = getCourseMedian(c);
+            means[c] = calcCourseMean(c);
+            medians[c] = calcCourseMedian(c);
             for (int s = 0; s < S; s++) {
                 if (grades[s][c] == -1) ngCounts[c]++;
             }
@@ -619,8 +660,8 @@ public class CurrentGradesModel {
             if (diffCompare != 0) return diffCompare;
 
             // secondary tiebreaker: overall mean grade (descending)
-            double meanA = getStudentMean(a.studentId);
-            double meanB = getStudentMean(b.studentId);
+            double meanA = calcStudentMean(a.studentId);
+            double meanB = calcStudentMean(b.studentId);
             return Double.compare(meanB, meanA);
         });
 
@@ -633,7 +674,7 @@ public class CurrentGradesModel {
             StudentPerformanceNG sp = betterStudents.get(i);
             System.out.println((i + 1) + ") Student " + sp.studentId +
                     " (Δ = " + String.format("%.2f", sp.diff) +
-                    ", Mean = " + String.format("%.2f", getStudentMean(sp.studentId)) + ")");
+                    ", Mean = " + String.format("%.2f", calcStudentMean(sp.studentId)) + ")");
         }
 
 
@@ -670,7 +711,7 @@ public class CurrentGradesModel {
         double sumMean = 0;     // sum of the means
         int counterMean = 0;    // number of means summed
         for (int i = 0; i < courseCount; i++){
-            double mean = getCourseMean(i);
+            double mean = calcCourseMean(i);
             if (mean == -1) {continue;}
             sumMean += mean;
             counterMean += 1;
@@ -764,7 +805,7 @@ public class CurrentGradesModel {
         //This value is used to determine passing rate of the courses without any data.
         double correlationValue = 0;
         for (int i = 0; i < grades[0].length; i++) {
-            correlationValue = correlationValue + getPassingRate(i)/GraduateGradesModel.getCourseMean(i);
+            correlationValue = correlationValue + getPassingRate(i)/ GraduateGradesModel.calcCourseMean(i);
         }
         return correlationValue/36;
     }
@@ -776,114 +817,12 @@ public class CurrentGradesModel {
         //Calculates mean passing rate of the courses based on the correlation value and course mean data from graduate grades.
         double sum = 0;
         for (int i = 0; i < grades[0].length; i++) {
-            sum = sum + passingCorrelationValue()*GraduateGradesModel.getCourseMean(i);
+            sum = sum + passingCorrelationValue()* GraduateGradesModel.calcCourseMean(i);
         }
         return sum / grades[0].length;
     }
 
 
-    /**
-     * Answering the final question of step 3: HOW MANY STUDENTS GRADUATE THIS YEAR?
-     *      Graduation criteria (from graduate grades): have a passing grade from all courses
-     * This approach assumes that every current student can graduate this year, and does not consider
-     * whether they are in year 1 or year 2 (maybe there are no years system at the alien school even)
-     * Run monte carlo simulations for all NGs to decide if they are a failing grade or not, and then
-     * count the students eligible for graduation. Repeat, and average out the results.
-     * */
-    public static double predictGraduateAmountMonteCarloSimulation(int numberOfIterations, int maxResitsAllowed) {
-
-        // so simulate if an NG in a course will fail or pass, we need to have passing rates first
-        double[] passingRates = new double[courseCount];
-        // course that have less than 30 actual grades (no NGs) are not significant enough
-        // to extrapolate their passing rate into the NGs of their course. These will inherit
-        // the mean of the passing rates.
-        ArrayList<Integer> nonSignificantCourses = new ArrayList<>();
-        for (int courseId = 0; courseId < courseCount; courseId++) {
-            // this already filters out the NGs.
-            ArrayList<Double> courseGrades = getAllGradesOfCourse(courseId);
-            int countPassing = 0;
-            for (double grade : courseGrades) {
-                if (grade >= 6) {
-                    countPassing++;
-                }
-            }
-            // store passing rate if it is significant
-            if (countPassing >= 30) {
-                passingRates[courseId] = countPassing / (double) courseGrades.size();
-            } else {
-                passingRates[courseId] = -1;
-            }
-        }
-        // calculate the mean of the passing rates (ignoring insignificant passing rates marked with -1)
-        double sumPassingRates = 0;
-        int countPassingRates = 0;
-        for (int i = 0; i < passingRates.length; i++) {
-            if (passingRates[i] == -1) {continue;}
-            sumPassingRates += passingRates[i];
-            countPassingRates++;
-        }
-        double meanPassingRate = sumPassingRates / countPassingRates;
-        // assing mean passing rate to courses with insignificant passing rates
-        for (int i = 0; i < passingRates.length; i++) {
-            if (passingRates[i] == -1) {
-                passingRates[i] = meanPassingRate;
-            }
-        }
-        // preparations for Monte Carlo Simulation are done
-
-        // MONTE CARLO SIMULATION PART:
-        // keep track the sum of all eligible graduates across all simulations
-        // so at the end we can take its average. (saves memory not having to keep
-        // the individual amounts in an array just to take their average later)
-        long sumOfGraduates = 0;
-        Random random = new Random();
-        for (int iteration = 1; iteration <= numberOfIterations; iteration++) {
-            int numberOfGraduates = 0;
-            int resitsRemaining = maxResitsAllowed;
-            // Go through each student's grade
-            for (int studentIndex = 0; studentIndex < studentCount; studentIndex++) {
-                // count failing grades of the student
-                int countFailingGrades = 0;
-                for (int courseIndex = 0; courseIndex < courseCount; courseIndex++) {
-                    double grade = grades[studentIndex][courseIndex];
-                    boolean isFail = false;
-                    // student has a grade but it is failing
-                    if (grade != -1 && grade < 6) {
-                        isFail = true;
-                    }
-                    // student has NG make a simulation to decide it passes or not
-                    else {
-                        double coursePassingRate = passingRates[courseIndex];
-                        // black magic to make a random decision between 2 options but with differing chances
-                        // think of it like this:
-                        //  - random.NextDouble < coursePassingRate => student passed
-                        //  - but we are looking for failing grades. so we should invert the condition
-                        //  - this is how we get random.nextDouble >= coursePassingRate
-                        if (random.nextDouble() >= coursePassingRate) {
-                            isFail = true;
-                        }
-                    }
-                    // students can retry failed exams's once if they can take a resit
-                    if (resitsRemaining > 0 && isFail) {
-                        isFail = random.nextDouble() >= passingRates[courseIndex];
-                    }
-
-                    // increment failed grade counter
-                    countFailingGrades += isFail ? 1 : 0;
-                }
-                // if the student has no failing grades then they graduate
-                if (countFailingGrades > 0) {
-                    numberOfGraduates++;
-                }
-            }
-
-            // add this iteration's number of graduates to the big sum for calculating the mean at the end
-            sumOfGraduates += numberOfGraduates;
-        }
-
-        // Finally, take the mean of all iterations as promised
-        return sumOfGraduates / (double)numberOfIterations;
-    }
 }
 
 
