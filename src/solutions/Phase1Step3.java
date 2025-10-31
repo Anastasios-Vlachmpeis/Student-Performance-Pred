@@ -1,6 +1,6 @@
 package solutions;
 
-import datamodels.AbstractFeature;
+import datamodels.Feature;
 import datamodels.CategoricalFeature;
 import datamodels.CurrentGradesModel;
 import datamodels.NumericalFeature;
@@ -30,7 +30,7 @@ public class Phase1Step3 {
      * If student's property IS the boundary value (or above in case of doubles) then it
      * is in the subgroup that satisfies the splitting criteria.
      * */
-    public static double[] meanGradesOfTabulation(int courseId, AbstractFeature splitFeature) {
+    public static double[] meanGradesOfTabulation(int courseId, Feature splitFeature) {
         ArrayList<ArrayList<Double>> tabulation = tabulateCourseByStudentFeature(courseId, splitFeature);
         // the mean grade of the two groups after the tabulations
         double[] means = new double[2];
@@ -47,7 +47,7 @@ public class Phase1Step3 {
         return means;
     }
 
-    public static ArrayList<ArrayList<Double>> tabulateCourseByStudentFeature(int courseId, AbstractFeature splitFeature) {
+    public static ArrayList<ArrayList<Double>> tabulateCourseByStudentFeature(int courseId, Feature splitFeature) {
 
         // all students' ids that have an actual grade (no NG) in the given course
         ArrayList<Integer> studentIds = CurrentGradesModel.getAllStudentIdsOfCourseWithGrade(courseId);
@@ -57,7 +57,7 @@ public class Phase1Step3 {
         for (int studentId: studentIds) {
             double grade = CurrentGradesModel.getGrade(studentId, courseId);
 
-            AbstractFeature studentFeature = StudentInfoModel.getFeature(studentId, splitFeature.getFeatureId());
+            Feature studentFeature = StudentInfoModel.getFeature(studentId, splitFeature.getFeatureId());
             // decides if the split condition is satisfied (can handle numeric and category type features as well)
             if (SplitCondition.evaluate(studentFeature, splitFeature)) {
                 subSetSatisfy.add(grade);
@@ -80,7 +80,7 @@ public class Phase1Step3 {
      * Variance reduction is very simple to information gain, but it calculates variance, and then
      * subtracts the weighted variance of the datasets after the split.
      */
-    public static AbstractFeature findBestPropertyToGuessGrade(int courseId) {
+    public static Feature findBestPropertyToGuessGrade(int courseId) {
         ArrayList<Double> courseGrades = CurrentGradesModel.getAllValidGradesCourse(courseId);
 
         // calculate initial variance
@@ -94,7 +94,7 @@ public class Phase1Step3 {
         // iterate over all possible splitting options of all features //
         //-------------------------------------------------------------//
         double bestReducedVariance = -1;    // if all splits give a zero reduction then the first one will be the "best"
-        AbstractFeature bestSplit = null;
+        Feature bestSplit = null;
 
         // first the categorical features (they have index 0, 1, 4)
         int[] categoricalFeatureIds = {0, 1, 4};
@@ -211,7 +211,7 @@ public class Phase1Step3 {
             int courseId = futureCourseIds.get(i);
             predictions[0][i] = courseId;
 
-            AbstractFeature bestSplit = findBestPropertyToGuessGrade(courseId);
+            Feature bestSplit = findBestPropertyToGuessGrade(courseId);
             // this is Y and Z in the rule if X then grade Y, else grade Z (X is the bestSplit)
             double[] tabulatedMeans = meanGradesOfTabulation(courseId, bestSplit);
             // judge the student based on its property
@@ -241,7 +241,7 @@ public class Phase1Step3 {
         for (int courseId = 0; courseId < CurrentGradesModel.courseCount; courseId++) {
             // start with naming the course
             // this is the best feature to split
-            AbstractFeature bestSplit = findBestPropertyToGuessGrade(courseId);
+            Feature bestSplit = findBestPropertyToGuessGrade(courseId);
             // and this is the mean grade below and above the split that will be incorporated into the rule (Y and Z)
             double[] tabulatedMeans = meanGradesOfTabulation(courseId, bestSplit);
             /*

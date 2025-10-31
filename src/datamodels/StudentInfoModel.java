@@ -17,7 +17,7 @@ public class StudentInfoModel {
 
     // an unconventional double array that stores all features of every student
     // indexed like this: features[studentIndex][featureIndex]
-    private static AbstractFeature[][] features = new AbstractFeature[studentCount][featureCount];
+    private static Feature[][] features = new Feature[studentCount][featureCount];
     // links student id to its index in features[][]
     static HashMap<Integer, Integer> studentID2index = new HashMap<>(studentCount);
 
@@ -166,10 +166,10 @@ public class StudentInfoModel {
     //====================//
     // DATA MODEL METHODS //
     //====================//
-    public static AbstractFeature getFeature(int studentId, int featureId) {
+    public static Feature getFeature(int studentId, int featureId) {
         return features[studentID2index.get(studentId)][featureId];
     }
-    public static AbstractFeature getFeature(int studentId, String featureName) {
+    public static Feature getFeature(int studentId, String featureName) {
         // do not check if feature name is valid, so misspelling is "caught" as a runtime error:3
         // (which should be fine as long as this code is used only
         // for analysing student data by group 28 in the mini project)
@@ -177,7 +177,7 @@ public class StudentInfoModel {
         int featureIndex = featureName2Index.get(featureName);
         return features[studentIndex][featureIndex];
     }
-    public static AbstractFeature[] getAllFeatures(int studentId) {
+    public static Feature[] getAllFeatures(int studentId) {
         // converting student id into local indexing
         return features[studentID2index.get(studentId)];
     }
