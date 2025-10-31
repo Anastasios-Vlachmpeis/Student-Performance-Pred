@@ -12,7 +12,7 @@ import java.util.Arrays;
 
 
 /**
- *
+ * This class holds all methods to answer questions in step 3 and methods required by the project guide
  */
 public class Phase1Step3 {
 
