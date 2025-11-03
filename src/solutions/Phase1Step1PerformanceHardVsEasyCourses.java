@@ -34,7 +34,7 @@ public class Phase1Step1PerformanceHardVsEasyCourses {
          */
         double[] means = new double[C];
         for (int c = 0; c < C; c++) {
-            means[c] = GraduateGradesModel.calcCourseMean(c);  //compute course mean
+            means[c] = Phase1Step1CourseMean.calcCourseMean(c);  //compute course mean
         }
 
 
@@ -127,8 +127,8 @@ public class Phase1Step1PerformanceHardVsEasyCourses {
 
 
             // secondary tiebreaker: overall mean grade (descending)
-            double meanA = GraduateGradesModel.calcStudentMean(a.studentId);
-            double meanB = GraduateGradesModel.calcStudentMean(b.studentId);
+            double meanA = Phase1Step1StudentMean.calcStudentMean(a.studentId);
+            double meanB = Phase1Step1StudentMean.calcStudentMean(b.studentId);
             return Double.compare(meanB, meanA);
         });
 

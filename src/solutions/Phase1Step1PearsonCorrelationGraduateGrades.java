@@ -79,7 +79,7 @@ public class Phase1Step1PearsonCorrelationGraduateGrades {
 
         //Store per-course stats for each course
         for (int c = 0; c < C; c++) {
-            means[c] = GraduateGradesModel.calcCourseMean(c);
+            means[c] = Phase1Step1CourseMean.calcCourseMean(c);
             stds[c]  = courseStd(c, means[c]);
         }
 

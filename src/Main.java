@@ -23,7 +23,7 @@ public class Main {
           ###########*/
         // Question 1
         System.out.println("Answering Step 1 - Question 1");
-        GraduateGradesModel.printBestAndWorstCourse();
+        Phase1Step1HardestEasiestCourses.printBestAndWorstCourse();
 
         // Question 2
         System.out.println("Answering Step 1- Question 2");
@@ -64,7 +64,7 @@ public class Main {
         Phase1Step2PearsonCorrelationGraduateGrades.printTopKCorrelatedCoursePairsIgnoreNG(TOP_K);
         // Q4 (extra): Adjusted Q4 for current grades
         System.out.println("Answering Step 2 - Question 4");
-        CurrentGradesModel.analyzeStudentPerformanceHardVsEasyNG();
+        Phase1Step2PerformanceHardVsEasyCourses.analyzeStudentPerformanceHardVsEasyNG();
 
 
         // QPrediction: Predicting number of graduates
