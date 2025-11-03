@@ -1,8 +1,7 @@
 import datamodels.CurrentGradesModel;
 import datamodels.GraduateGradesModel;
 import datamodels.StudentInfoModel;
-import solutions.Phase1Step2PredictionMonteCarlo;
-import solutions.Phase1Step3;
+import solutions.*;
 
 import java.util.Locale;
 
@@ -28,18 +27,18 @@ public class Main {
 
         // Question 2
         System.out.println("Answering Step 1- Question 2");
-        GraduateGradesModel.printCumLaudeStudents();
+        Phase1Step1CumLaudeStudents.printCumLaudeStudents();
 
         // Q3: Are there courses that seem similar or related?
         //     Find top 10 most similar course pairs.
         System.out.println("Answering Step 1 - Question 3");
         int TOP_K = 10; // Take the top 10 course pairs with the highest correlation
-        GraduateGradesModel.printTopKCorrelatedCoursePairs(TOP_K);
+        Phase1Step1PearsonCorrelationGraduateGrades.printTopKCorrelatedCoursePairs(TOP_K);
 
          // Q4: Which students performed significantly better in the difficult courses, compared to the easy ones?
          //     Find the top 10 best performing ones.
         System.out.println("Answering Step 1 - Question 4");
-        GraduateGradesModel.analyzeStudentPerformanceHardVsEasy();
+        Phase1Step1PerformanceHardVsEasyCourses.analyzeStudentPerformanceHardVsEasy();
 
          /*###########
           # STEP 2 #
@@ -62,7 +61,7 @@ public class Main {
 
         // Q3 (extra): Adjusted Q3 from graduate grade for current grades!
         System.out.println("Answering Step 2 - Question 3");
-        CurrentGradesModel.printTopKCorrelatedCoursePairsIgnoreNG(TOP_K);
+        Phase1Step2PearsonCorrelationGraduateGrades.printTopKCorrelatedCoursePairsIgnoreNG(TOP_K);
         // Q4 (extra): Adjusted Q4 for current grades
         System.out.println("Answering Step 2 - Question 4");
         CurrentGradesModel.analyzeStudentPerformanceHardVsEasyNG();
