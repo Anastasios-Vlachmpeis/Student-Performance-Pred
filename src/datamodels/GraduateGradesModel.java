@@ -11,6 +11,8 @@ import java.util.*;
  *      - getGrade(int StudentId, int courseId)
  *      - getAllGradesStudent(int StudentId)
  *      - getAllGradesCourse(int courseId)
+ *      - getAllStudentIds()
+ *      - getCourseName(int courseId)
  * Also, it must have a hashmaps that maps the global student ids to the local indexing. (not yet for course Ids)
  * All variables that are not final are private!
  */
@@ -164,6 +166,15 @@ public class GraduateGradesModel {
             studentIds[i++] = studentId;
         }
         return studentIds;
+    }
+
+    /**
+     * Gives the name of the course assigned to an id.
+     * @param courseId valid course id (0-36)
+     * @return name of the course
+     */
+    public static String getCourseName(int courseId) {
+        return courses[courseId];
     }
 
 
