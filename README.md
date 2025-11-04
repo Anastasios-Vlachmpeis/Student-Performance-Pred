@@ -58,8 +58,9 @@ It is used in two different ways:
 
 When we are tyring to find a good splitting criteria it is useful to know the *range* of the feature. For this reason
 we have:
-- `NumericalFeature.getRange()` that returns the lowest and highest value a feature with that ID can take. (`double[2]`)
-- `CategoricalFeature.getRange(featureId)` which returns an ArrayList of strings of all the categories this feature can take. (`ArrayList<String>`)
+- `NumericalFeature.getRangeMax()` that returns the highest value a feature with that ID can take.
+- `NumericalFeature.getRangeMin()` that returns the lowest value a feature with that ID can take.
+- `CategoricalFeature.getRange(featureId)` which returns an array of strings of all the categories this feature can take.
 
 Using these you can try out all possible splitting criteria.
 
