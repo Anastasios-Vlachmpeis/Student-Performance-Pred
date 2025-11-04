@@ -14,6 +14,7 @@ This class exposes the following three methods.
  - `getAllGradesCourse(int courseId)` returns an array of all grades given in a course with a valid course ID.
  - `getCourseName(int courseId)` returns the name of the course associated with a course ID.
  - `getAllStudentIds()` returns an array of all the ids of the students stored in this data model class
+ - `getCourses()` returns the array of the course names
 
 **Everything else is meant to be a private member of the class. You should access everything via these methods!**
 **Do not make class variables public!**
