@@ -11,6 +11,8 @@ import java.util.*;
  *      - getGrade(int StudentId, int courseId)
  *      - getAllGradesStudent(int StudentId)
  *      - getAllGradesCourse(int courseId)
+ *      - getAllStudentIds()
+ *      - getCourseName(int courseId)
  * Also, it must have a hashmaps that maps the global student ids to the local indexing. (not yet for course Ids)
  * All variables that are not final are private!
  */
@@ -28,18 +30,18 @@ public class GraduateGradesModel {
 
 
     // Contains name of the courses. courseID is equivalent to index in the array
-    public static String[] courses = new String[courseCount];
+    private static String[] courses = new String[courseCount];
     // Internal representation of student's grades as a table (2D array)
     // First index corresponds to studentID
     // Second index correspond to the courseID
     // Their combination tells a given student's grade at a given course
-    public static double[][] grades = new double[studentCount][courseCount];
+    private static double[][] grades = new double[studentCount][courseCount];
     // links student id to its index in grades[][]
     private static HashMap<Integer, Integer> studentID2index = new HashMap<>(studentCount);
 
     // ensure .csv is loaded before DataModel class is accessed
     static {loadCSV();}
-    public static void loadCSV() {
+    private static void loadCSV() {
         try {
             Locale.setDefault(Locale.US);
             // Adapt this when you want to read and display a different file.
@@ -164,6 +166,15 @@ public class GraduateGradesModel {
             studentIds[i++] = studentId;
         }
         return studentIds;
+    }
+
+    /**
+     * Gives the name of the course assigned to an id.
+     * @param courseId valid course id (0-36)
+     * @return name of the course
+     */
+    public static String getCourseName(int courseId) {
+        return courses[courseId];
     }
 }
 
