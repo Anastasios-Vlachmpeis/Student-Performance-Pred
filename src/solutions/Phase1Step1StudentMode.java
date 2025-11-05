@@ -12,7 +12,7 @@ public class Phase1Step1StudentMode {
 
     public static double calcStudentMode(int studentId) {
         // Calculates the most frequent for a specific student
-        double[] studentGrades = GraduateGradesModel.grades[studentId];
+        double[] studentGrades = GraduateGradesModel.getAllGradesStudent(studentId);
         double mode = studentGrades[0];
         int maxCount = 0;
 

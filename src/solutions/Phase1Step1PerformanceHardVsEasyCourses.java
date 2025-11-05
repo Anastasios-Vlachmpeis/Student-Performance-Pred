@@ -24,9 +24,10 @@ public class Phase1Step1PerformanceHardVsEasyCourses {
      */
     public static void analyzeStudentPerformanceHardVsEasy() {
 
-
-        final int C = GraduateGradesModel.courses.length; //total number of courses
-        final int S = GraduateGradesModel.grades.length; //total number of students
+        String[] courses = GraduateGradesModel.getCourses();
+        int[] studentIds = GraduateGradesModel.getAllStudentIds();
+        final int C = courses.length; //total number of courses
+        final int S = studentIds.length; //total number of students
 
 
         /*
@@ -67,7 +68,7 @@ public class Phase1Step1PerformanceHardVsEasyCourses {
         // Print hardest courses
         System.out.println("\nHardest 5 courses :");
         for (int i = 0; i < 5; i++) {
-            System.out.println((i + 1) + ") " + GraduateGradesModel.courses[hardest[i]] +
+            System.out.println((i + 1) + ") " + GraduateGradesModel.getCourseName(hardest[i]) +
                     " (mean = " + courseMeans[i].mean + ")");
         }
 
@@ -75,7 +76,7 @@ public class Phase1Step1PerformanceHardVsEasyCourses {
         // Print easiest courses
         System.out.println("\nEasiest 5 courses :");
         for (int i = 0; i < 5; i++) {
-            System.out.println((i + 1) + ") " + GraduateGradesModel.courses[easiest[i]] +
+            System.out.println((i + 1) + ") " + GraduateGradesModel.getCourseName(easiest[i]) +
                     " (mean = " + courseMeans[C - 1 - i].mean + ")");
         }
 
@@ -87,14 +88,15 @@ public class Phase1Step1PerformanceHardVsEasyCourses {
 
 
         for (int s = 0; s < S; s++) {
+            int studentId = studentIds[s];
             double hardSum = 0.0; //sum of differences - hard courses
             double easySum = 0.0; //sum of differences - easy courses
 
 
             // Loop through selected courses
             for (int i = 0; i < 5; i++) {
-                double gradeHard = GraduateGradesModel.grades[s][hardest[i]]; //student grade - hard courses
-                double gradeEasy = GraduateGradesModel.grades[s][easiest[i]]; //student grade - easy courses
+                double gradeHard = GraduateGradesModel.getGrade(studentId, hardest[i]); //student grade - hard courses
+                double gradeEasy = GraduateGradesModel.getGrade(studentId, easiest[i]); //student grade - easy courses
 
 
                 hardSum += (gradeHard - means[hardest[i]]); //diff from mean - hard courses
@@ -107,7 +109,7 @@ public class Phase1Step1PerformanceHardVsEasyCourses {
             double diff = hardAvg - easyAvg; //compare averages
 
 
-            studentResults[s] = new StudentPerformance(s, diff); // store Δ for each student
+            studentResults[s] = new StudentPerformance(studentId, diff); // store Δ for each student
         }
 
 

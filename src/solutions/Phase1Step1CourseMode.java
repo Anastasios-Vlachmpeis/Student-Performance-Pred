@@ -17,8 +17,9 @@ public class Phase1Step1CourseMode {
         // index 0 is 6.0, index 1 is 7.0, etc.
         // So we need to subtract 6 from the grade to get its corresponding index in the
         int[] gradeFrequencies = new int[5];
-        for (int studentId = 0; studentId < GraduateGradesModel.grades.length; studentId++) {
-            gradeFrequencies[(int)GraduateGradesModel.grades[studentId][courseId] - 6] += 1;
+        double[] courseGrades = GraduateGradesModel.getAllGradesCourse(courseId);
+        for (int i = 0; i < courseGrades.length; i++) {
+            gradeFrequencies[(int)courseGrades[i] - 6] += 1;
         }
 
         // Searches highest frequency

@@ -18,7 +18,8 @@ public class Phase1Step1HardestEasiestCourses {
         int worstCourseId = -1;
 
         //Go through the means for every course
-        for (int i = 0; i < GraduateGradesModel.courses.length; i++) {
+        String[] courses = GraduateGradesModel.getCourses();
+        for (int i = 0; i < courses.length; i++) {
             double mean = Phase1Step1CourseMean.calcCourseMean(i);
 
             //Detect and update the most difficult and easiest courses on every step of the loop
@@ -34,7 +35,7 @@ public class Phase1Step1HardestEasiestCourses {
 
         //Print the most difficult and the easiest course with their means
         System.out.println("\nMost difficult and easiest courses:");
-        System.out.println("Most difficult course: " + GraduateGradesModel.courses[bestCourseId] + " (mean grade = " + bestMean + ")");
-        System.out.println("Easiest course: " + GraduateGradesModel.courses[worstCourseId] + " (mean grade = " + worstMean + ")");
+        System.out.println("Most difficult course: " + GraduateGradesModel.getCourseName(bestCourseId) + " (mean grade = " + bestMean + ")");
+        System.out.println("Easiest course: " + GraduateGradesModel.getCourseName(worstCourseId) + " (mean grade = " + worstMean + ")");
     }
 }

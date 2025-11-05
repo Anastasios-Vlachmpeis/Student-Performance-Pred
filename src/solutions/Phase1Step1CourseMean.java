@@ -12,11 +12,12 @@ public class Phase1Step1CourseMean {
 
     public static double calcCourseMean(int courseId) {
         // Calculates mean of grades of a specific course
+        double[] courseGrades = GraduateGradesModel.getAllGradesCourse(courseId);
         double sum = 0;
-        for (int studentId = 0; studentId < GraduateGradesModel.grades.length; studentId++) {
-            sum += GraduateGradesModel.grades[studentId][courseId];
+        for (int i = 0; i < courseGrades.length; i++) {
+            sum += courseGrades[i];
         }
-        return sum / GraduateGradesModel.grades.length;
+        return sum / courseGrades.length;
 
     }
 }

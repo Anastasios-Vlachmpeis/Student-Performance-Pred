@@ -12,7 +12,7 @@ public class Phase1Step1StudentMean {
 
     public static double calcStudentMean(int studentId) {
         // Calculates average of grades for a specific student
-        double[] studentGrades = GraduateGradesModel.grades[studentId];
+        double[] studentGrades = GraduateGradesModel.getAllGradesStudent(studentId);
         double sum = 0;
 
         // Sum all grades of the student

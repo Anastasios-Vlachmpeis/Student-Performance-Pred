@@ -14,7 +14,7 @@ public class Phase1Step1StudentMedian {
 
     public static double calcStudentMedian(int studentId) {
         // Calculates middle value of grades for a specific student
-        double[] studentGrades = GraduateGradesModel.grades[studentId].clone();
+        double[] studentGrades = GraduateGradesModel.getAllGradesStudent(studentId).clone();
 
         // Sort the array from the smallest number to the largest one
         Arrays.sort(studentGrades);

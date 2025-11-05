@@ -32,11 +32,12 @@ public class Phase1Step2PerformanceHardVsEasyCourses {
         double[] medians = new double[C];
         int[] ngCounts = new int[C];
 
+        int[] studentIds = CurrentGradesModel.getAllStudentIds();
         for (int c = 0; c < C; c++) {
             means[c] = CurrentGradesModel.calcCourseMean(c);
             medians[c] = CurrentGradesModel.calcCourseMedian(c);
-            for (int s = 0; s < S; s++) {
-                if (CurrentGradesModel.grades[s][c] == -1) ngCounts[c]++;
+            for (int studentId : studentIds) {
+                if (CurrentGradesModel.getGrade(studentId, c) == -1) ngCounts[c]++;
             }
         }
 
@@ -67,13 +68,13 @@ public class Phase1Step2PerformanceHardVsEasyCourses {
         //We evaluate each student's relative performance in hard vs easy courses
         ArrayList<StudentPerformanceNG> studentResults = new ArrayList<>();
 
-        for (int s = 0; s < S; s++) {
+        for (int studentId : studentIds) {
             double hardSum = 0.0, easySum = 0.0;
             int hardCountValid = 0, easyCountValid = 0;
 
             //Check hard courses
             for (int i = 0; i < hardCount; i++) {
-                double grade = CurrentGradesModel.grades[s][hardest[i]];
+                double grade = CurrentGradesModel.getGrade(studentId, hardest[i]);
                 if (grade != -1) {
                     hardSum += (grade - means[hardest[i]]);
                     hardCountValid++;
@@ -82,7 +83,7 @@ public class Phase1Step2PerformanceHardVsEasyCourses {
 
             //check easy courses
             for (int i = 0; i < easyCount; i++) {
-                double grade = CurrentGradesModel.grades[s][easiest[i]];
+                double grade = CurrentGradesModel.getGrade(studentId, easiest[i]);
                 if (grade != -1) {
                     easySum += (grade - means[easiest[i]]);
                     easyCountValid++;
@@ -98,17 +99,8 @@ public class Phase1Step2PerformanceHardVsEasyCourses {
             double easyAvg = easySum / easyCount;
             double diff = hardAvg - easyAvg;
 
-            /**
-             * We convert the internal index s to the actual StudentID to prevent NullPointerException.
-             */
-            int realStudentId = -1;
-            for (var entry : CurrentGradesModel.studentID2index.entrySet()) {
-                if (entry.getValue() == s) {
-                    realStudentId = entry.getKey();
-                    break;
-                }
-            }
-            studentResults.add(new StudentPerformanceNG(realStudentId, diff));
+            //direct implementation of the Null check implementation in the getGrade method
+            studentResults.add(new StudentPerformanceNG(studentId, diff));
         }
 
         /**

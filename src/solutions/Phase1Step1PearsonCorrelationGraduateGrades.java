@@ -34,10 +34,11 @@ public class Phase1Step1PearsonCorrelationGraduateGrades {
      */
     static double courseStd(int courseId, double mean) {
         double sumSq = 0.0;
-        int n = GraduateGradesModel.grades.length;
+        double[] courseGrades = GraduateGradesModel.getAllGradesCourse(courseId);
+        int n = courseGrades.length;
         for (int s = 0; s < n; s++) {
-            //Subtract the course mean from each student’s grade
-            double diff = GraduateGradesModel.grades[s][courseId] - mean;
+            //Subtract the course mean from each student's grade
+            double diff = courseGrades[s] - mean;
             //Add the square of the deviation to the sum
             sumSq += diff * diff;
         }
@@ -50,7 +51,9 @@ public class Phase1Step1PearsonCorrelationGraduateGrades {
      */
     static double pearsonBetweenCourses(int i, double meanI, double stdI,
                                         int j, double meanJ, double stdJ) {
-        int n = GraduateGradesModel.grades.length; //Get total number of students
+        double[] courseIGrades = GraduateGradesModel.getAllGradesCourse(i);
+        double[] courseJGrades = GraduateGradesModel.getAllGradesCourse(j);
+        int n = courseIGrades.length; //Get total number of students
         if (n <= 1) return Double.NaN; //Stop if there is less than 2
         if (stdI == 0.0 || stdJ == 0.0) return Double.NaN;
 
@@ -61,7 +64,7 @@ public class Phase1Step1PearsonCorrelationGraduateGrades {
              * the multiplication of the difference between the student's
              * grades and the course means
              */
-            covSum += (GraduateGradesModel.grades[s][i] - meanI) * (GraduateGradesModel.grades[s][j] - meanJ);
+            covSum += (courseIGrades[s] - meanI) * (courseJGrades[s] - meanJ);
         }
 
         //Compute the sample covariance
@@ -73,7 +76,8 @@ public class Phase1Step1PearsonCorrelationGraduateGrades {
      * Build all pair correlations between courses
      */
     static CoursePairCorrelation[] computeAllCourseCorrelations() {
-        final int C = GraduateGradesModel.courses.length; //should be 36
+        String[] courses = GraduateGradesModel.getCourses();
+        final int C = courses.length; //should be 36
         double[] means = new double[C];
         double[] stds  = new double[C];
 
@@ -117,8 +121,8 @@ public class Phase1Step1PearsonCorrelationGraduateGrades {
         System.out.println("\nTop " + limit + " most similar course pairs:");
         for (int t = 0; t < limit; t++) {
             CoursePairCorrelation p = pairs[t];
-            String nameA = (p.courseA >= 0 && p.courseA < GraduateGradesModel.courses.length) ? GraduateGradesModel.courses[p.courseA] : ("Course " + p.courseA);
-            String nameB = (p.courseB >= 0 && p.courseB < GraduateGradesModel.courses.length) ? GraduateGradesModel.courses[p.courseB] : ("Course " + p.courseB);
+            String nameA = GraduateGradesModel.getCourseName(p.courseA);
+            String nameB = GraduateGradesModel.getCourseName(p.courseB);
 
             System.out.println((t + 1) + ") " + nameA + " and " + nameB + " have correlation r = " + p.r);
         }

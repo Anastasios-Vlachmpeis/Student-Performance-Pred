@@ -27,9 +27,10 @@ public class Phase1Step2PearsonCorrelationGraduateGrades {
         // Gathers pairs of grades only when both courses have a grade for the same student
         ArrayList<Double> gradesA = new ArrayList<>();
         ArrayList<Double> gradesB = new ArrayList<>();
-        for (int s = 0; s < CurrentGradesModel.grades.length; s++) {
-            double gradeA = CurrentGradesModel.grades[s][i];
-            double gradeB = CurrentGradesModel.grades[s][j];
+        int[] studentIds = CurrentGradesModel.getAllStudentIds();
+        for (int studentId : studentIds) {
+            double gradeA = CurrentGradesModel.getGrade(studentId, i);
+            double gradeB = CurrentGradesModel.getGrade(studentId, j);
             if (gradeA != -1 && gradeB != -1) {
                 gradesA.add(gradeA);
                 gradesB.add(gradeB);
@@ -71,7 +72,8 @@ public class Phase1Step2PearsonCorrelationGraduateGrades {
     }
 
     static CoursePairCorrelation[] computeAllCourseCorrelationsIgnoreNG() {
-        final int C = CurrentGradesModel.courses.length; //should be courseCount
+        String[] courses = CurrentGradesModel.getCourses();
+        final int C = courses.length; //should be courseCount
         ArrayList<CoursePairCorrelation> pairList = new ArrayList<>();
 
         //Go through every unique unordered pair
@@ -100,8 +102,8 @@ public class Phase1Step2PearsonCorrelationGraduateGrades {
         System.out.println("\nTop " + limit + " most similar course pairs for current grades:");
         for (int t = 0; t < limit; t++) {
             CoursePairCorrelation p = pairs[t];
-            String nameA = (p.courseA >= 0 && p.courseA < CurrentGradesModel.courses.length) ? CurrentGradesModel.courses[p.courseA] : ("Course " + p.courseA);
-            String nameB = (p.courseB >= 0 && p.courseB < CurrentGradesModel.courses.length) ? CurrentGradesModel.courses[p.courseB] : ("Course " + p.courseB);
+            String nameA = CurrentGradesModel.getCourseName(p.courseA);
+            String nameB = CurrentGradesModel.getCourseName(p.courseB);
 
             System.out.println((t + 1) + ") " + nameA + " and " + nameB + " have correlation r = " + String.format("%.3f", p.r));
         }

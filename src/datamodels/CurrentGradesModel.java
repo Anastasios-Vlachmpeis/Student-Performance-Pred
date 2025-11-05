@@ -28,10 +28,10 @@ public class CurrentGradesModel {
 
     // stores the grade table of all students for all courses
     // NG is encoded as -1
-    public static double[][] grades = new double[studentCount][courseCount];
-    public static String[] courses = new String[courseCount];
+    private static double[][] grades = new double[studentCount][courseCount];
+    private static String[] courses = new String[courseCount];
     // links student id to its index in grades[][]
-    public static HashMap<Integer, Integer> studentID2index = new HashMap<>(studentCount);
+    private static HashMap<Integer, Integer> studentID2index = new HashMap<>(studentCount);
 
     // ensure .csv is loaded before DataModel class is accessed
     static {loadCSV();}
@@ -117,7 +117,12 @@ public class CurrentGradesModel {
     // DATA MODEL METHODS //
     //====================//
     public static double getGrade(int studentId, int courseId) {
-        return grades[studentID2index.get(studentId)][courseId];
+        Integer studentIndex = studentID2index.get(studentId);
+        // Null check implementation prevents NullPointerException in case an invalid studentId is passed
+        if (studentIndex == null) {
+            throw new IllegalArgumentException("Student ID " + studentId + " not found");
+        }
+        return grades[studentIndex][courseId];
     }
     public static double[] getAllGradesStudent(int studentId) {
         double[] studentGrades = new double[courseCount];
@@ -132,7 +137,7 @@ public class CurrentGradesModel {
         double[] courseGrades = new double[studentCount];
         // has to convert global student id into local representation
         int courseIndex = courseId; // course id and course index is the same
-        for (int i = 0; i < courseCount; i++) {
+        for (int i = 0; i < studentCount; i++) {
             courseGrades[i] = grades[i][courseIndex];
         }
         return courseGrades;
@@ -164,6 +169,23 @@ public class CurrentGradesModel {
             studentIds[i++] = studentId;
         };
         return studentIds;
+    }
+
+    /**
+     * Gives the list of the names of all courses.
+     * @return array of the course names where index is the course's id.
+     */
+    public static String[] getCourses() {
+        return courses;
+    }
+
+    /**
+     * Gives the name of the course assigned to an id.
+     * @param courseId valid course id (0-35)
+     * @return name of the course
+     */
+    public static String getCourseName(int courseId) {
+        return courses[courseId];
     }
     public static ArrayList<Integer> getAllStudentIdsOfCourseWithGrade(int courseId) {
         ArrayList<Integer> studentIds = new ArrayList<>();

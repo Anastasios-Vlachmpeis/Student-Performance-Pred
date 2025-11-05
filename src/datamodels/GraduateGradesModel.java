@@ -141,6 +141,18 @@ public class GraduateGradesModel {
     }
 
     /**
+     * This was missing but is necessa
+     * Gives a specific grade of a student for a course.
+     * @param studentId global id of the student
+     * @param courseId global id of the course
+     * @return the grade of the student in the course
+     */
+    public static double getGrade(int studentId, int courseId) {
+        int studentIndex = studentID2index.get(studentId);
+        return grades[studentIndex][courseId];
+    }
+
+    /**
      * Gives all grades of a graduate student.
      * @param courseId global id of the course
      * @return array containing all grades of the course (id of the students are not preserved)
@@ -149,7 +161,8 @@ public class GraduateGradesModel {
         double[] courseGrades = new double[studentCount];
         // has to convert global student id into local representation
         int courseIndex = courseId; // course id and course index is the same
-        for (int i = 0; i < courseCount; i++) {
+        // Fixed bug where we would iterate over courseCount instead of studentCount to get all grades of a course
+        for (int i = 0; i < studentCount; i++) {
             courseGrades[i] = grades[i][courseIndex];
         }
         return courseGrades;
