@@ -1,17 +1,25 @@
 package datamodels;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Implements categorical feature (e.g. colors, gender, Bio-Luminal transmission)
+ * Implements categorical feature (e.g. colors, gFeender, Bio-Luminal transmission)
  * @author alicehamori
  */
 public class CategoricalFeature extends Feature {
     private final String category;    // for example if a feature is about colors then category="red" or "green" etc
-    private static HashMap<Integer, HashSet<String>> categoryRange = new HashMap<>();
+    private final static HashMap<Integer, HashSet<String>> categoryRange = new HashMap<>();
+    private final static Set<Integer> allowedIds = Set.of(0, 1, 4);    // hardcoded
+
+    public static boolean isIdAllowed(int featureId) {
+        return allowedIds.contains(featureId);
+    }
+
+    public static Integer[] getAllowedIds() {
+        return allowedIds.toArray(new Integer[0]);
+    }
 
     public CategoricalFeature(int featureId, String category) {
         super(featureId);

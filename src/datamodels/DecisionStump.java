@@ -18,10 +18,11 @@ public class DecisionStump {
 
     /**
      * Predicts a grade for a student based on a feature of the student.
-     * @param studentFeature MUST MATCH THE ID OF THE FEATURE USED IN THE PREDICTION
+     * @param studentId id of the student whose grade should be predicted
      * @return The grade predicted by the decision stump according to student's feature
      */
-    public double doPrediction(Feature studentFeature) {
+    public double predictGrade(int studentId) {
+        Feature studentFeature = StudentInfoModel.getFeature(studentId, this.splittingFeature.getFeatureId());
         if (studentFeature.getFeatureId() != this.splittingFeature.getFeatureId()) {
             throw new IllegalArgumentException(
                     "studentFeature's ID MUST MATCH THE ID OF THE FEATURE USED IN THE PREDICTION\n" +
@@ -47,5 +48,10 @@ public class DecisionStump {
 
     public double getGradeBelowSplit() {
         return gradeBelowSplit;
+    }
+
+    public String asRule() {
+        // Print out the whole rule as specified in project manual and enter into new line
+        return "If "+ this.splittingFeature.toString() + " grade " + String.format("%.2f", this.gradeAboveSplit) + ", else grade " + String.format("%.2f", gradeBelowSplit);
     }
 }

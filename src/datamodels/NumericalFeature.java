@@ -1,6 +1,7 @@
 package datamodels;
 
 import java.util.HashMap;
+import java.util.Set;
 
 /**
  * Implements Numerical feature. (e.g. height, Psionic Interference Tolerance)
@@ -8,7 +9,16 @@ import java.util.HashMap;
  */
 public class NumericalFeature extends Feature {
     private final double value;   // the value of the feature (e.g. height of a student, or some other real valued feature)
-    private static HashMap<Integer, double[]> valueRange = new HashMap<>();
+    private final static HashMap<Integer, double[]> valueRange = new HashMap<>();
+    private final static Set<Integer> allowedIds = Set.of(2, 3);   // hardcoded
+
+    public static boolean isIdAllowed(int featureId) {
+        return allowedIds.contains(featureId);
+    }
+
+    public static Integer[] getAllowedIds() {
+        return allowedIds.toArray(new Integer[0]);
+    }
 
     public NumericalFeature(int featureId, double value) {
         super(featureId);
@@ -38,6 +48,6 @@ public class NumericalFeature extends Feature {
         return "NumericalFeature(id=" + this.getFeatureId() + ", value=" + String.format("%.2f", this.value) + ")";
     }
 
-    public double getRangeMax(int featureId) {return valueRange.get(featureId)[0];}
-    public double getRangeMin(int featureId) {return valueRange.get(featureId)[1];}
+    public static double getRangeMax(int featureId) {return valueRange.get(featureId)[0];}
+    public static double getRangeMin(int featureId) {return valueRange.get(featureId)[1];}
 }

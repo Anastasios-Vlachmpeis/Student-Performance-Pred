@@ -35,9 +35,10 @@ This class exposes the following methods: **(No Grade is marked with -1.0)**
 ### Student Info
 This class exposes the following methods:
 
- - getFeature(int StudentId, int featureId) Returns a Feature object (categorical or numerical) representing a student feature based on student ID and feature ID
- - getAllFeatures(int StudentId) returns an array of Feature objects that has all the features of a single student.
- - getAllStudentIds() return an array of all the ids of the students stored in this data model class
+ - `getFeature(int StudentId, int featureId)` Returns a Feature object (categorical or numerical) representing a student feature based on student ID and feature ID
+ - `getAllFeatures(int StudentId)` returns an array of Feature objects that has all the features of a single student.
+ - `getAllStudentIds()` returns an array of all the ids of the students stored in this data model class
+ - `getAllFeatureIds()` returns an array of all the ids of the features represented in this data model class
 
 **Everything else is meant to be a private member of the class. You should access everything via these methods!**
 **Do not make class variables public!**
