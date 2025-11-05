@@ -25,6 +25,7 @@ public class StudentInfoModel {
     public static String[] featureNames = new String[featureCount];
     // maps feature names and abbreviation of their names onto internal index used by this class
     static HashMap<String, Integer> featureName2Index = new HashMap<>();
+    static HashMap<Integer, Integer> featureId2Index = new HashMap<>();
 
     // stores the ranges of possible values for each feature. internal index is used
     public static ArrayList<ArrayList> featureRanges = new ArrayList<>(5);
@@ -65,6 +66,7 @@ public class StudentInfoModel {
                         }
                     }
                     featureName2Index.put(sAbbreviated, featureCounter);
+                    featureId2Index.put(featureCounter, featureCounter);
                     featureCounter++;
                 }
             }
@@ -188,5 +190,13 @@ public class StudentInfoModel {
             studentIds[i++] = studentId;
         }
         return studentIds;
+    }
+    public static int[] getAllFeatureIds() {
+        int[] featureIds = new int[featureCount];
+        int i = 0;
+        for (int studentId : featureId2Index.keySet()) {
+            featureIds[i++] = studentId;
+        }
+        return featureIds;
     }
 }

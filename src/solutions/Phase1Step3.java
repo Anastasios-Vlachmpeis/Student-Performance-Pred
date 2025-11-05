@@ -1,11 +1,6 @@
 package solutions;
 
-import datamodels.Feature;
-import datamodels.CategoricalFeature;
-import datamodels.CurrentGradesModel;
-import datamodels.NumericalFeature;
-import datamodels.SplitCondition;
-import datamodels.StudentInfoModel;
+import datamodels.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,13 +25,15 @@ public class Phase1Step3 {
      * If student's property IS the boundary value (or above in case of doubles) then it
      * is in the subgroup that satisfies the splitting criteria.
      * */
-    public static double[] meanGradesOfTabulation(int courseId, Feature splitFeature) {
-        ArrayList<ArrayList<Double>> tabulation = tabulateCourseByStudentFeature(courseId, splitFeature);
+    private static double[] meanGradesOfTabulation(int courseId, Feature splitFeature) {
+        // 2 arrayLists first containing grades below split, second containing grades above split
+        ArrayList<Double>[] tabulation = tabulateCourseByStudentFeature(courseId, splitFeature);
+
         // the mean grade of the two groups after the tabulations
         double[] means = new double[2];
 
         for (int i = 0; i < 2; i++) {
-            ArrayList<Double> subGroup = tabulation.get(i);
+            ArrayList<Double> subGroup = tabulation[i];
             double sum = 0;
             for (double grade: subGroup) {
                sum += grade;
@@ -47,28 +44,31 @@ public class Phase1Step3 {
         return means;
     }
 
-    public static ArrayList<ArrayList<Double>> tabulateCourseByStudentFeature(int courseId, Feature splitFeature) {
+    /**
+     * Splits students with grade of a course into two groups, one is above and one is below the splitting criteria
+     * @param splitFeature Feature object representing the splitting criteria
+     * @return An array of length 2. First index has the grades below the split, second index has the grades above the split
+     */
+    private static ArrayList<Double>[] tabulateCourseByStudentFeature(int courseId, Feature splitFeature) {
 
         // all students' ids that have an actual grade (no NG) in the given course
         ArrayList<Integer> studentIds = CurrentGradesModel.getAllStudentIdsOfCourseWithGrade(courseId);
 
-        ArrayList<Double> subSetSatisfy = new ArrayList<>();
-        ArrayList<Double> subSetNotSatisfy = new ArrayList<>();
+        ArrayList<Double> aboveSplit = new ArrayList<>();
+        ArrayList<Double> belowSplit = new ArrayList<>();
         for (int studentId: studentIds) {
             double grade = CurrentGradesModel.getGrade(studentId, courseId);
 
             Feature studentFeature = StudentInfoModel.getFeature(studentId, splitFeature.getFeatureId());
             // decides if the split condition is satisfied (can handle numeric and category type features as well)
             if (SplitCondition.evaluate(studentFeature, splitFeature)) {
-                subSetSatisfy.add(grade);
+                aboveSplit.add(grade);
             } else {
-                subSetNotSatisfy.add(grade);
+                belowSplit.add(grade);
             }
         }
 
-        ArrayList<ArrayList<Double>> results = new ArrayList<>();
-        results.add(subSetNotSatisfy);
-        results.add(subSetSatisfy);
+        ArrayList<Double>[] results = new ArrayList[] {belowSplit, aboveSplit};
         return results;
     }
 
@@ -80,7 +80,7 @@ public class Phase1Step3 {
      * Variance reduction is very simple to information gain, but it calculates variance, and then
      * subtracts the weighted variance of the datasets after the split.
      */
-    public static Feature findBestPropertyToGuessGrade(int courseId) {
+    private static Feature findBestPropertyToGuessGrade(int courseId) {
         ArrayList<Double> courseGrades = CurrentGradesModel.getAllValidGradesCourse(courseId);
 
         // calculate initial variance
@@ -93,48 +93,48 @@ public class Phase1Step3 {
         //-------------------------------------------------------------//
         // iterate over all possible splitting options of all features //
         //-------------------------------------------------------------//
-        double bestReducedVariance = -1;    // if all splits give a zero reduction then the first one will be the "best"
+
+        // to keep track best feature based on variance reduction
         Feature bestSplit = null;
+        double bestVarianceReduction = -1; // if all splits give a zero reduction then the first one will be the "best"
 
-        // first the categorical features (they have index 0, 1, 4)
-        int[] categoricalFeatureIds = {0, 1, 4};
-        for (int featureId : categoricalFeatureIds) {
-            // checks all possible categorical splits of a feature and saves the best
-            for (Object element : StudentInfoModel.featureRanges.get(featureId)) {
-                // this will be used as the splitting criteria
-                String category = (String) element;
-                CategoricalFeature splitFeature = new CategoricalFeature(featureId, category);
-                double reducedVariance = calculateVarianceReduction(
-                        tabulateCourseByStudentFeature(courseId, splitFeature),
-                        initialVariance);
+        // go through all known features
+        for (int featureId : StudentInfoModel.getAllFeatureIds()) {
 
-                if (reducedVariance > bestReducedVariance) {
-                    bestReducedVariance = reducedVariance;
-                    bestSplit = splitFeature;
+            // we need different logic for going through all splitting options
+            // based on the type of features
+
+            // numerical feature
+            if (NumericalFeature.isIdAllowed(featureId)) {
+                double rangeMax = NumericalFeature.getRangeMax(featureId);
+                double rangeMin = NumericalFeature.getRangeMin(featureId);
+                double STEP_SIZE = (rangeMax - rangeMin) / 1000.0;   // hardcoded value. 3 digits precision
+                for (double step = rangeMin; step < rangeMax; step += STEP_SIZE) {
+                    NumericalFeature splitFeature = new NumericalFeature(featureId, step);
+                    double varianceReduction = calculateVarianceReduction(courseId, splitFeature, initialVariance);
+
+                    if (varianceReduction > bestVarianceReduction) {
+                        bestVarianceReduction = varianceReduction;
+                        bestSplit = splitFeature;
+                    }
                 }
             }
-        }
-        // Then we check the numerical feature checks.
-        // Have to have a stepsize. which will be the range length divided by 1000.
-        // The indexes of these features are 2 and 3
-        int[] numericalFeatureIs = {2, 3};
-        for (int featureId : numericalFeatureIs) {
-            // checks all possible categorical splits of a feature and saves the best
-            double rangeBottom = (double) StudentInfoModel.featureRanges.get(featureId).get(0);
-            double rangeTop = (double) StudentInfoModel.featureRanges.get(featureId).get(1);
-            double stepSize = Math.abs(rangeBottom - rangeTop) / 1000;
-            for (double splitThreshold = rangeBottom; splitThreshold < rangeTop; splitThreshold += stepSize) {
-                // this will be used as the splitting criteria
-                NumericalFeature splitFeature = new NumericalFeature(featureId, splitThreshold);
-                double reducedVariance = calculateVarianceReduction(
-                        tabulateCourseByStudentFeature(courseId, splitFeature),
-                        initialVariance);
 
-                if (reducedVariance > bestReducedVariance) {
-                    bestReducedVariance = reducedVariance;
-                    bestSplit = splitFeature;
+            // categorical features
+            if (CategoricalFeature.isIdAllowed(featureId)) {
+                String[] categoryRange = CategoricalFeature.getRange(featureId);
+                for (String splitCategory : categoryRange) {
+                    CategoricalFeature splitFeature = new CategoricalFeature(featureId, splitCategory);
+                    double varianceReduction = calculateVarianceReduction(courseId, splitFeature, initialVariance);
+
+                    if (varianceReduction > bestVarianceReduction) {
+                        bestVarianceReduction = varianceReduction;
+                        bestSplit = splitFeature;
+                    }
                 }
             }
+
+
         }
 
         // now we have the best split
@@ -146,11 +146,13 @@ public class Phase1Step3 {
      * tabulateCourseByStudentFeature().
      * So it takes a list of lists that contain the grades of each subpart after splitting
      */
-    public static double calculateVarianceReduction(ArrayList<ArrayList<Double>> tabulationResults, double initialVariance) {
+    private static double calculateVarianceReduction(int courseId, Feature splitFeature, double initialVariance) {
         /// Formula for variance reduction:
         ///     VarianceReduction = InitialVariance - sum(subgroupVariance * subgroupSize / totalSize)
         /// Variance for any group (including total dataset before splitting):
         ///     Variance = (sum of (groupMean - individual item)^2 )/ totalSize
+
+        ArrayList<Double>[] tabulationResults = tabulateCourseByStudentFeature(courseId, splitFeature);
 
         // knowing the size before the split is needed to calculate variance reduction
         int sizeBeforeSplit = 0;
@@ -160,24 +162,13 @@ public class Phase1Step3 {
         // empty dataset's variance cannot be reduced
         if (sizeBeforeSplit == 0) {return 0.0;}
 
+
         double sumWeightedSubGroupVariances = 0;
         for (ArrayList<Double> subGroup : tabulationResults) {
             // skip empty splits, as they would not contribute to the weighted subgroup variance sum after all
             if (subGroup.isEmpty()) {continue;}
 
-            // first calculate mean of subgroup
-            double sum = 0;
-            for (double grade: subGroup) {
-                sum += grade;
-            }
-           double subGroupMeanGrade = sum / subGroup.size();
-
-            // calculate weighted variance of subgroup
-            double sumOfSubGroupSquareOfDifferences = 0; //  sum of (groupMean - individual item)^2
-            for (double grade: subGroup) {
-                sumOfSubGroupSquareOfDifferences += Math.pow((subGroupMeanGrade - grade), 2);
-            }
-            double subGroupVariance = sumOfSubGroupSquareOfDifferences / subGroup.size();
+            double subGroupVariance = calculateVariance(subGroup);
 
             // add subgroup variance to the weighted sum
             sumWeightedSubGroupVariances += subGroupVariance * subGroup.size() / sizeBeforeSplit;
@@ -185,6 +176,28 @@ public class Phase1Step3 {
 
         // finish computing variance reduction
         return initialVariance - sumWeightedSubGroupVariances;
+    }
+
+    /**
+     * Calculates variance of a list of numbers.
+     * @return -1 when the dataset is empty
+     */
+    private static double calculateVariance(ArrayList<Double> numbers) {
+        if (numbers.isEmpty()) {
+            return -1;
+        }
+        // first calculate the mean
+        double sum = 0;
+        for (Double num : numbers) {
+            sum += num;
+        }
+        double mean = sum / numbers.size();
+
+        double sumOfSquaredDifferences = 0;
+        for (double num : numbers) {
+            sumOfSquaredDifferences += Math.pow(mean - num, 2);
+        }
+        return sumOfSquaredDifferences / numbers.size();
     }
 
     /** Implementing last question of step 3 of phase 1:
@@ -210,27 +223,7 @@ public class Phase1Step3 {
         for (int i = 0; i < futureCourseIds.size(); i++) {
             int courseId = futureCourseIds.get(i);
             predictions[0][i] = courseId;
-
-            Feature bestSplit = findBestPropertyToGuessGrade(courseId);
-            // this is Y and Z in the rule if X then grade Y, else grade Z (X is the bestSplit)
-            double[] tabulatedMeans = meanGradesOfTabulation(courseId, bestSplit);
-            // judge the student based on its property
-            boolean isSplitConditionSatisfied = SplitCondition.evaluate(StudentInfoModel.getFeature(studentId, bestSplit.getFeatureId()), bestSplit);
-            // the subgroup that the given student falls in (the variable stores the index that points to the
-            // mean of student's subgroup according to their feature property)
-            int subgroupIndex = isSplitConditionSatisfied ? 1 : 0;
-            // sometimes the best split (according to variance reduction) is to make no split at all
-            // when this is the case the empty subgroup's mean is a -1. and we should choose the other mean
-            if (tabulatedMeans[subgroupIndex] == -1) {
-                subgroupIndex = (subgroupIndex + 1) % 2;}    // modular arithmetic black magic
-            // sometimes a course has no grades whatsoever in the current grades
-            // at cases like that, we are predicting the mean of the mean grade of every course with at least one no NG
-            if (tabulatedMeans[subgroupIndex] == -1) {
-                predictions[1][i] = CurrentGradesModel.getCourseMeansMean();
-            } else {
-                predictions[1][i] = tabulatedMeans[subgroupIndex];
-            }
-
+            predictions[1][i] = findBestDecisionStumpForCourse(courseId).predictGrade(studentId);
         }
 
         return predictions;
@@ -239,37 +232,38 @@ public class Phase1Step3 {
     public static void printBestRulesForGradePrediction() {
         // go through all curses
         for (int courseId = 0; courseId < CurrentGradesModel.courseCount; courseId++) {
-            // start with naming the course
-            // this is the best feature to split
-            Feature bestSplit = findBestPropertyToGuessGrade(courseId);
-            // and this is the mean grade below and above the split that will be incorporated into the rule (Y and Z)
-            double[] tabulatedMeans = meanGradesOfTabulation(courseId, bestSplit);
-            /*
-             We must handle some edge cases because of the missing data.
-                1. sometimes the best split is to have no split. at times like this
-                   the empty upper or below split's mean is -1, and we automatically use the other one
-                2. sometimes we cannot split the data because all grades are NGs so both the below and upper
-                   split set is empty. so both means are -1.
-                   At times like this, we use the mean of the mean of the other courses that have grades besides NGs
-            */
-            double gradePredictionY = tabulatedMeans[1];    // the grade predicted if student satisfies the criteria
-            // (upper split)
-            double gradePredictionZ = tabulatedMeans[0];    // the grade predicted if student does not satisfy the
-            // criteria (below and equal split)
 
-            if (gradePredictionY == -1) {gradePredictionY = gradePredictionZ;}
-            if (gradePredictionZ == -1) {gradePredictionZ = gradePredictionY;}
-            if (gradePredictionY == -1 && gradePredictionZ == -1) {
-                double meanOfCourseGradeMeans = CurrentGradesModel.getCourseMeansMean();
-                gradePredictionY = meanOfCourseGradeMeans;
-                gradePredictionZ = meanOfCourseGradeMeans;
-            }
+            DecisionStump bestDecisionStump = findBestDecisionStumpForCourse(courseId);
 
             // Print out the whole rule as specified in project manual and enter into new line
-            System.out.print(CurrentGradesModel.courses[courseId] + ": " + bestSplit.toString());
-            System.out.print(" grade " + String.format("%.2f", gradePredictionY) + ", else grade " + String.format("%.2f", gradePredictionZ));
+            System.out.print(CurrentGradesModel.courses[courseId] + ": " + bestDecisionStump.asRule());
             System.out.println();
         }
     }
 
+    private static DecisionStump findBestDecisionStumpForCourse(int courseId) {
+        Feature bestSplit = findBestPropertyToGuessGrade(courseId);
+        // this is Y and Z in the rule if X then grade Y, else grade Z (X is the bestSplit)
+        double[] tabulatedMeans = meanGradesOfTabulation(courseId, bestSplit);
+
+        // sometimes the best split (according to variance reduction) is to make no split at all
+        // then mean of the empty split will be a -1 so we use the other spit's mean
+        if (tabulatedMeans[0] == -1) {
+            tabulatedMeans[0] = tabulatedMeans[1];
+        }
+        else if (tabulatedMeans[1] == -1) {
+            tabulatedMeans[1] = tabulatedMeans[0];
+        }
+
+        // sometimes a course has no grades whatsoever in the current grades
+        if (tabulatedMeans[0] == -1 && tabulatedMeans[1] == -1) {
+            tabulatedMeans[0] = tabulatedMeans[1] = CurrentGradesModel.getCourseMeansMean();
+        }
+
+        // if this was a decision stump this is how it would look
+        DecisionStump decisionStump = new DecisionStump(bestSplit, tabulatedMeans[1], tabulatedMeans[0]);
+
+
+        return decisionStump;
+    }
 }
