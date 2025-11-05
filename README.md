@@ -64,7 +64,20 @@ we have:
 - `NumericalFeature.getRangeMin()` that returns the lowest value a feature with that ID can take.
 - `CategoricalFeature.getRange(featureId)` which returns an array of strings of all the categories this feature can take.
 
-Using these you can try out all possible splitting criteria.
+## Decision Stumps
+Decision stumps that predict the grade of a student are implemented through the `Decision Stump` class.
+When initialized it asks for a Feature Object that serves as the splitting criteria, and the two grades it will predict 
+whether the student's feature puts the student in the above or below split.
+### How to use them for Phase 1 step 4:
+You will create a method that takes an array of `DecisionStump` objects (you can assume this array contains all possible
+decision stumps) and you will return a smaller array (say with length 10) that is somehow the best subset of them.
+To get a prediction from it, you need to call the `.predictGrade(int studentId)` method so you can work with that data.
+
+We will make a decision stump forest for each course. Or rather methods that can find the best decision forest for a given course.
+**The Methods**: 
+1. least variance (subset of decision stumps whose predictions produces the least variance)
+2. noah's method
+3. boosted trees algorithm (finding best stump first. find the next stump by maximizing combined results with first stump. repeat)
 
 ## HOW TO RUN
 1. Find Main.java in src/
