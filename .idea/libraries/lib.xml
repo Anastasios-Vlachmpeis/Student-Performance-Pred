@@ -1,13 +1,10 @@
 <component name="libraryTable">
     <library name="lib">
         <CLASSES>
-            <root url="file://$USER_HOME$/Dev/openjfx-21.0.9_linux-x64_bin-sdk/javafx-sdk-21.0.9/lib" />
+            <root url="file://$USER_HOME$/Downloads/openjfx-21.0.9_windows-x64_bin-sdk/javafx-sdk-21.0.9/lib" />
         </CLASSES>
         <JAVADOC />
-        <NATIVE>
-            <root url="file://$USER_HOME$/Dev/openjfx-21.0.9_linux-x64_bin-sdk/javafx-sdk-21.0.9/lib" />
-        </NATIVE>
         <SOURCES />
-        <jarDirectory url="file://$USER_HOME$/Dev/openjfx-21.0.9_linux-x64_bin-sdk/javafx-sdk-21.0.9/lib" recursive="false" />
+        <jarDirectory url="file://$USER_HOME$/Downloads/openjfx-21.0.9_windows-x64_bin-sdk/javafx-sdk-21.0.9/lib" recursive="false" />
     </library>
 </component>
