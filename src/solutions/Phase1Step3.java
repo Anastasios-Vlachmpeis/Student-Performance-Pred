@@ -236,7 +236,7 @@ public class Phase1Step3 {
             DecisionStump bestDecisionStump = findBestDecisionStumpForCourse(courseId);
 
             // Print out the whole rule as specified in project manual and enter into new line
-            System.out.print(CurrentGradesModel.courses[courseId] + ": " + bestDecisionStump.asRule());
+            System.out.print(CurrentGradesModel.getCourseName(courseId) + ": " + bestDecisionStump.asRule());
             System.out.println();
         }
     }
