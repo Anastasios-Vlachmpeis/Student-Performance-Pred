@@ -348,22 +348,19 @@ public class CurrentGradesModel {
         return indexMostFrequent;
     }
 
-    public static void printCourseNGcount() {
-        //Print the number of NG per course
+    public static int getCourseNG(int courseID) {
+        //Get the number of NG per course
         //This is to assume the order of taking the courses
         int count = 0;
-        for (int i = 0; i < grades[0].length; i++) {
+
 
             for (int j = 0; j < grades.length; j++) {
-                if (grades[j][i] == -1) {
+                if (grades[j][courseID] == -1) {
                     count++;
                 }
             }
 
-            System.out.println("Number of NG for the course " +i + " : " + count);
-            count = 0;
-        }
-
+       return count;
     }
 
     /**
