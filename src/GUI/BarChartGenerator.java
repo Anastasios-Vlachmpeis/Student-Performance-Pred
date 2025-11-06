@@ -29,7 +29,7 @@ public class BarChartGenerator {
 
         //Fill in the dataset with a for loop, getting the number of ng data from data models
         for (int i = 0; i < CurrentGradesModel.courseCount; i++) {
-            series.getData().add(new XYChart.Data<>(CurrentGradesModel.courses[i]+ " ", CurrentGradesModel.getCourseNG(i)));
+            series.getData().add(new XYChart.Data<>(CurrentGradesModel.getCourseName(i)+ " ", CurrentGradesModel.getCourseNG(i)));
         }
 
         //Add the dataset into the chart
