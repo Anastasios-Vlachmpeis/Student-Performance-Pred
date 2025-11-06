@@ -48,7 +48,7 @@ public class Main {
         //     (Compute some of the same statistics you did in step 1 for current grades
         System.out.println("Answering step 2 - some statistics we did on graduate grades applied to current grades");
         System.out.println("(Not a real question)");;
-        CurrentGradesModel.printHardestAndEasiestCourses();
+        Phase1Step2HardestEasiestCourses.printHardestAndEasiestCourses();
 
         // Q1:
         // it is done with graphics will be in report
