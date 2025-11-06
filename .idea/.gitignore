@@ -10,4 +10,7 @@
 /dataSources.local.xml
 
 # Java build files
-/out/
+../out/
+
+# lib.xml is different depending on your OS
+libraries/lib.xml
