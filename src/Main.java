@@ -81,10 +81,8 @@ public class Main {
           ###########*/
         // The actual question of step 3: finding the rules for grade prediction
         System.out.println("Answering step 3 - Rules for grade prediction");
-        Phase1Step3.printBestRulesForGradePrediction();
-
-
+        Phase1Step3.printBestRulesForGradePrediction();   
+        
+        
     }
-
-
 }
