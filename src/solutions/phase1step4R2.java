@@ -37,9 +37,11 @@ public class phase1step4R2 { // R2 is a comparison between the mean grade and th
         final int TOP_FOREST = 1000; //keeping the top 1000 ( idk if it is my greatest idea tbh)
 
 
+        // TODO: Briefly explain the purpose of this two arrays please
         ArrayList<int[]>[] TopForestsByCourse = new ArrayList[courseCount];
         ArrayList<Double>[] TopR2sByCourse = new ArrayList[courseCount];
 
+        // TODO: What is happening here? Initializing with what?
         for (int c = 0; c < courseCount; c++) {
             TopForestsByCourse[c] = new ArrayList<int[]>(TOP_FOREST);
             TopR2sByCourse[c] = new ArrayList<Double>(TOP_FOREST);
@@ -48,6 +50,8 @@ public class phase1step4R2 { // R2 is a comparison between the mean grade and th
         for (int courseId = 0; courseId < courseCount; courseId++) {
             System.out.println("Evaluating forests for course " + courseId + " (" + GraduateGradesModel.getCourseName(courseId) + ")...");
 
+
+            // Filtering out students with NGs
 
             int[] allStudents = GraduateGradesModel.getAllStudentIds(); // Get all students from graduate data (from another file)
 
@@ -63,6 +67,7 @@ public class phase1step4R2 { // R2 is a comparison between the mean grade and th
             }
 
 
+            // TODO: please motivate this better. Why does 2000 gives accuracy or computation time?
             int sampleSize = Math.min(2000, studentsWithGrade.size()); // choose 2000 to have a mix of accuracy and computation time
 
             Collections.shuffle(studentsWithGrade, rng);
