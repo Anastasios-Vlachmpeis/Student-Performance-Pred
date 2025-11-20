@@ -130,7 +130,7 @@ public class StudentInfoModel {
                 // this feature is just a string (category)
                 // there is a trailing whitespace at the end which should be removed
                 BLT = lineScanner.next().trim();
-                CategoricalFeature BLTNew = new CategoricalFeature(3, BLT);
+                CategoricalFeature BLTNew = new CategoricalFeature(4, BLT);
                 features[studentCounter][4] = BLTNew;
 
                 // update feature ranges if necessary
@@ -139,14 +139,14 @@ public class StudentInfoModel {
                 if (!featureRanges.get(1).contains(SNC)) {featureRanges.get(1).add(SNC);}
                 if (!featureRanges.get(4).contains(BLT)) {featureRanges.get(4).add(BLT);}
                 // then update real values properties
-                if (ATDR < (double)featureRanges.get(2).getFirst()) {
-                    featureRanges.get(2).set(0, ATDR);  // real value ranges have only 2 element
-                } else if (ATDR > (double)featureRanges.get(2).getLast()) {
-                    featureRanges.get(2).set(1, ATDR);  // real value ranges have only 2 element
+                if (ATDR < (double)featureRanges.get(2).get(0)) {
+                    featureRanges.get(2).set(0, ATDR);  // real value ranges have only 2 elements
+                } else if (ATDR > (double)featureRanges.get(2).get(1)) {
+                    featureRanges.get(2).set(1, ATDR);  // real value ranges have only 2 elements
                 }
-                if (PIT < (double)featureRanges.get(3).getFirst()) {
+                if (PIT < (double)featureRanges.get(3).get(0)) {
                     featureRanges.get(3).set(0, PIT);
-                } else if (PIT > (double)featureRanges.get(3).getLast()) {
+                } else if (PIT > (double)featureRanges.get(3).get(1)) {
                     featureRanges.get(3).set(1, PIT);
                 }
 
