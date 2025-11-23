@@ -31,7 +31,7 @@ public class HistogramGenerator {
 
         // Create chart, Label, Bars are bigger, no gaps between Bars
         BarChart<String, Number> histogram = new BarChart<>(xAxis,yAxis);
-        histogram.setTitle("Histogram of number of NGs Across Courses");
+        histogram.setTitle("Histogram of number of Courses with the same amount of NGs");
         histogram.setLegendVisible(false);
         histogram.setCategoryGap(0);
         histogram.setBarGap(0);
@@ -51,39 +51,4 @@ public class HistogramGenerator {
         histogram.getData().add(series);
         return histogram;
     }
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
