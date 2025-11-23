@@ -22,6 +22,10 @@ public class BarChartGenerator {
         //Create the Bar Chart with the predefined axes
         BarChart<String, Number> barChart = new BarChart<>(xAxis, yAxis);
         barChart.setTitle("Number of NG's per Course");
+        barChart.setLegendVisible(false);
+        barChart.setCategoryGap(0);
+        barChart.setBarGap(0);
+        barChart.setAnimated(false);
 
         //Create the dataset to put into the chart
         XYChart.Series<String, Number> series = new XYChart.Series<>();
