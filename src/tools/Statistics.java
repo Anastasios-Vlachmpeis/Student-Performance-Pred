@@ -5,10 +5,10 @@ import java.util.*;
 
 /**
  * Static helper class for performing descriptive statistics on double values datasets.
- *  - mean
- *  - median
- *  - mode
- *  - standard variation
+ * - mean
+ * - median
+ * - mode
+ * - standard variation
  */
 public class Statistics {
 
@@ -18,7 +18,7 @@ public class Statistics {
      */
     private static double[] convertDoubleListToArray(List<Double> list) {
         double[] array = new double[list.size()];
-        for (int i = 0; i< array.length; i++) {
+        for (int i = 0; i < array.length; i++) {
             array[i] = list.get(i);
         }
         return array;
@@ -101,23 +101,72 @@ public class Statistics {
         return mode(convertDoubleListToArray(list));
     }
 
-    public static double standardDeviation(double[] array) {
+    public static double sampleVariance(double[] array) {
         if (array.length == 0) {
-            throw new IllegalArgumentException("Array must not be empty in order to calculate its standard deviation");
+            throw new IllegalArgumentException("Array must not be empty in order to calculate its sample variance");
         }
         double mean = mean(array);
         double sumSquaredDifference = 0;
         for (double num : array) {
-            sumSquaredDifference += Math.pow(num - mean , 2);
+            sumSquaredDifference += Math.pow(num - mean, 2);
         }
         return sumSquaredDifference / (array.length - 1);
     }
 
-    public static double standardDeviation(List<Double> list) {
+    public static double sampleVariance(List<Double> list) {
         if (list.isEmpty()) {
-            throw new IllegalArgumentException("List must not be empty in order to calculate its mean");
+            throw new IllegalArgumentException("List must not be empty in order to calculate its sample variance");
         }
-        return standardDeviation(convertDoubleListToArray(list));
+        return sampleVariance(convertDoubleListToArray(list));
     }
 
+    public static double populationVariance(double[] array) {
+        if (array.length == 0) {
+            throw new IllegalArgumentException("Array must not be empty in order to calculate its population variance");
+        }
+        double mean = mean(array);
+        double sumSquaredDifference = 0;
+        for (double num : array) {
+            sumSquaredDifference += Math.pow(num - mean, 2);
+        }
+        return sumSquaredDifference / array.length;
+    }
+
+    public static double populationVariance(List<Double> list) {
+        if (list.isEmpty()) {
+            throw new IllegalArgumentException("List must not be empty in order to calculate its population variance");
+        }
+        return populationVariance(convertDoubleListToArray(list));
+    }
+
+    public static double sampleStandardDeviation(double[] array) {
+        if (array.length == 0) {
+            throw new IllegalArgumentException("Array must not be empty in order to calculate its sample standard variation");
+        }
+        return Math.sqrt(sampleVariance(array));
+
+    }
+
+    public static double sampleStandardDeviation(List<Double> list) {
+        if (list.isEmpty()) {
+            throw new IllegalArgumentException("List must not be empty in order to calculate its sample standard deviation");
+        }
+        return sampleStandardDeviation(convertDoubleListToArray(list));
+
+    }
+
+    public static double populationStandardDeviation(double[] array) {
+        if (array.length == 0) {
+            throw new IllegalArgumentException("Array must not be empty in order to calculate its population standard variation");
+        }
+        return Math.sqrt(populationVariance(array));
+    }
+
+    public static double populationStandardDeviation(List<Double> list) {
+        if (list.isEmpty()) {
+            throw new IllegalArgumentException("List must not be empty in order to calculate its population standard deviation");
+        }
+        return populationStandardDeviation(convertDoubleListToArray(list));
+
+    }
 }

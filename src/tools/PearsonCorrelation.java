@@ -34,8 +34,8 @@ public class PearsonCorrelation {
         double meanB = Statistics.mean(gradesB);
 
         // calculate std deviations
-        double stdA = Statistics.standardDeviation(gradesA);
-        double stdB = Statistics.standardDeviation(gradesB);
+        double stdA = Statistics.sampleStandardDeviation(gradesA);
+        double stdB = Statistics.sampleStandardDeviation(gradesB);
 
         // avoid division by zero or missing variability
         if (stdA == 0.0 || stdB == 0.0) return Double.NaN;
