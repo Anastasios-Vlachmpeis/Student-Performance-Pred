@@ -22,7 +22,7 @@ public class Phase1Step2PearsonCorrelationGraduateGrades {
      * pairs as the most "similar" courses, while skipping NG entries.
      */
 
-    // Compute pearson correlation for a pair of courses, considering only students with grades in both
+    // Compute Pearson correlation for a pair of courses, considering only students with grades in both
     static double pearsonBetweenCoursesIgnoreNG(int i, int j) {
         // Gathers pairs of grades only when both courses have a grade for the same student
         ArrayList<Double> gradesA = new ArrayList<>();
