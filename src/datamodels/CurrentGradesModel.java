@@ -387,6 +387,25 @@ public class CurrentGradesModel {
        return count;
     }
 
+    public static int getStudentNG(int studentId) {
+        //This method gives the number of NG for the given student
+        int count = 0;
+
+        if (studentId < 0 || studentId >= grades.length) {
+            System.out.println("Invalid student ID.");
+            return -1;
+        }
+
+        for (int i = 0; i < grades[studentId].length; i++) {
+            if (grades[studentId][i] == -1) {
+                count++;
+            }
+        }
+
+        return count;
+
+    }
+
     // moved Q1 printing method to solutions.Phase1Step2HardestEasiestCourses
 
     //Helper class that stores a course's mean and id
