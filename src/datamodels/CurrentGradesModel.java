@@ -187,6 +187,7 @@ public class CurrentGradesModel {
     public static String getCourseName(int courseId) {
         return courses[courseId];
     }
+
     public static ArrayList<Integer> getAllStudentIdsOfCourseWithGrade(int courseId) {
         ArrayList<Integer> studentIds = new ArrayList<>();
         for (int studentId : studentID2index.keySet()){
@@ -372,20 +373,6 @@ public class CurrentGradesModel {
         return indexMostFrequent;
     }
 
-    public static int getCourseNG(int courseID) {
-        //Get the number of NG per course
-        //This is to assume the order of taking the courses
-        int count = 0;
-
-
-            for (int j = 0; j < grades.length; j++) {
-                if (grades[j][courseID] == -1) {
-                    count++;
-                }
-            }
-
-       return count;
-    }
 
     public static int getStudentNG(int studentId) {
         //This method gives the number of NG for the given student
@@ -434,7 +421,23 @@ public class CurrentGradesModel {
         return sumMean / counterMean;   // division by zero if and only if all courses have only NGs
     }
 
-    public static int getStudentNGCount(int studentId) {
+
+    public static int getCourseNG(int courseID) {
+        //Get the number of NG per course
+        //This is to assume the order of taking the courses
+        int count = 0;
+
+
+        for (int j = 0; j < grades.length; j++) {
+            if (grades[j][courseID] == -1) {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    public static int getStudentNG(int studentId) {
         //This method gives the number of NG for the given student
         int count = 0;
 
@@ -478,7 +481,7 @@ public class CurrentGradesModel {
         int count = 0;
         for (int i = 0; i < grades.length; i++) {
             int fails = getFailedCourses(i);
-            int ngs = getStudentNGCount(i);
+            int ngs = getStudentNG(i);
 
             if (fails == 0 && ngs < 5) {
                 // System.out.println("Possible graduation of the student: " + i);  // DEBUG
@@ -488,53 +491,6 @@ public class CurrentGradesModel {
         System.out.println("Number of expected students to graduate this year: " + count);
 
 
-    }
-
-    public static double getPassingRate(int courseID) {
-        //This gives us the passing rate for the given course id
-        //The method divides the number of passing values to the number of values that are not NG
-        if (courseID < 0 || courseID >= grades.length) {
-            System.out.println("Invalid courseID");
-            return -1;
-        }
-        int numberOfAllGrades = 0;
-        double numberOfPassingGrades = 0;
-        for (int i = 0; i < grades.length; i++) {
-            if (grades[i][courseID] != -1) {
-                numberOfAllGrades++;
-                if (grades[i][courseID] >= 6) {
-                    numberOfPassingGrades++;
-                }
-
-            }
-
-
-        }
-
-        return numberOfPassingGrades / numberOfAllGrades;
-
-    }
-
-    public static double passingCorrelationValue() {
-        //We find the passing correlation value by dividing passing rate of the courses to the course mean from graduate grades.
-        //This value is used to determine passing rate of the courses without any data.
-        double correlationValue = 0;
-        for (int i = 0; i < grades[0].length; i++) {
-            correlationValue = correlationValue + getPassingRate(i)/ Phase1Step1CourseMean.calcCourseMean(i);
-        }
-        return correlationValue/36;
-    }
-
-
-
-    public static double meanPassingRate() {
-
-        //Calculates mean passing rate of the courses based on the correlation value and course mean data from graduate grades.
-        double sum = 0;
-        for (int i = 0; i < grades[0].length; i++) {
-            sum = sum + passingCorrelationValue()* Phase1Step1CourseMean.calcCourseMean(i);
-        }
-        return sum / grades[0].length;
     }
 
 
