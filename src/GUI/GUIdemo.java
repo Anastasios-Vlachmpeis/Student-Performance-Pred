@@ -88,7 +88,7 @@ public class GUIdemo extends Application {
             case "BarChart" -> chart = new BarChartGenerator().createChart(selectedXAxis, selectedYAxis, xAxisFilterStart, xAxisFilterEnd, yAxisFilterStart, yAxisFilterEnd);
             //case "Histogram" -> chart = new HistogramGenerator().createChart(selectedXAxis, selectedYAxis);
             //case "JointPlot" -> chart = new JointPlotGenerator().createChart(selectedXAxis, selectedYAxis);
-            //case "ScarPlot" -> chart = new ScarPlotGenerator().createChart(selectedXAxis, selectedYAxis);
+            //case "SwarmPlot" -> chart = new ScarPlotGenerator().createChart(selectedXAxis, selectedYAxis);
             //case "ScatterPlot" -> chart = new ScatterPlotGenerator().createChart(selectedXAxis, selectedYAxis);
         }
 
