@@ -6,7 +6,13 @@
       <root url="file://$PROJECT_DIR$/jdks/openjfx-21.0.9_osx-x64_bin-sdk/javafx-sdk-21.0.9/lib" />
       <root url="file://$PROJECT_DIR$/jdks/openjfx-21.0.9_osx-aarch64_bin-sdk/javafx-sdk-21.0.9/lib" />
     </CLASSES>
-    <JAVADOC />
+    <JAVADOC>
+      <root url="file://$PROJECT_DIR$/jdks/openjfx-21.0.9-javadoc/javafx-21.0.9-javadoc" />
+      <root url="https://openjfx.io/javadoc/21/javafx.base/" />
+      <root url="https://openjfx.io/javadoc/21/javafx.graphics/" />
+      <root url="https://openjfx.io/javadoc/21/javafx.controls/" />
+      <root url="https://openjfx.io/javadoc/21/javafx.media/" />
+    </JAVADOC>
     <SOURCES />
     <jarDirectory url="file://$PROJECT_DIR$/jdks/openjfx-21.0.9_linux-x64_bin-sdk/javafx-sdk-21.0.9/lib" recursive="false" />
     <jarDirectory url="file://$PROJECT_DIR$/jdks/openjfx-21.0.9_osx-aarch64_bin-sdk/javafx-sdk-21.0.9/lib" recursive="false" />
