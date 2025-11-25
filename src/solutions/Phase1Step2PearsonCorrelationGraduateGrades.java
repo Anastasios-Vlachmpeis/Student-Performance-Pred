@@ -16,13 +16,13 @@ public class Phase1Step2PearsonCorrelationGraduateGrades {
 
     /**
      * Q3: "Are there courses that seem similar or related?"
-     * Computes Pearson correlation between all pairs of courses,
+     * Computes PearsonCorrelation correlation between all pairs of courses,
      * but only considers students who have valid (non-NG) grades
      * in both courses. Displays the top positively correlated course
      * pairs as the most "similar" courses, while skipping NG entries.
      */
 
-    // Compute Pearson correlation for a pair of courses, considering only students with grades in both
+    // Compute PearsonCorrelation correlation for a pair of courses, considering only students with grades in both
     static double pearsonBetweenCoursesIgnoreNG(int i, int j) {
         // Gathers pairs of grades only when both courses have a grade for the same student
         ArrayList<Double> gradesA = new ArrayList<>();

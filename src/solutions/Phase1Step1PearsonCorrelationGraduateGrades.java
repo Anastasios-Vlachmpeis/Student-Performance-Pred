@@ -47,7 +47,7 @@ public class Phase1Step1PearsonCorrelationGraduateGrades {
         return Math.sqrt(sumSq / (n - 1));
     }
     /**
-     * Pearson correlation between two course columns i and j
+     * PearsonCorrelation correlation between two course columns i and j
      */
     static double pearsonBetweenCourses(int i, double meanI, double stdI,
                                         int j, double meanJ, double stdJ) {

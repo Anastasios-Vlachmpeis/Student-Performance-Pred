@@ -1,21 +1,46 @@
 package tools;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
+
+/**
+ * Static helper class for performing descriptive statistics on double values datasets.
+ *  - mean
+ *  - median
+ *  - mode
+ *  - standard variation
+ */
 public class Statistics {
 
-    public static double average(double[] array) {
+    /**
+     * Helper function to convert list of doubles into arrays of doubles
+     * so they are compatible with double[] argument methods
+     */
+    private static double[] convertDoubleListToArray(List<Double> list) {
+        double[] array = new double[list.size()];
+        for (int i = 0; i< array.length; i++) {
+            array[i] = list.get(i);
+        }
+        return array;
+    }
+
+    public static double mean(double[] array) {
         if (array.length == 0) {
             throw new IllegalArgumentException("Array must not be empty in order to calculate its mean");
         }
 
         double sum = 0;
-        for (double num: array) {
+        for (double num : array) {
             sum += num;
         }
         return sum / array.length;
+    }
+
+    public static double mean(List<Double> list) {
+        if (list.isEmpty()) {
+            throw new IllegalArgumentException("List must not be empty in order to calculate its mean");
+        }
+        return mean(convertDoubleListToArray(list));
     }
 
     public static double median(double[] array) {
@@ -31,12 +56,18 @@ public class Statistics {
         double median = 0;
         if (safeArray.length % 2 == 0) {
             median = (safeArray[safeArray.length / 2] + safeArray[safeArray.length / 2 + 1]) / 2;
-        }
-        else {
+        } else {
             median = safeArray[safeArray.length / 2];
         }
 
         return median;
+    }
+
+    public static double median(List<Double> list) {
+        if (list.isEmpty()) {
+            throw new IllegalArgumentException("List must not be empty in order to calculate its mean");
+        }
+        return median(convertDoubleListToArray(list));
     }
 
     public static double mode(double[] array) {
@@ -53,14 +84,40 @@ public class Statistics {
         // find first with the highest frequency
         int highestCount = 0;
         double mode = array[0];
-        for (Map.Entry<Double, Integer> frequency: frequencies.entrySet()) {
-           if (frequency.getValue() > highestCount) {
-               highestCount = frequency.getValue();
-               mode = frequency.getKey();
-           }
+        for (Map.Entry<Double, Integer> frequency : frequencies.entrySet()) {
+            if (frequency.getValue() > highestCount) {
+                highestCount = frequency.getValue();
+                mode = frequency.getKey();
+            }
         }
 
         return mode;
+    }
+
+    public static double mode(List<Double> list) {
+        if (list.isEmpty()) {
+            throw new IllegalArgumentException("List must not be empty in order to calculate its mean");
+        }
+        return mode(convertDoubleListToArray(list));
+    }
+
+    public static double standardDeviation(double[] array) {
+        if (array.length == 0) {
+            throw new IllegalArgumentException("Array must not be empty in order to calculate its standard deviation");
+        }
+        double mean = mean(array);
+        double sumSquaredDifference = 0;
+        for (double num : array) {
+            sumSquaredDifference += Math.pow(num - mean , 2);
+        }
+        return sumSquaredDifference / (array.length - 1);
+    }
+
+    public static double standardDeviation(List<Double> list) {
+        if (list.isEmpty()) {
+            throw new IllegalArgumentException("List must not be empty in order to calculate its mean");
+        }
+        return standardDeviation(convertDoubleListToArray(list));
     }
 
 }
