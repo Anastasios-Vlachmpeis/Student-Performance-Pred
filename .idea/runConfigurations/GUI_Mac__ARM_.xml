@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="GUI Mac (ARM)" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="GUI.GUIdemo" />
+    <module name="project-1.1" />
+    <option name="VM_PARAMETERS" value="--module-path jdks/openjfx-21.0.9_osx-aarch64_bin-sdk/javafx-sdk-21.0.9/lib --add-modules=javafx.controls" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
