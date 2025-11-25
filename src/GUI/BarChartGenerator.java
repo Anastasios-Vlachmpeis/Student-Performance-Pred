@@ -41,7 +41,7 @@ public class BarChartGenerator {
                 alert.show();
             }
 
-            for (int i = xAxisFilterStart; i < xAxisFilterEnd; i++) {
+            for (int i = xAxisFilterStart; i <= xAxisFilterEnd; i++) {
                 String courseName = CurrentGradesModel.getCourseName(i);
                 Number value = switch (yAxisData) {
                     case "Number of NG" -> CurrentGradesModel.getCourseNG(i);
@@ -51,12 +51,14 @@ public class BarChartGenerator {
                     default -> 0;
                 };
 
-                dataset.getData().add(new XYChart.Data<>(courseName, value)); }
+                if(value.doubleValue() >= yAxisFilterStart && value.doubleValue() <= yAxisFilterEnd) {
+                    dataset.getData().add(new XYChart.Data<>(courseName, value)); }}
 
         }
 
         //If chosen X axis is Per Student
         if (xAxisData.equals("Per Student")) {
+
 
             //Alert if the inputs are not in range
             if (xAxisFilterStart < 0 || xAxisFilterEnd > CurrentGradesModel.studentCount || xAxisFilterStart >= xAxisFilterEnd) {
@@ -67,7 +69,7 @@ public class BarChartGenerator {
                 alert.show();
             }
 
-            for (int i = xAxisFilterStart; i < xAxisFilterEnd; i++) {
+            for (int i = xAxisFilterStart; i <= xAxisFilterEnd; i++) {
                 String studentNumber = "Student " + i;
 
                 Number value = switch (yAxisData) {
@@ -78,8 +80,8 @@ public class BarChartGenerator {
                     default -> 0;
                 };
 
-
-                dataset.getData().add(new XYChart.Data<>(studentNumber, value)); }
+                if(value.doubleValue() >= yAxisFilterStart && value.doubleValue() <= yAxisFilterEnd) {
+                dataset.getData().add(new XYChart.Data<>(studentNumber, value)); }}
 
         }
         barChart.getData().add(dataset);
