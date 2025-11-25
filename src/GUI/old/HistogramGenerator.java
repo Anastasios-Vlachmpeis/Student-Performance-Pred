@@ -23,15 +23,15 @@ public class HistogramGenerator {
 
         // X-axis label
         CategoryAxis xAxis = new CategoryAxis();
-        xAxis.setLabel("Amount of NGs");
+        xAxis.setLabel(xAxisData);
 
         // Y-axis label
         NumberAxis yAxis = new NumberAxis();
-        yAxis.setLabel("Number of Courses");
+        yAxis.setLabel(yAxisData);
 
         // Create chart, Label, Bars are bigger, no gaps between Bars
         BarChart<String, Number> histogram = new BarChart<>(xAxis,yAxis);
-        histogram.setTitle("Histogram of number of Courses with the same amount of NGs");
+        histogram.setTitle(yAxisData + " " + xAxisData);
         histogram.setLegendVisible(false);
         histogram.setCategoryGap(0);
         histogram.setBarGap(0);

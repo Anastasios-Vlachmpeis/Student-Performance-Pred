@@ -22,6 +22,10 @@ public class BarChartGenerator {
         // Create the bar chart
         BarChart<String, Number> barChart = new BarChart<>(xAxis, yAxis);
         barChart.setTitle(yAxisData + " " + xAxisData);
+        barChart.setLegendVisible(false);
+        barChart.setCategoryGap(0);
+        barChart.setBarGap(1);
+        barChart.setAnimated(false);
 
         XYChart.Series<String, Number> dataset = new XYChart.Series<>();
         dataset.setName(yAxisData + " " + xAxisData);
