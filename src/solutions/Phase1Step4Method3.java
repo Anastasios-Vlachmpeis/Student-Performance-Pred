@@ -1,9 +1,15 @@
 package solutions;
 
-import datamodels.*;
+import datamodels.StudentInfoModel;
+import datamodels.CategoricalFeature;
+import datamodels.CurrentGradesModel;
+import datamodels.SplitCondition;
+import datamodels.Feature;
 
 import java.util.ArrayList;
 import java.util.Random;
+
+
 
 
 /**
@@ -70,19 +76,19 @@ public class Phase1Step4Method3 {
         double sum_r_no = 0;
         //should group this 4 variables into a class for phase 3//
 
-        final String[] QCT = {"Stable", "Fractured", "Chaotic", "Coherent", "Resonant"};
-        // consider using this: final String[] QCT = CategoricalFeature.getRange(0);
+        //final String[] QCT = {"Stable", "Fractured", "Chaotic", "Coherent", "Resonant"};
+        final String[] QCT = CategoricalFeature.getRange(0);
         //all values for Quantum Coherence Threshold//
 
-        final String[] SNC = {"None", "Harmonized"};
-        // consider using this: final String[] QCT = CategoricalFeature.getRange(1);
+        //final String[] SNC = {"None", "Harmonized"};
+        final String[] SNC = CategoricalFeature.getRange(1);
         //all values for Symbiotic Network Compatibility//
 
-        final String[] BLT = {"silver", "Crimson", "White-Blue", "Violet"};
-        // consider using this: final String[] QCT = CategoricalFeature.getRange(4);
+        // final String[] BLT = {"silver", "Crimson", "White-Blue", "Violet"};
+        final String[] BLT = CategoricalFeature.getRange(4);
         //all values for Bio-Luminal Transmission//
 
-        int id = (randomInt(0, 4));
+        int id = (RandomInt(0, 4));
         //picks random feature by assigned id//
 
         String valueC = "NULL";
@@ -93,44 +99,31 @@ public class Phase1Step4Method3 {
 
         Feature creature = StudentInfoModel.getFeature(studentId, id);
 
-        // determines which feature type id belongs to
-        if (NumericalFeature.isIdAllowed(id)) {
-            int featureRangeMin = (int) NumericalFeature.getRangeMin(id);
-            int featureRangeMax = (int) NumericalFeature.getRangeMax(id);
-            creature = new NumericalFeature(id, randomInt(featureRangeMin, featureRangeMax));
-        }
-        else if (CategoricalFeature.isIdAllowed(id)) {
-           creature = new CategoricalFeature(id, randomString(CategoricalFeature.getRange(id)));
-        }
-        else {
-            throw new IllegalArgumentException("Feature id " + id + " is not recognized by the project.");
-        }
-
-//        switch (id) {
-//            case 0:
-//                valueC = (randomString(QCT));
-//                creature = new CategoricalFeature(id, valueC);
-//                break;
-//            case 1:
-//                valueC = (randomString(SNC));
-//                creature = new CategoricalFeature(id, valueC);
-//                break;
-//            case 2:
-//                valueN = (randomInt(1, 3));
-//                //all Astro-Temporal Drift Resistance values are {1,2,3}//
-//                creature = new NumericalFeature(id, valueN);
-//                break;
-//            case 3:
-//                valueN = (RandomDouble(-1, 1));
-//                //all Psionic Interference Tolerance values are between -1 and 1 with an exeption//
-//                //there is one student with a P.I.T. value of 9.64538577714835E-4//
-//                creature = new NumericalFeature(id, valueN);
-//                break;
-//            case 4:
-//                valueC = (randomString(BLT));
-//                creature = new CategoricalFeature(id, valueC);
-//                break;
-//        }
+       switch (id) {
+           case 0:
+               valueC = (RandomString(QCT));
+               //creature = new CategoricalFeature(id, valueC);
+               break;
+           case 1:
+               valueC = (RandomString(SNC));
+               //creature = new CategoricalFeature(id, valueC);
+               break;
+           case 2:
+               valueN = (RandomInt(1, 3));
+               //all Astro-Temporal Drift Resistance values are {1,2,3}//
+               //creature = new NumericalFeature(id, valueN);
+               break;
+           case 3:
+               valueN = (RandomDouble(-1, 1));
+               //all Psionic Interference Tolerance values are between -1 and 1 with an exeption//
+               //there is one student with a P.I.T. value of 9.64538577714835E-4//
+               //creature = new NumericalFeature(id, valueN);
+               break;
+           case 4:
+               valueC = (RandomString(BLT));
+               //creature = new CategoricalFeature(id, valueC);
+               break;
+       }
 
         ArrayList<Integer> Split = CurrentGradesModel.getAllStudentIdsOfCourseWithGrade(courseId);
         //takes split containing all students who have a grade on selected course//
@@ -138,13 +131,13 @@ public class Phase1Step4Method3 {
 
         for (int i = 0; i < 100; i++) {
 
-            double[][] Sample = takeSample(Split, 70, courseId);
+            double[][] Sample = TakeSample(Split, 70, courseId);
             //samples 70% of the split at random every time//
 
-            grade_yes = meanSide(id, true, Sample, creature);
+            grade_yes = MeanSide(id, true, Sample, creature);
             //calculates mean of all students who fall on one side of the stump//
 
-            grade_no = meanSide(id, false, Sample, creature);
+            grade_no = MeanSide(id, false, Sample, creature);
             //updating both values is redundent when you could check which side of the stump the student//
             //falls on at the start, but it will be needed when making the decision tree for phase 3//
             //it can also help in case we change the program to find grades for multiple students//
@@ -169,7 +162,7 @@ public class Phase1Step4Method3 {
 
     }
 
-    private static double[][] takeSample(ArrayList<Integer> Split, int percent, int course) {
+    private static double[][] TakeSample(ArrayList<Integer> Split, int percent, int course) {
 
 
         ArrayList<Integer> Copy = (ArrayList) Split.clone();
@@ -195,17 +188,33 @@ public class Phase1Step4Method3 {
         return Sample;
     }
 
-    private static double meanSide(int id, boolean yn, double[][] Sample, Feature creature) {
+    private static double MeanSide(int id, boolean yn, double[][] Sample, Feature creature) {
 
         double grade_y = 0;
         int div_y = 0;
         double grade_n = 0;
         int div_n = 0;
 
+        // determines which feature type id belongs to//
+        // if (NumericalFeature.isIdAllowed(id)) {
+        //     int featureRangeMin = (int) NumericalFeature.getRangeMin(id);
+        //     int featureRangeMax = (int) NumericalFeature.getRangeMax(id);
+        //     creature = new NumericalFeature(id, randomInt(featureRangeMin, featureRangeMax));
+        // }
+        // else if (CategoricalFeature.isIdAllowed(id)) {
+        //    creature = new CategoricalFeature(id, randomString(CategoricalFeature.getRange(id)));
+        // }
+        // else {
+        //     throw new IllegalArgumentException("Feature id " + id + " is not recognized by the project.");
+        // }
+
 
         for (int i = 0; i < Sample[0].length; i++) {
 
             int trigger = (int) Sample[0][i];
+            // if(NumericalFeature.isIdAllowed(id)){
+            //     StudentInfoModel.getFeature(id, id)
+            // }
             //becomes an int of student id in order to be used in getFeature//
             if (SplitCondition.evaluate(StudentInfoModel.getFeature(trigger, id), creature)) {
 
@@ -226,18 +235,18 @@ public class Phase1Step4Method3 {
         }
     }
 
-    private static int randomInt(int min, int max) {
+    private static int RandomInt(int min, int max) {
         Random r = new Random();
         return r.nextInt(max - min) + min;
         //random int from min to max//
     }
 
-    private static double randomDouble(double min, double max) {
+    private static double RandomDouble(double min, double max) {
         return min + (double) (Math.random() * (max - min));
         //random double from min to max//
     }
 
-    private static String randomString(String[] list) {
+    private static String RandomString(String[] list) {
         Random r = new Random();
         int item = r.nextInt(list.length);
         return list[item];
