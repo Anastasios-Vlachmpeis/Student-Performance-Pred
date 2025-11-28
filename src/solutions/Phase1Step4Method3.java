@@ -48,14 +48,16 @@ import java.util.Random;
  */
 public class Phase1Step4Method3 {
 
+    static {StudentInfoModel.getAllFeatureIds();}
+
     public static void main(String[] args) {
         double result = 0;
-        for (int i = 1; i <= 10; i++) {
+        for (int i = 1; i <= 100; i++) {
             result += (StumpForestGrade(311913, 1));
         }
         //result is the mean of all stumps//
-        result /= 10;
-        System.out.println(result);
+        result /= 100;
+        System.out.println("Student " + "311913" + " is expected to have a grade of " + result + " on " + CurrentGradesModel.getCourseName(1));
     }
 
     private static double StumpForestGrade(int studentId, int courseId) {
@@ -170,16 +172,18 @@ public class Phase1Step4Method3 {
         Random r = new Random();
 
         int total = Split.size();
-        //System.out.println(total);
+        
         total = total * percent / 100;
-        //System.out.println(total);
+        
 
         double[][] Sample = new double[2][total];
+        //2d matrice containg "total" number of rows, each containing studentid and grade on selected course//
 
         for (int i = 0; i < total; i++) {
             int randomIndex = r.nextInt(Copy.size());
             double z = CurrentGradesModel.getGrade(Copy.get(randomIndex), course);
-            Sample[0][i] = randomIndex;
+            int randomValue = Copy.get(randomIndex);
+            Sample[0][i] = randomValue;
             Sample[1][i] = z;
             //saves student id and grade for easier use//
             Copy.remove(randomIndex);
