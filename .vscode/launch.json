@@ -6,14 +6,6 @@
     "configurations": [
         {
             "type": "java",
-            "name": "ScatterPlotDashboard",
-            "request": "launch",
-            "mainClass": "scatterplot.ScatterPlotDashboard",
-            "projectName": "project-1.1_49aab83e",
-            "vmArgs": "--module-path \"${workspaceFolder}/jdks/openjfx-21.0.9_windows-x64_bin-sdk/javafx-sdk-21.0.9/lib\" --add-modules javafx.controls,javafx.fxml,javafx.graphics"
-        },
-        {
-            "type": "java",
             "name": "GUIdemo",
             "request": "launch",
             "mainClass": "GUI.GUIdemo",
