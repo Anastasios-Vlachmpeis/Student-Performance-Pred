@@ -1,0 +1,31 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "ScatterPlotDashboard",
+            "request": "launch",
+            "mainClass": "scatterplot.ScatterPlotDashboard",
+            "projectName": "project-1.1_49aab83e",
+            "vmArgs": "--module-path \"${workspaceFolder}/jdks/openjfx-21.0.9_windows-x64_bin-sdk/javafx-sdk-21.0.9/lib\" --add-modules javafx.controls,javafx.fxml,javafx.graphics"
+        },
+        {
+            "type": "java",
+            "name": "GUIdemo",
+            "request": "launch",
+            "mainClass": "GUI.GUIdemo",
+            "projectName": "project-1.1_49aab83e",
+            "vmArgs": "--module-path \"${workspaceFolder}/jdks/openjfx-21.0.9_windows-x64_bin-sdk/javafx-sdk-21.0.9/lib\" --add-modules javafx.controls,javafx.fxml,javafx.graphics"
+        },
+        {
+            "type": "java",
+            "name": "Current File",
+            "request": "launch",
+            "mainClass": "${file}",
+            "vmArgs": "--module-path \"${workspaceFolder}/jdks/openjfx-21.0.9_windows-x64_bin-sdk/javafx-sdk-21.0.9/lib\" --add-modules javafx.controls,javafx.fxml,javafx.graphics"
+        }
+    ]
+}
