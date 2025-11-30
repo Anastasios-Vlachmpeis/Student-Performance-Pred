@@ -1,4 +1,4 @@
-package GUI;
+package GUI.chart;
 
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.ScatterChart;
