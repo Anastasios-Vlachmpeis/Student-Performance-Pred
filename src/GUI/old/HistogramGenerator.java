@@ -1,4 +1,4 @@
-package GUI;
+package GUI.old;
 
 import datamodels.CurrentGradesModel;
 import javafx.scene.chart.BarChart;
