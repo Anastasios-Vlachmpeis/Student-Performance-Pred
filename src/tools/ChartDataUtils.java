@@ -9,29 +9,14 @@ import java.util.ArrayList;
 import java.util.function.Predicate;
 
 /**
- * Utility class containing shared data calculation and chart generation logic
- * used by ScatterPlotGenerator and JointPlotGenerator only, but can be used by other chart generators.
- * 
- * Methods that can be used by other chart types:
- * - getStudentYValueForFiltered(int studentId, String yAxisData, String selectedCourse, String selectedFeature) -- Calculates the Y-value for a student based on the selected Y-axis data and course/feature
- * - getCourseYValue(int courseId, String yAxisData) -- Calculates the Y-value for a course based on the selected Y-axis data
- * - getPredictedGrade(int studentId, String selectedCourse, String selectedFeature) -- Predicts the grade for a student based on the selected course and feature
- * - findCourseId(String courseName) -- Finds the course ID for a given course name
- * - findFeatureId(String featureName) -- Finds the feature ID for a given feature name
- * - createDecisionStumpForFeature(int courseId, int featureId) -- Creates a decision stump for a given course and feature
- * - getPassingStudents(int courseId) -- Gets the number of passing students for a given course
- * - getNonPassingStudents(int courseId) -- Gets the number of non-passing students for a given course
- * - getCumLaudeStudents(int courseId) -- Gets the number of cum-laude students for a given course
- * - countStudentsByGrade(int courseId, Predicate<Double> condition) -- Counts the number of students for a given course that satisfy a given condition
- * - getFilteredStudentIds(String filterFeature, String filterValue) -- Gets the filtered student IDs based on a given filter feature and value
- * - generateStudentData(XYChart.Series<Number, Number> series, String yAxisData, double xFilterStart, double xFilterEnd, double yFilterStart, double yFilterEnd, String selectedCourse, String selectedFeature, int[] filteredStudentIds) -- Generates student data for a given Y-axis data, filter start/end, and selected course/feature
- * - generateCourseData(XYChart.Series<Number, Number> series, String yAxisData, double xFilterStart, double xFilterEnd, double yFilterStart, double yFilterEnd) -- Generates course data for a given Y-axis data, filter start/end
- * - generatePredictedVsActualData(XYChart.Series<Number, Number> predictedSeries, XYChart.Series<Number, Number> actualSeries, double xFilterStart, double xFilterEnd, double yFilterStart, double yFilterEnd, String selectedCourse, String selectedFeature, int[] filteredStudentIds) -- Generates predicted vs actual data for a given Y-axis data, filter start/end, and selected course/feature
- * - addTooltipsToSeries(XYChart.Series<Number, Number> series, String xAxisData, String yAxisData, String courseName) -- Adds tooltips to a given series
- * - createCourseCorrelationChart(String xCourse, String yCourse, double xFilterStart, double xFilterEnd, double yFilterStart, double yFilterEnd, int[] filteredStudentIds, boolean showYEqualsX) -- Creates a course correlation chart for a given X and Y course, filter start/end, and filtered student IDs
+ * Utility class for data calculation and chart generation.
+ * Used by ScatterPlotGenerator and JointPlotGenerator.
  */
 public class ChartDataUtils {
     
+    /** 
+     * Calculate the Y-value for a student based on selected Y-axis data type 
+     */
     public static double getStudentYValueForFiltered(int studentId, String yAxisData, String selectedCourse, String selectedFeature) {
         return switch (yAxisData) {
             case "Mean" -> {
@@ -47,6 +32,7 @@ public class ChartDataUtils {
                 yield median == -1 ? 0 : median;
             }
             case "Number of NGs" -> {
+                // Here we map student ID to index because getStudentNG expects index, not ID
                 int[] allStudentIds = CurrentGradesModel.getAllStudentIds();
                 int studentIndex = -1;
                 for (int i = 0; i < allStudentIds.length; i++) {
@@ -62,6 +48,9 @@ public class ChartDataUtils {
         };
     }
     
+    /** 
+     * Calculate the Y-value for a course based on selected Y-axis data type 
+     */
     public static double getCourseYValue(int courseId, String yAxisData) {
         return switch (yAxisData) {
             case "Mean" -> {
@@ -84,6 +73,10 @@ public class ChartDataUtils {
         };
     }
     
+    /** 
+     * Predict the grade for a student using a decision stump
+     * based on the selected course and feature 
+     */
     public static double getPredictedGrade(int studentId, String selectedCourse, String selectedFeature) {
         if (selectedCourse == null || selectedFeature == null) {
             return 0;
@@ -97,7 +90,7 @@ public class ChartDataUtils {
                 return 0;
             }
             
-            // Create decision stump and predict grade
+            // Here we create a decision stump for this course/feature combination and use it to predict the grade
             DecisionStump decisionStump = createDecisionStumpForFeature(courseId, featureId);
             return decisionStump.predictGrade(studentId);
         } catch (Exception e) {
@@ -105,6 +98,9 @@ public class ChartDataUtils {
         }
     }
     
+    /** 
+     * Find the course ID for a given course name. Returns -1 if not found. 
+     */
     public static int findCourseId(String courseName) {
         if (courseName == null) {
             return -1;
@@ -118,6 +114,9 @@ public class ChartDataUtils {
         return -1;
     }
     
+    /** 
+     * Find the feature ID for a given feature name. Returns -1 if not found. 
+     */
     public static int findFeatureId(String featureName) {
         if (featureName == null) {
             return -1;
@@ -131,10 +130,14 @@ public class ChartDataUtils {
         return -1;
     }
     
+    /** 
+     * We create a decision stump for a given course and feature
+     * using median split for numerical features and first category for categorical features
+     */
     public static DecisionStump createDecisionStumpForFeature(int courseId, int featureId) {
         ArrayList<Integer> studentIds = CurrentGradesModel.getAllStudentIdsOfCourseWithGrade(courseId);
         
-        // Return default decision stump if no students with grades
+        // Here we return a default decision stump if no students have grades for this course
         if (studentIds.isEmpty()) {
             double defaultMean = CurrentGradesModel.getCourseMeansMean();
             int[] allStudentIds = CurrentGradesModel.getAllStudentIds();
@@ -147,13 +150,14 @@ public class ChartDataUtils {
             }
         }
         
-        // Determine split feature (median for numerical, first category for categorical)
         Feature sampleFeature = StudentInfoModel.getFeature(studentIds.get(0), featureId);
         ArrayList<Double> aboveSplit = new ArrayList<>();
         ArrayList<Double> belowSplit = new ArrayList<>();
         
+        // Here we determine the split feature: we use median for numerical features, first category for categorical
         Feature splitFeature;
         if (sampleFeature instanceof NumericalFeature) {
+            // Calculate median of feature values
             ArrayList<Double> featureValues = new ArrayList<>();
             for (int studentId : studentIds) {
                 Feature feature = StudentInfoModel.getFeature(studentId, featureId);
@@ -206,18 +210,22 @@ public class ChartDataUtils {
         return new DecisionStump(splitFeature, meanAbove, meanBelow);
     }
     
+    /** Returns number of passing students (grade >= 6.0) for a given course */
     public static int getPassingStudents(int courseId) {
         return countStudentsByGrade(courseId, grade -> grade >= 6.0);
     }
     
+    /** Returns number of non-passing students (grade < 6.0) for a given course */
     public static int getNonPassingStudents(int courseId) {
         return countStudentsByGrade(courseId, grade -> grade < 6.0);
     }
     
+    /** Returns number of cum-laude students (grade > 8.0) for a given course */
     public static int getCumLaudeStudents(int courseId) {
         return countStudentsByGrade(courseId, grade -> grade > 8.0);
     }
     
+    /** Counts students for a given course that satisfy the provided grade condition */
     public static int countStudentsByGrade(int courseId, Predicate<Double> condition) {
         int count = 0;
         int[] studentIds = CurrentGradesModel.getAllStudentIds();
@@ -234,10 +242,14 @@ public class ChartDataUtils {
         return count;
     }
     
+    /** 
+     * Return filtered student IDs based on selected feature and filter value
+     * Return all students if no filter is selected
+     */
     public static int[] getFilteredStudentIds(String filterFeature, String filterValue) {
         int[] allStudentIds = CurrentGradesModel.getAllStudentIds();
         
-        // Return all students if no filter is selected
+        // Here we return all students if no filter is selected
         if (filterFeature == null || filterFeature.equals("No Feature")) {
             return allStudentIds;
         }
@@ -247,7 +259,7 @@ public class ChartDataUtils {
             return allStudentIds;
         }
         
-        // Filter students based on feature type and value
+        // Here we filter students based on feature type and value
         ArrayList<Integer> filteredIds = new ArrayList<>();
         
         for (int studentId : allStudentIds) {
@@ -256,6 +268,7 @@ public class ChartDataUtils {
                 
                 boolean matches = false;
                 
+                // Here we check if the student's feature matches the filter: exact match for categorical, threshold for numerical
                 if (studentFeature instanceof CategoricalFeature) {
                     String category = ((CategoricalFeature) studentFeature).getCategory();
                     matches = category.equals(filterValue);
@@ -285,12 +298,19 @@ public class ChartDataUtils {
         return filteredIds.stream().mapToInt(i -> i).toArray();
     }
     
-    public static void generateStudentData(XYChart.Series<Number, Number> series, String yAxisData, double xFilterStart, double xFilterEnd, double yFilterStart, double yFilterEnd, String selectedCourse, String selectedFeature, int[] filteredStudentIds) {
+    /** 
+     * Generate student data points for the chart series, applying X and Y axis filters 
+     */
+    public static void generateStudentData(XYChart.Series<Number, Number> series, 
+        String yAxisData, double xFilterStart, double xFilterEnd, double yFilterStart, 
+        double yFilterEnd, String selectedCourse, String selectedFeature, int[] filteredStudentIds) {
         for (int i = 0; i < filteredStudentIds.length; i++) {
             int studentId = filteredStudentIds[i];
+            // Here we use the index in the filtered list as the X-value (not the global student ID)
             double xValue = i;
             double yValue = getStudentYValueForFiltered(studentId, yAxisData, selectedCourse, selectedFeature);
             
+            // Here we only add the point if it passes both X and Y filters
             if (xValue >= xFilterStart && xValue <= xFilterEnd && 
                 yValue >= yFilterStart && yValue <= yFilterEnd) {
                 series.getData().add(new XYChart.Data<>(xValue, yValue));
@@ -298,7 +318,11 @@ public class ChartDataUtils {
         }
     }
     
+    /** 
+     * Generate course data points for the chart series, applying X and Y axis filters 
+     */
     public static void generateCourseData(XYChart.Series<Number, Number> series, String yAxisData, double xFilterStart, double xFilterEnd, double yFilterStart, double yFilterEnd) {
+        // Here we calculate the valid course index range from the filter bounds
         int startIdx = (int) Math.max(0, Math.ceil(xFilterStart));
         int endIdx = (int) Math.min(CurrentGradesModel.courseCount - 1, Math.floor(xFilterEnd));
         
@@ -306,6 +330,7 @@ public class ChartDataUtils {
             double xValue = i;
             double yValue = getCourseYValue(i, yAxisData);
             
+            // Here we only add the point if it passes both X and Y filters
             if (xValue >= xFilterStart && xValue <= xFilterEnd && 
                 yValue >= yFilterStart && yValue <= yFilterEnd) {
                 series.getData().add(new XYChart.Data<>(xValue, yValue));
@@ -313,12 +338,17 @@ public class ChartDataUtils {
         }
     }
     
+    /** 
+     * Generate predicted and actual grade data points for comparison, applying X and Y axis filters 
+     */
     public static void generatePredictedVsActualData(XYChart.Series<Number, Number> predictedSeries, XYChart.Series<Number, Number> actualSeries, double xFilterStart, double xFilterEnd, double yFilterStart, double yFilterEnd, String selectedCourse, String selectedFeature, int[] filteredStudentIds) {
+        // Here we find the course ID and return early if the course is not found
         int courseId = findCourseId(selectedCourse);
         if (courseId == -1) {
             return;
         }
         
+        // Here we generate data points for each filtered student
         for (int i = 0; i < filteredStudentIds.length; i++) {
             double xValue = i;
             int studentId = filteredStudentIds[i];
@@ -326,11 +356,13 @@ public class ChartDataUtils {
             double predictedGrade = getPredictedGrade(studentId, selectedCourse, selectedFeature);
             double actualGrade = CurrentGradesModel.getGrade(studentId, courseId);
             
+            // Here we add the predicted grade point if it passes the filters
             if (xValue >= xFilterStart && xValue <= xFilterEnd && 
                 predictedGrade >= yFilterStart && predictedGrade <= yFilterEnd && predictedGrade != -1) {
                 predictedSeries.getData().add(new XYChart.Data<>(xValue, predictedGrade));
             }
             
+            // Here we add the actual grade point if it passes the filters (separate from predicted)
             if (xValue >= xFilterStart && xValue <= xFilterEnd && 
                 actualGrade >= yFilterStart && actualGrade <= yFilterEnd && actualGrade != -1) {
                 actualSeries.getData().add(new XYChart.Data<>(xValue, actualGrade));
@@ -338,16 +370,22 @@ public class ChartDataUtils {
         }
     }
     
+    /** 
+     * Add tooltips to all data points in the series showing X and Y axis values 
+     */
     public static void addTooltipsToSeries(XYChart.Series<Number, Number> series, String xAxisData, String yAxisData, String courseName) {
         for (XYChart.Data<Number, Number> data : series.getData()) {
+            // Here we include the course name in the tooltip for prediction-related data
             String tooltipText = courseName != null && (yAxisData.equals("Predicted Grade") || yAxisData.equals("Actual Grade"))
                 ? String.format("%s: %.2f\n%s: %.2f\nCourse: %s", xAxisData, data.getXValue().doubleValue(), yAxisData, data.getYValue().doubleValue(), courseName)
                 : String.format("%s: %.2f\n%s: %.2f", xAxisData, data.getXValue().doubleValue(), yAxisData, data.getYValue().doubleValue());
             
             Tooltip tooltip = new Tooltip(tooltipText);
+            // Here we install the tooltip immediately if the node exists, otherwise we wait for node creation
             if (data.getNode() != null) {
                 Tooltip.install(data.getNode(), tooltip);
             }
+            // Here we "listen" for node creation because JavaFX nodes are created lazily
             data.nodeProperty().addListener((obs, oldNode, newNode) -> {
                 if (newNode != null) {
                     Tooltip.install(newNode, tooltip);
@@ -356,11 +394,15 @@ public class ChartDataUtils {
         }
     }
     
+    /** 
+     * Create a scatter chart comparing grades between two courses,
+     * with the option to show a Y=X reference line 
+     */
     public static ScatterChart<Number, Number> createCourseCorrelationChart(String xCourse, String yCourse, double xFilterStart, double xFilterEnd, double yFilterStart, double yFilterEnd, int[] filteredStudentIds, boolean showYEqualsX) {
         int xCourseId = findCourseId(xCourse);
         int yCourseId = findCourseId(yCourse);
         
-        // Create empty chart if courses not found
+        // Here we return an empty chart if neither course is found
         if (xCourseId == -1 || yCourseId == -1) {
             NumberAxis xAxis = new NumberAxis();
             xAxis.setLabel(xCourse);
@@ -369,22 +411,24 @@ public class ChartDataUtils {
             return new ScatterChart<>(xAxis, yAxis);
         }
         
-        // Create the axes
+        // Here we create the axes
         NumberAxis xAxis = new NumberAxis();
         xAxis.setLabel(xCourse);
         
         NumberAxis yAxis = new NumberAxis();
         yAxis.setLabel(yCourse);
         
-        // Create the scatter chart
         ScatterChart<Number, Number> scatterChart = new ScatterChart<>(xAxis, yAxis);
         scatterChart.setTitle(yCourse + " vs " + xCourse);
         
-        // Add Y=X line if requested
         if (showYEqualsX) {
             XYChart.Series<Number, Number> yEqualsXSeries = new XYChart.Series<>();
             yEqualsXSeries.setName("Y = X Line");
             
+            /*
+             * We generate Y=X line points by calculating the range from filter bounds,
+             * clamped to valid grade range [0, 10]
+             */
             double minRange = Math.max(0, Math.min(xFilterStart, yFilterStart));
             double maxRange = Math.min(10, Math.max(xFilterEnd, yFilterEnd));
             
@@ -393,6 +437,7 @@ public class ChartDataUtils {
                 double value = minRange + (maxRange - minRange) * i / numPoints;
                 XYChart.Data<Number, Number> data = new XYChart.Data<>(value, value);
                 yEqualsXSeries.getData().add(data);
+                // Here we style it as a thin black line (rendered first, so appears below data points)
                 data.nodeProperty().addListener((obs, oldNode, newNode) -> {
                     if (newNode != null) {
                         newNode.setStyle("-fx-background-color: black; -fx-background-radius: 0.5px; -fx-pref-width: 1px; -fx-pref-height: 1px;");
@@ -403,7 +448,7 @@ public class ChartDataUtils {
             scatterChart.getData().add(yEqualsXSeries);
         }
         
-        // Add student grade data points
+        // Here we add student grade data points (one point per student showing grades in both courses)
         XYChart.Series<Number, Number> series = new XYChart.Series<>();
         series.setName("Student Grades");
         
@@ -412,6 +457,7 @@ public class ChartDataUtils {
                 double xGrade = CurrentGradesModel.getGrade(studentId, xCourseId);
                 double yGrade = CurrentGradesModel.getGrade(studentId, yCourseId);
                 
+                // Here we only add the point if both grades are valid and within filter ranges
                 if (xGrade != -1 && yGrade != -1 &&
                     xGrade >= xFilterStart && xGrade <= xFilterEnd &&
                     yGrade >= yFilterStart && yGrade <= yFilterEnd) {
