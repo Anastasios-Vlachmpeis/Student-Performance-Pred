@@ -5,106 +5,128 @@ import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
+import tools.ChartDataUtils;
+import tools.Statistics;
 
 import java.util.Map;
 import java.util.TreeMap;
 
 public class HistogramGenerator {
 
-    public BarChart<String, Number> createChart(String xAxisData, String yAxisData, int xAxisFilterStart, int xAxisFilterEnd, int yAxisFilterStart, int yAxisFilterEnd) {
+    public BarChart<String, Number> createChart(String xAxisData, String yAxisData, double xAxisFilterStart, double xAxisFilterEnd, double yAxisFilterStart, double yAxisFilterEnd, String filterFeature, String filterValue) {
 
+        int[] filterStudentIds = ChartDataUtils.getFilteredStudentIds(filterFeature, filterValue);
         // X-axis label
         CategoryAxis xAxis = new CategoryAxis();
 
         // Y-axis label
         NumberAxis yAxis = new NumberAxis();
 
-        // Create chart, Label, Bars are bigger, no gaps between Bars
+        // This part creates the chart with the distance between Categories set to five for appearance
         BarChart<String, Number> histogram = new BarChart<>(xAxis,yAxis);
-        histogram.setTitle(yAxisData + " " + xAxisData);
+        histogram.setTitle(yAxisData + " with the " + xAxisData + " (unsupported X)");
         histogram.setLegendVisible(false);
         histogram.setCategoryGap(5);
         histogram.setBarGap(0);
         histogram.setAnimated(false);
 
-        // Data series
-        XYChart.Series<String, Number> series = new XYChart.Series<>();
-        series.setName(yAxisData + " " + xAxisData);
+        xAxis.setLabel(xAxisData);
+        yAxis.setLabel(yAxisData);
 
+        XYChart.Series<String, Number> series1 = new XYChart.Series<>();
+        series1.setName(yAxisData + " with the " + xAxisData);
 
-        if (xAxisData.equals("Mean of Grades")) {
+        Map<String, Integer> frequencies = new TreeMap<>();
 
-            xAxis.setLabel("Mean of Grades");
-            yAxis.setLabel(yAxisData);
+        double binWidth = 0.5;
 
-            XYChart.Series<String, Number> series1 = new XYChart.Series<>();
-            series1.setName(yAxisData + "Mean of Grades");
+        if ("Number of Courses".equals(yAxisData)) {
 
-            Map<String, Integer> frequencies = new TreeMap<>();
+            int nCourses = CurrentGradesModel.courseCount;
 
-            double binWidth = 0.5;
+            for (int courseIndex = 0; courseIndex < nCourses; courseIndex++) {
 
-            if (yAxisData.equals("Number of Courses with")) {
+                double value;
 
-                int start = Math.max(0, xAxisFilterStart);
-                int end = Math.min(CurrentGradesModel.courseCount - 1, xAxisFilterEnd);
+                try {
+                    switch (xAxisData) {
+                        case "Mean of Grades" -> value = CurrentGradesModel.calcCourseMean(courseIndex);
+                        case "Median of Grades" -> value = CurrentGradesModel.calcCourseMedian(courseIndex);
+                        case "Mode of Grades" -> value = CurrentGradesModel.calcCourseMode(courseIndex);
+                        case "Number of NG" -> value = CurrentGradesModel.getCourseNG(courseIndex);
 
-                for (int i = start; i <= end; i++) {
-
-                    double mean = CurrentGradesModel.calcCourseMean(i);
-
-                    if (mean < yAxisFilterStart || mean > yAxisFilterEnd) {
-                        continue;
+                        case "Number of Passing Students" -> value = ChartDataUtils.getPassingStudents(courseIndex);
+                        case "Number of Non-passingStudents" -> value = ChartDataUtils.getNonPassingStudents(courseIndex);
+                        default -> {
+                            continue;
+                        }
                     }
-
-                    int binIndex = (int) Math.floor(mean / binWidth);
-                    double left = binIndex * binWidth;
-                    double right = left + binWidth;
-
-                    String label = String.format("%.1f-%.1f", left, right);
-                    frequencies.put(label, frequencies.getOrDefault(label, 0) + 1);
+                } catch (Exception e) {
+                    continue;
                 }
-            }
 
-            else if (yAxisData.equals("Number of Students with")) {
-
-                int start = Math.max(0, xAxisFilterStart);
-                int end = Math.min(CurrentGradesModel.studentCount - 1, xAxisFilterEnd);
-
-                for (int i = start; i <= end; i++) {
-
-                    double mean;
-
-                    try {
-                        mean = CurrentGradesModel.calcStudentMean(i);
-                    }   catch (NullPointerException e) {
-                        continue;
-                    }
-
-                    if (mean < yAxisFilterStart || mean > yAxisFilterEnd) {
-                        continue;
-                    }
-
-                    int binIndex = (int) Math.floor(mean / binWidth);
-                    double left = binIndex * binWidth;
-                    double right = left + binWidth;
-
-                    String label = String.format("%.1f-%.1f", left, right);
-                    frequencies.put(label, frequencies.getOrDefault(label, 0) + 1);
+                if (value < xAxisFilterStart || value > xAxisFilterEnd) {
+                    continue;
                 }
+
+                int binIndex = (int) Math.floor(value / binWidth);
+                double left = binIndex * binWidth;
+                double right = left + binWidth;
+
+                String label = String.format("%.1f-%.1f", left, right);
+                frequencies.put(label, frequencies.getOrDefault(label, 0) + 1);
+            }
+        }
+        else if ("Number of Students".equals(yAxisData)) {
+
+            if (filterStudentIds == null || filterStudentIds.length == 0) {
+                histogram.getData().add(series1);
+                return histogram;
             }
 
-            System.out.println("Histogram frequencies size = " + frequencies.size());
+            for (int studentId : filterStudentIds) {
 
-            for (Map.Entry<String, Integer> entry : frequencies.entrySet()) {
-                String binlabel = entry.getKey();
-                int count = entry.getValue();
+                double value;
 
-                series1.getData().add(new XYChart.Data<>(binlabel, count));
+                try {
+                    switch (xAxisData) {
+                        case "Mean of Grades" -> value = CurrentGradesModel.calcStudentMean(studentId);
+                        case "Median of Grades" -> value = CurrentGradesModel.calcStudentMedian(studentId);
+                        case "Mode of Grades" -> value = CurrentGradesModel.calcStudentMode(studentId);
+                        case "Number of NG" -> value = CurrentGradesModel.getStudentNG(studentId);
+
+                        default -> {
+                            continue;
+                        }
+                    }
+                }catch (Exception e) {
+                    continue;
+                }
+
+                if (value < xAxisFilterStart || value > xAxisFilterEnd) {
+                    continue;
+                }
+
+                int binIndex = (int) Math.floor(value / binWidth);
+                double left = binIndex * binWidth;
+                double right = left + binWidth;
+
+                String label = String.format("%.1f-%.1f", left, right);
+                frequencies.put(label, frequencies.getOrDefault(label, 0) + 1);
             }
-        histogram.getData().add(series1);
         }
 
-        return histogram;
+         for (Map.Entry<String, Integer> entry : frequencies.entrySet()) {
+             String binlabel = entry.getKey();
+             int count = entry.getValue();
+
+             if (count < yAxisFilterStart || count > yAxisFilterEnd) {
+                 continue;
+             }
+
+             series1.getData().add(new XYChart.Data<>(binlabel, count));
+         }
+         histogram.getData().add(series1);
+         return histogram;
     }
 }
