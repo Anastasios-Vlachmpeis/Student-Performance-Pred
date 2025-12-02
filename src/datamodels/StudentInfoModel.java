@@ -169,7 +169,13 @@ public class StudentInfoModel {
     // DATA MODEL METHODS //
     //====================//
     public static Feature getFeature(int studentId, int featureId) {
-        return features[studentID2index.get(studentId)][featureId];
+        if (!studentID2index.containsKey(studentId)) {
+            throw new IllegalArgumentException("Student id " + studentId + " is not contained in this dataset");
+        }
+        if (!featureId2Index.containsKey(featureId)) {
+            throw new IllegalArgumentException("Feature id " + featureId + "is not contained in this dataset");
+        }
+        return features[studentID2index.get(studentId)][featureId2Index.get(featureId)];
     }
     public static Feature getFeature(int studentId, String featureName) {
         // do not check if feature name is valid, so misspelling is "caught" as a runtime error:3
