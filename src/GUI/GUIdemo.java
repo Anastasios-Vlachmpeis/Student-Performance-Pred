@@ -35,7 +35,7 @@ public class GUIdemo extends Application {
 
         Label chartLabel = new Label("Choose the type of chart:");
         chartList = new ListView<>();
-        chartList.getItems().addAll("BarChart", "Histogram", "JointPlot", "ScarPlot", "ScatterPlot");
+        chartList.getItems().addAll("BarChart", "Histogram", "JointPlot", "SwarmPlot", "ScatterPlot");
         chartList.getSelectionModel().selectFirst();
 
         Label yAxisLabel = new Label("Choose the dataset of y axis:");
@@ -88,7 +88,7 @@ public class GUIdemo extends Application {
             case "BarChart" -> chart = new BarChartGenerator().createChart(selectedXAxis, selectedYAxis, xAxisFilterStart, xAxisFilterEnd, yAxisFilterStart, yAxisFilterEnd);
             //case "Histogram" -> chart = new HistogramGenerator().createChart(selectedXAxis, selectedYAxis);
             //case "JointPlot" -> chart = new JointPlotGenerator().createChart(selectedXAxis, selectedYAxis);
-            //case "ScarPlot" -> chart = new ScarPlotGenerator().createChart(selectedXAxis, selectedYAxis);
+            case "SwarmPlot" -> chart = new SwarmPlotGenerator().createChart(selectedXAxis, selectedYAxis, xAxisFilterStart, xAxisFilterEnd, yAxisFilterStart, yAxisFilterEnd);
             //case "ScatterPlot" -> chart = new ScatterPlotGenerator().createChart(selectedXAxis, selectedYAxis);
         }
 
