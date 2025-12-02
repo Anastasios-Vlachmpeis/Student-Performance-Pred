@@ -67,7 +67,6 @@ public class phase1step4R2 { // R2 is a comparison between the mean grade and th
             }
 
 
-            // TODO: please motivate this better. Why does 2000 gives accuracy or computation time?
             int sampleSize = Math.min(2000, studentsWithGrade.size()); // choose 2000 to have a mix of accuracy and computation time
 
             Collections.shuffle(studentsWithGrade, rng);
@@ -75,15 +74,17 @@ public class phase1step4R2 { // R2 is a comparison between the mean grade and th
             List<Integer> sampleofStudents = studentsWithGrade.subList(0, sampleSize);
 
 
-            PriorityQueue<ForestsR2> topForests = new PriorityQueue<ForestsR2>(TOP_FOREST, new Comparator<ForestsR2>() {
-                public int compare(ForestsR2 a, ForestsR2 b) {
-                    return Double.compare(a.r2, b.r2);
-                }
-            });
+            // priority que maintains order after inserting a new element.
+            // to do it needs a comparator at initialization. the priority queue uses this
+            // comparator for reordering itself after a new element is added to it.
+            // its initial capacity is set to TOP_FOREST which is the amount of forest tested (see the for loop
+            // just below this)
+            PriorityQueue<ForestsR2> topForests = new PriorityQueue<ForestsR2>(TOP_FOREST, (a, b) -> Double.compare(a.r2, b.r2));
 
 
             for (int f = 0; f < FOREST_COUNT; f++) { //creates the forests
 
+                // store random indexes that represent stumps in the allStumps[] array
                 int[] forest = new int[FOREST_SIZE];
 
                 for (int i = 0; i < FOREST_SIZE; i++) { //pick random stumps to create the forest
@@ -109,9 +110,12 @@ public class phase1step4R2 { // R2 is a comparison between the mean grade and th
 
                 double r2 = calculateR2(truegrade, forestsPred);
 
+                // increment the number of forests until it reaches a large enough population
                 if (topForests.size() < TOP_FOREST) {
                     topForests.add(new ForestsR2(forest, r2)); // Add new forest
-                } else if (r2 > topForests.peek().r2) {
+                }
+                // then start killing off those who performs the worst replacing with a new one
+                else if (r2 > topForests.peek().r2) {
                     topForests.poll(); // Remove worst
                     topForests.add(new ForestsR2(forest, r2)); //and add the new one
                 }
@@ -120,12 +124,15 @@ public class phase1step4R2 { // R2 is a comparison between the mean grade and th
             while (!topForests.isEmpty()) {
                 ForestsR2 fs = topForests.poll();
                 TopForestsByCourse[courseId].add(fs.forest);
-                TopR2sByCourse[courseId].add(fs.r2); //storse the forest and it's r2 on the heap
+                TopR2sByCourse[courseId].add(fs.r2); //store the forest and it's r2 on the heap
             }
 
+            // reverse the order so the first ones will be the best performing forests based on the R2 score
             Collections.reverse(TopForestsByCourse[courseId]);
             Collections.reverse(TopR2sByCourse[courseId]);
 
+
+            // communicating the results to the terminal in this format
             System.out.println("  Stored best " + TopForestsByCourse[courseId].size() + " forests for " + GraduateGradesModel.getCourseName(courseId));
             if (!TopR2sByCourse[courseId].isEmpty()) {
                 System.out.println("  Top forest R2 for " + GraduateGradesModel.getCourseName(courseId) + ": " + TopR2sByCourse[courseId].get(0));
@@ -143,8 +150,6 @@ public class phase1step4R2 { // R2 is a comparison between the mean grade and th
                     }
                 }
             }
-
-
         }
     }
 
