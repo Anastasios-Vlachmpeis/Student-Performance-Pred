@@ -5,7 +5,6 @@ import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
-import javafx.scene.control.Alert;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -14,27 +13,17 @@ public class HistogramGenerator {
 
     public BarChart<String, Number> createChart(String xAxisData, String yAxisData, int xAxisFilterStart, int xAxisFilterEnd, int yAxisFilterStart, int yAxisFilterEnd) {
 
-        //Count how many courses have each NG value
-        Map<Integer, Integer> frequencies = new TreeMap<>();
-
-        for (int i = 0; i < CurrentGradesModel.courseCount; i++) {
-            int ng = CurrentGradesModel.getCourseNG(i);
-            frequencies.put(ng, frequencies.getOrDefault(ng, 0) + 1);
-        }
-
         // X-axis label
         CategoryAxis xAxis = new CategoryAxis();
-        xAxis.setLabel(xAxisData);
 
         // Y-axis label
         NumberAxis yAxis = new NumberAxis();
-        yAxis.setLabel(yAxisData);
 
         // Create chart, Label, Bars are bigger, no gaps between Bars
         BarChart<String, Number> histogram = new BarChart<>(xAxis,yAxis);
         histogram.setTitle(yAxisData + " " + xAxisData);
         histogram.setLegendVisible(false);
-        histogram.setCategoryGap(0);
+        histogram.setCategoryGap(5);
         histogram.setBarGap(0);
         histogram.setAnimated(false);
 
@@ -42,72 +31,80 @@ public class HistogramGenerator {
         XYChart.Series<String, Number> series = new XYChart.Series<>();
         series.setName(yAxisData + " " + xAxisData);
 
-        //If chosen X axis is per Course
-        if (xAxisData.equals("")) {
 
-            //Alert if the inputs are not in range
-            if (xAxisFilterStart < 0 || xAxisFilterEnd > CurrentGradesModel.courseCount || xAxisFilterStart >= xAxisFilterEnd) {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Invalid Range");
-                alert.setHeaderText("Filter range is out of bounds!");
-                alert.setContentText("Valid range: 0 to " + CurrentGradesModel.courseCount);
-                alert.show();
-            }
+        if (xAxisData.equals("Mean of Grades")) {
 
-            for (int i = xAxisFilterStart; i <= xAxisFilterEnd; i++) {
-                String courseName = CurrentGradesModel.getCourseName(i);
-                Number value = switch (yAxisData) {
-                    case "Number of Courses" -> CurrentGradesModel.getCourseNG(i);
-                    case "Mean of Grades" -> CurrentGradesModel.calcCourseMean(i);
-                    case "Mode of Grades" -> CurrentGradesModel.calcCourseMode(i);
-                    case "Median of Grades" -> CurrentGradesModel.calcCourseMedian(i);
-                    default -> 0;
-                };
+            xAxis.setLabel("Mean of Grades");
+            yAxis.setLabel(yAxisData);
 
-                if(value.doubleValue() >= yAxisFilterStart && value.doubleValue() <= yAxisFilterEnd) {
-                    series.getData().add(new XYChart.Data<>(courseName, value)); }}
+            XYChart.Series<String, Number> series1 = new XYChart.Series<>();
+            series1.setName(yAxisData + "Mean of Grades");
 
-        }
+            Map<String, Integer> frequencies = new TreeMap<>();
 
-        //If chosen X axis is Per Student
-        if (xAxisData.equals("Per Student")) {
+            double binWidth = 0.5;
 
+            if (yAxisData.equals("Number of Courses with")) {
 
-            //Alert if the inputs are not in range
-            if (xAxisFilterStart < 0 || xAxisFilterEnd > CurrentGradesModel.studentCount || xAxisFilterStart >= xAxisFilterEnd) {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Invalid Range");
-                alert.setHeaderText("Filter range is out of bounds!");
-                alert.setContentText("Valid range: 0 to " + CurrentGradesModel.studentCount);
-                alert.show();
-            }
+                int start = Math.max(0, xAxisFilterStart);
+                int end = Math.min(CurrentGradesModel.courseCount - 1, xAxisFilterEnd);
 
-            for (int i = xAxisFilterStart; i <= xAxisFilterEnd; i++) {
-                String studentNumber = "Student " + i;
+                for (int i = start; i <= end; i++) {
 
-                Number value = switch (yAxisData) {
-                    case "Number of NG" -> CurrentGradesModel.getStudentNG(i);
-                    case "Mean of Grades" -> CurrentGradesModel.calcStudentMean(i);
-                    case "Mode of Grades" -> CurrentGradesModel.calcStudentMode(i);
-                    case "Median of Grades" -> CurrentGradesModel.calcStudentMedian(i);
-                    default -> 0;
-                };
+                    double mean = CurrentGradesModel.calcCourseMean(i);
 
-                if (value.doubleValue() >= yAxisFilterStart && value.doubleValue() <= yAxisFilterEnd) {
-                    series.getData().add(new XYChart.Data<>(studentNumber, value));
+                    if (mean < yAxisFilterStart || mean > yAxisFilterEnd) {
+                        continue;
+                    }
+
+                    int binIndex = (int) Math.floor(mean / binWidth);
+                    double left = binIndex * binWidth;
+                    double right = left + binWidth;
+
+                    String label = String.format("%.1f-%.1f", left, right);
+                    frequencies.put(label, frequencies.getOrDefault(label, 0) + 1);
                 }
             }
+
+            else if (yAxisData.equals("Number of Students with")) {
+
+                int start = Math.max(0, xAxisFilterStart);
+                int end = Math.min(CurrentGradesModel.studentCount - 1, xAxisFilterEnd);
+
+                for (int i = start; i <= end; i++) {
+
+                    double mean;
+
+                    try {
+                        mean = CurrentGradesModel.calcStudentMean(i);
+                    }   catch (NullPointerException e) {
+                        continue;
+                    }
+
+                    if (mean < yAxisFilterStart || mean > yAxisFilterEnd) {
+                        continue;
+                    }
+
+                    int binIndex = (int) Math.floor(mean / binWidth);
+                    double left = binIndex * binWidth;
+                    double right = left + binWidth;
+
+                    String label = String.format("%.1f-%.1f", left, right);
+                    frequencies.put(label, frequencies.getOrDefault(label, 0) + 1);
+                }
+            }
+
+            System.out.println("Histogram frequencies size = " + frequencies.size());
+
+            for (Map.Entry<String, Integer> entry : frequencies.entrySet()) {
+                String binlabel = entry.getKey();
+                int count = entry.getValue();
+
+                series1.getData().add(new XYChart.Data<>(binlabel, count));
+            }
+        histogram.getData().add(series1);
         }
 
-        for (Map.Entry<Integer, Integer> entry : frequencies.entrySet()) {
-            int ngValue = entry.getKey();
-            int count = entry.getValue();
-            series.getData().add(new XYChart.Data<>(
-                    String.valueOf(ngValue),
-                    count
-            ));
-        }
-        histogram.getData().add(series);
         return histogram;
     }
 }
