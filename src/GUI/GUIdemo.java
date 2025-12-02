@@ -3,6 +3,7 @@ package GUI;
 import GUI.tab.FauxHeatMapTab;
 import GUI.tab.JointPlotTab;
 import GUI.tab.ScatterPlotTab;
+import GUI.tab.SwarmPlotTab;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -68,7 +69,7 @@ public class GUIdemo extends Application {
         // Tab 4: Swarm plot
         Tab swarmPlotTab = new Tab("Swarm plot");
         swarmPlotTab.setClosable(false);
-
+        swarmPlotTab.setContent(new SwarmPlotTab().createTab());
         tabPane.getTabs().add(swarmPlotTab);
 
         root.setCenter(tabPane);
