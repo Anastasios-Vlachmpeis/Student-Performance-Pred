@@ -1,11 +1,13 @@
 package GUI;
 
+import GUI.tab.FauxHeatMapTab;
 import GUI.tab.JointPlotTab;
 import GUI.tab.ScatterPlotTab;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
 public class GUIdemo extends Application {
@@ -49,6 +51,19 @@ public class GUIdemo extends Application {
         BorderPane jointPlotPane = new JointPlotTab().createJointPlotTab();
         jointPlotTab.setContent(jointPlotPane);
         tabPane.getTabs().add(jointPlotTab);
+
+        // Tab 3: Faux Heat Map
+        Tab fauxHeatMapTab = new Tab("Pearson Correlation Current");
+        fauxHeatMapTab.setClosable(false);
+        Pane fauxHeatMapCurrentGrades = new FauxHeatMapTab().createPearsonCorrelationCurrentCourses();
+        fauxHeatMapTab.setContent(fauxHeatMapCurrentGrades);
+        tabPane.getTabs().add(fauxHeatMapTab);
+        // Tab 3.5: Faux Heat Map
+        Tab fauxHeatMapTab2 = new Tab("Pearson Correlation Graduate");
+        fauxHeatMapTab2.setClosable(false);
+        Pane fauxHeatMapGraduateGrades = new FauxHeatMapTab().createPearsonCorrelationGraduateCourses();
+        fauxHeatMapTab2.setContent(fauxHeatMapGraduateGrades);
+        tabPane.getTabs().add(fauxHeatMapTab2);
 
         root.setCenter(tabPane);
 
