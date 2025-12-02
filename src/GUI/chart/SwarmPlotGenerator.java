@@ -1,6 +1,5 @@
 package GUI.chart;
 
-import javafx.scene.chart.Chart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.ScatterChart;
 import javafx.scene.chart.XYChart;
@@ -42,15 +41,15 @@ public class SwarmPlotGenerator {
         // X-axis is the courses
         if (xAxisData.equals("Per Course")) {
             xAxisFilterStart = Util.cap(0, CurrentGradesModel.courseCount, xAxisFilterStart);
-            xAxisFilterEnd = Util.cap(0, CurrentGradesModel.studentCount, xAxisFilterEnd);
+            xAxisFilterEnd = Util.cap(xAxisFilterStart, CurrentGradesModel.courseCount-1, xAxisFilterEnd);
             // alert if the filters are set out of range
-            if (xAxisFilterStart < 0 || xAxisFilterEnd > CurrentGradesModel.courseCount || xAxisFilterStart >= xAxisFilterEnd) {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Invalid Range");
-                alert.setHeaderText("Filter range is out of bounds!");
-                alert.setContentText("Valid range: 0 to " + CurrentGradesModel.courseCount);
-                alert.show();
-            }
+//            if (xAxisFilterStart < 0 || xAxisFilterEnd > CurrentGradesModel.courseCount || xAxisFilterStart >= xAxisFilterEnd) {
+//                Alert alert = new Alert(Alert.AlertType.ERROR);
+//                alert.setTitle("Invalid Range");
+//                alert.setHeaderText("Filter range is out of bounds!");
+//                alert.setContentText("Valid range: 0 to " + CurrentGradesModel.courseCount);
+//                alert.show();
+//            }
             // loops through the courses in the filter range
             for (int i = xAxisFilterStart; i <= xAxisFilterEnd; i++) {
                 String courseName = CurrentGradesModel.getCourseName(i);
@@ -66,14 +65,16 @@ public class SwarmPlotGenerator {
         }
         // X-axis is the students
         if (xAxisData.equals("Per Student")) {
+            xAxisFilterStart = Util.cap(0, CurrentGradesModel.courseCount, xAxisFilterStart);
+            xAxisFilterEnd = Util.cap(xAxisFilterStart, CurrentGradesModel.courseCount-1, xAxisFilterEnd);
             // alert if the filters are set out of range
-            if (xAxisFilterStart < 0 || xAxisFilterEnd > CurrentGradesModel.courseCount || xAxisFilterStart >= xAxisFilterEnd) {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Invalid Range");
-                alert.setHeaderText("Filter range is out of bounds!");
-                alert.setContentText("Valid range: 0 to " + CurrentGradesModel.courseCount);
-                alert.show();
-            }
+//            if (xAxisFilterStart < 0 || xAxisFilterEnd > CurrentGradesModel.courseCount || xAxisFilterStart >= xAxisFilterEnd) {
+//                Alert alert = new Alert(Alert.AlertType.ERROR);
+//                alert.setTitle("Invalid Range");
+//                alert.setHeaderText("Filter range is out of bounds!");
+//                alert.setContentText("Valid range: 0 to " + CurrentGradesModel.courseCount);
+//                alert.show();
+//            }
             // loop through the students in the filter range
             for (int i = xAxisFilterStart; i <= xAxisFilterEnd; i++) {
                 String studentName = "Student " + i;
