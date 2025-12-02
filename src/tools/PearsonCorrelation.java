@@ -2,7 +2,6 @@ package tools;
 
 import datamodels.CurrentGradesModel;
 import datamodels.GraduateGradesModel;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,7 +10,7 @@ public class PearsonCorrelation {
     /**
      * PearsonCorrelation correlation between two course columns courseIdI and j.
      * Compute PearsonCorrelation correlation for a pair of courses, considering only students with grades in both
-     * @author Tassos, minor refactoring by Alice
+     * @author Tasos, minor refactoring by Alice
      */
     public static double betweenCurrentCourses(int courseIdI, int courseIdJ) {
         // Gathers pairs of grades only when both courses have a grade for the same student
@@ -53,7 +52,7 @@ public class PearsonCorrelation {
     /**
      * PearsonCorrelation correlation between two course columns courseIdI and j.
      * Compute PearsonCorrelation correlation for a pair of courses of the graduate grades dataset.
-     * @author Tassos, minor refactoring by Alice (utilization the Statistics class)
+     * @author Tasos, minor refactoring by Alice (utilization the Statistics class)
      */
     public static double betweenGraduateCourses(int courseIdI, int courseIdJ) {
         double[] courseIGrades = GraduateGradesModel.getAllGradesCourse(courseIdI);

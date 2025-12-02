@@ -7,12 +7,17 @@ import tools.ChartDataUtils;
 
 public class ScatterPlotGenerator {
 
-    public ScatterChart<Number, Number> createChart(String xAxisData, String yAxisData, double xAxisFilterStart, double xAxisFilterEnd, double yAxisFilterStart, double yAxisFilterEnd, String selectedCourse, String selectedFeature, boolean showActualGrades, String filterFeature, String filterValue, boolean courseCorrelationMode, String xCourse, String yCourse, boolean showYEqualsX) {
+    /**
+     * This method creates the scatter plot chart based on the selected axis data, filters, and options
+     */
+    public ScatterChart<Number, Number> createChart(String xAxisData, String yAxisData, double xAxisFilterStart, double xAxisFilterEnd,
+        double yAxisFilterStart, double yAxisFilterEnd, String selectedCourse, String selectedFeature, boolean showActualGrades,
+        String filterFeature, String filterValue, boolean courseCorrelationMode, String xCourse, String yCourse, boolean showYEqualsX) {
         
-        // Filter students based on feature filter
+        // This filters students based on the selected feature filter
         int[] filteredStudentIds = ChartDataUtils.getFilteredStudentIds(filterFeature, filterValue);
         
-        // Handle Course Correlation Mode
+        // This handles Course Correlation Mode
         if (courseCorrelationMode && xCourse != null && yCourse != null) {
             return ChartDataUtils.createCourseCorrelationChart(xCourse, yCourse, xAxisFilterStart, xAxisFilterEnd,
                                                yAxisFilterStart, yAxisFilterEnd, filteredStudentIds, showYEqualsX);
@@ -39,7 +44,8 @@ public class ScatterPlotGenerator {
                 XYChart.Series<Number, Number> actualSeries = new XYChart.Series<>();
                 actualSeries.setName("Actual Grades");
                 
-                ChartDataUtils.generatePredictedVsActualData(predictedSeries, actualSeries, xAxisFilterStart, xAxisFilterEnd, yAxisFilterStart, yAxisFilterEnd, selectedCourse, selectedFeature, filteredStudentIds);
+                ChartDataUtils.generatePredictedVsActualData(predictedSeries, actualSeries, xAxisFilterStart, xAxisFilterEnd, 
+                    yAxisFilterStart, yAxisFilterEnd, selectedCourse, selectedFeature, filteredStudentIds);
                 
                 scatterChart.getData().add(predictedSeries);
                 scatterChart.getData().add(actualSeries);
@@ -49,7 +55,8 @@ public class ScatterPlotGenerator {
             } else {
                 XYChart.Series<Number, Number> series = new XYChart.Series<>();
                 series.setName("Data Points");
-                ChartDataUtils.generateStudentData(series, yAxisData, xAxisFilterStart, xAxisFilterEnd, yAxisFilterStart, yAxisFilterEnd, selectedCourse, selectedFeature, filteredStudentIds);
+                ChartDataUtils.generateStudentData(series, yAxisData, xAxisFilterStart, xAxisFilterEnd, 
+                    yAxisFilterStart, yAxisFilterEnd, selectedCourse, selectedFeature, filteredStudentIds);
                 scatterChart.getData().add(series);
                 ChartDataUtils.addTooltipsToSeries(series, xAxisData, yAxisData, selectedCourse);
             }
