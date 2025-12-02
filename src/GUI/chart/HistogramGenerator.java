@@ -1,4 +1,4 @@
-package GUI.old;
+package GUI.chart;
 
 import datamodels.CurrentGradesModel;
 import javafx.scene.chart.BarChart;
@@ -6,7 +6,6 @@ import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import tools.ChartDataUtils;
-import tools.Statistics;
 
 import java.util.Map;
 import java.util.TreeMap;
