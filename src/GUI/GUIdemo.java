@@ -65,6 +65,12 @@ public class GUIdemo extends Application {
         fauxHeatMapTab2.setContent(fauxHeatMapGraduateGrades);
         tabPane.getTabs().add(fauxHeatMapTab2);
 
+        // Tab 4: Swarm plot
+        Tab swarmPlotTab = new Tab("Swarm plot");
+        swarmPlotTab.setClosable(false);
+
+        tabPane.getTabs().add(swarmPlotTab);
+
         root.setCenter(tabPane);
 
         Scene scene = new Scene(root, 1200, 960);
