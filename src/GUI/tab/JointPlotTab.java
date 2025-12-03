@@ -1,6 +1,6 @@
 package GUI.tab;
 
-import GUI.old.JointPlotGenerator;
+import GUI.chart.JointPlotGenerator;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.control.*;

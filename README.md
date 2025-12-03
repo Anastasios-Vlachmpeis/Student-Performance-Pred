@@ -1,6 +1,13 @@
 This from the Gitlab repository of team winlog (#28).
 
+## HOW TO RUN
+1. Use java 21 LTS
+2. Hava javafx 21.0.9 jdk ready
+3. Find src/GUI/GUIDemo.java's main method as the entry point
+4. Run. (you might need to add javafx parameters to the VM options)
 
+
+# Mini documentation for data model classes
 ## How to access student data via code
 The data we got via the .csv files is stored in internal models and representation inside the data model classes 
 (`GraduateGradesModel`, `CurrentGradesModel`, `StudentInfoModel` named after the .csv). These classes are static and 
@@ -78,12 +85,5 @@ We will make a decision stump forest for each course. Or rather methods that can
 1. least variance (subset of decision stumps whose predictions produces the least variance)
 2. noah's method
 3. boosted trees algorithm (finding best stump first. find the next stump by maximizing combined results with first stump. repeat)
-
-## HOW TO RUN
-1. Find Main.java in src/
-2. Run Main.java in terminal
-3. If errors are thrown check that you use the most recent version of java and that you
-   run the command from the right directory.
-(We used Intellij for developing the code, the easies it to import the project and run it from there)
 
 *This is an easter egg:)*

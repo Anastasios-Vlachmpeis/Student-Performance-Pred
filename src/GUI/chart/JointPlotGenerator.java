@@ -1,4 +1,4 @@
-package GUI.old;
+package GUI.chart;
 
 import datamodels.*;
 import javafx.scene.chart.BarChart;
