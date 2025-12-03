@@ -284,7 +284,7 @@ public class ChartControlFactory {
         if (xAxisData.equals("Per Student")) {
             setSliderRange(xAxisMinSlider, xAxisMaxSlider, 0, 1522);
         } else {
-            setSliderRange(xAxisMinSlider, xAxisMaxSlider, 0, 36);
+            setSliderRange(xAxisMinSlider, xAxisMaxSlider, 0, 35);
         }
         
         double yMax = 10;
