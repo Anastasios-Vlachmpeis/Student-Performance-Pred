@@ -1,6 +1,7 @@
 package GUI;
 
 import GUI.tab.FauxHeatMapTab;
+import GUI.tab.HistogramTab;
 import GUI.tab.JointPlotTab;
 import GUI.tab.ScatterPlotTab;
 import javafx.application.Application;
@@ -64,6 +65,13 @@ public class GUIdemo extends Application {
         Pane fauxHeatMapGraduateGrades = new FauxHeatMapTab().createPearsonCorrelationGraduateCourses();
         fauxHeatMapTab2.setContent(fauxHeatMapGraduateGrades);
         tabPane.getTabs().add(fauxHeatMapTab2);
+
+        // Tab 4: Histogram
+        Tab histogramTab = new Tab("Histogram");
+        histogramTab.setClosable(false);
+        BorderPane histogramPane = new HistogramTab().createHistogramTab();
+        histogramTab.setContent(histogramPane);
+        tabPane.getTabs().add(histogramTab);
 
         root.setCenter(tabPane);
 
