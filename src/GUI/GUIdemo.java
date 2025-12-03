@@ -1,9 +1,6 @@
 package GUI;
 
-import GUI.tab.FauxHeatMapTab;
-import GUI.tab.HistogramTab;
-import GUI.tab.JointPlotTab;
-import GUI.tab.ScatterPlotTab;
+import GUI.tab.*;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -39,6 +36,12 @@ public class GUIdemo extends Application {
 //        chartGeneratorTab.setContent(chartGeneratorPane);
 //        tabPane.getTabs().add(chartGeneratorTab);
 
+        // Tab 0: Bar Chart
+        Tab barTab = new Tab("Bar Chart");
+        barTab.setClosable(false);
+        BorderPane barPane = new BarChartTab().createBarChartTab();
+        barTab.setContent(barPane);
+        tabPane.getTabs().add(barTab);
         // Tab 1: Scatter Plot
         Tab scatterPlotTab = new Tab("Scatter Plot");
         scatterPlotTab.setClosable(false);
@@ -65,6 +68,12 @@ public class GUIdemo extends Application {
         Pane fauxHeatMapGraduateGrades = new FauxHeatMapTab().createPearsonCorrelationGraduateCourses();
         fauxHeatMapTab2.setContent(fauxHeatMapGraduateGrades);
         tabPane.getTabs().add(fauxHeatMapTab2);
+        // Tab 4: Pie Chart
+        Tab PieChartTab = new Tab("Pie Chart");
+        PieChartTab.setClosable(false);
+        BorderPane PieChartPane = new PieChartTab().createPieChart();
+        PieChartTab.setContent(PieChartPane);
+        tabPane.getTabs().add(PieChartTab);
 
         // Tab 4: Histogram
         Tab histogramTab = new Tab("Histogram");
@@ -75,7 +84,7 @@ public class GUIdemo extends Application {
 
         root.setCenter(tabPane);
 
-        Scene scene = new Scene(root, 1200, 960);
+        Scene scene = new Scene(root, 1000, 840);
         primaryStage.setScene(scene);
         primaryStage.setTitle("Graph Generator");
         primaryStage.show();

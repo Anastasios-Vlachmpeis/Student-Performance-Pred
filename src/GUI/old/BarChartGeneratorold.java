@@ -7,7 +7,7 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Alert;
 
-public class BarChartGenerator {
+public class BarChartGeneratorold {
 
     public BarChart<String, Number> createChart(String xAxisData, String yAxisData, int xAxisFilterStart, int xAxisFilterEnd, int yAxisFilterStart, int yAxisFilterEnd) {
 

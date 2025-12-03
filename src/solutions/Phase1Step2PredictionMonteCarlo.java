@@ -54,15 +54,16 @@ public class Phase1Step2PredictionMonteCarlo {
                         }
                     }
                     // students can retry failed exams's once if they can take a resit
-                    if (resitsRemaining > 0 && isFail) {
+                    if (isFail) {
                         isFail = random.nextDouble() >= passingRates[courseIndex];
+
                     }
 
                     // increment failed grade counter
                     countFailingGrades += isFail ? 1 : 0;
                 }
                 // if the student has no failing grades then they graduate
-                if (countFailingGrades > 0) {
+                if (countFailingGrades == 0) {
                     numberOfGraduates++;
                 }
             }
