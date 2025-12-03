@@ -12,120 +12,178 @@ import java.util.TreeMap;
 
 public class HistogramGenerator {
 
-    public BarChart<String, Number> createChart(String xAxisData, String yAxisData, double xAxisFilterStart, double xAxisFilterEnd, double yAxisFilterStart, double yAxisFilterEnd, String filterFeature, String filterValue) {
+    /**
+     * Converts a global student ID to a local StudentId.
+     */
+    private Integer getStudentIndex(int studentId) {
+        int[] allIds = CurrentGradesModel.getAllStudentIds();
+        for (int i = 0; i < allIds.length; i++) {
+            if (allIds[i] == studentId) return i;
+        }
+        return null; // Should not happen unless dataset has inconsistencies
+    }
 
+    /**
+     * Determines the bin width based on the selected X-axis metric.
+     * Helps produce readable histograms without overly dense bars.
+     */
+    private double determineBinWidth(String xAxisData) {
+        return switch (xAxisData) {
+            case "Mean of Grades" -> 0.2;
+            case "Median of Grades" -> 0.5;
+            case "Number of NG" -> 6.0;
+            case "Number of Passing Students" -> 30.0;
+            case "Number of graded Courses" -> 3.0;
+            case "Mode of Grades", "Number of failed Courses" -> 1.0;
+            default -> 0.5;  // Safe fallback
+        };
+    }
+
+    /**
+     * Creates a histogram BarChart based on the chosen X and Y axis metrics.
+     * All logic is performed here.
+     */
+    public BarChart<String, Number> createChart(
+            String xAxisData, String yAxisData,
+            double xAxisFilterStart, double xAxisFilterEnd,
+            double yAxisFilterStart, double yAxisFilterEnd,
+            String filterFeature, String filterValue
+    ) {
+
+        // Filter out students based on user-chosen feature settings
         int[] filterStudentIds = ChartDataUtils.getFilteredStudentIds(filterFeature, filterValue);
-        // X-axis label
-        CategoryAxis xAxis = new CategoryAxis();
 
-        // Y-axis label
+        // Setup axes for the histogram
+        CategoryAxis xAxis = new CategoryAxis();
         NumberAxis yAxis = new NumberAxis();
 
-        // This part creates the chart with the distance between Categories set to five for appearance
-        BarChart<String, Number> histogram = new BarChart<>(xAxis,yAxis);
-        histogram.setTitle(yAxisData + " with the " + xAxisData + " (unsupported X)");
+        // Creates Histogram, with title and spacing between bars
+        BarChart<String, Number> histogram = new BarChart<>(xAxis, yAxis);
+        histogram.setTitle(yAxisData + " with the " + xAxisData);
         histogram.setLegendVisible(false);
         histogram.setCategoryGap(5);
         histogram.setBarGap(0);
         histogram.setAnimated(false);
 
+        // Sets label for X and Y axis
         xAxis.setLabel(xAxisData);
         yAxis.setLabel(yAxisData);
 
         XYChart.Series<String, Number> series1 = new XYChart.Series<>();
         series1.setName(yAxisData + " with the " + xAxisData);
 
-        Map<String, Integer> frequencies = new TreeMap<>();
+        // TreeMap keeps bins sorted numerically by left-bound
+        TreeMap<Double, Integer> frequencies = new TreeMap<>();
 
-        double binWidth = 0.5;
+        // Adds the private determineBinWidth to a double for the following code
+        double binWidth = determineBinWidth(xAxisData);
 
+        // Y-axis 1: "Number of Courses"; with the different metrics for the X-axis
         if ("Number of Courses".equals(yAxisData)) {
 
-            int nCourses = CurrentGradesModel.courseCount;
-
-            for (int courseIndex = 0; courseIndex < nCourses; courseIndex++) {
+            for (int courseIndex = 0; courseIndex < CurrentGradesModel.courseCount; courseIndex++) {
 
                 double value;
 
+                // Select X-axis metric for the Courses
                 try {
                     switch (xAxisData) {
                         case "Mean of Grades" -> value = CurrentGradesModel.calcCourseMean(courseIndex);
                         case "Median of Grades" -> value = CurrentGradesModel.calcCourseMedian(courseIndex);
                         case "Mode of Grades" -> value = CurrentGradesModel.calcCourseMode(courseIndex);
                         case "Number of NG" -> value = CurrentGradesModel.getCourseNG(courseIndex);
-
                         case "Number of Passing Students" -> value = ChartDataUtils.getPassingStudents(courseIndex);
-                        case "Number of Non-passingStudents" -> value = ChartDataUtils.getNonPassingStudents(courseIndex);
                         default -> {
-                            continue;
+                            continue; // Ignore unsupported combinations
                         }
                     }
-                } catch (Exception e) {
-                    continue;
-                }
+                } catch (Exception e){
+                        continue; // Skip problematic entries
+                    }
 
+                // Apply X-axis filter
                 if (value < xAxisFilterStart || value > xAxisFilterEnd) {
                     continue;
                 }
 
+                // Compute bin index and left bound
                 int binIndex = (int) Math.floor(value / binWidth);
                 double left = binIndex * binWidth;
-                double right = left + binWidth;
 
-                String label = String.format("%.1f-%.1f", left, right);
-                frequencies.put(label, frequencies.getOrDefault(label, 0) + 1);
+                // Count frequency for this bin
+                frequencies.put(left, frequencies.getOrDefault(left, 0) + 1);
             }
         }
-        else if ("Number of Students".equals(yAxisData)) {
 
-            if (filterStudentIds == null || filterStudentIds.length == 0) {
-                histogram.getData().add(series1);
-                return histogram;
-            }
+        // Y-axis 2: "Number of Students"; with the different metrics for the X-axis
+        else if ("Number of Students".equals(yAxisData)) {
 
             for (int studentId : filterStudentIds) {
 
+                Integer idx = getStudentIndex(studentId);
+                if (idx == null) continue; // Should not occur if IDs are valid
+
                 double value;
 
+                // Select X-axis metric for the Students
                 try {
                     switch (xAxisData) {
                         case "Mean of Grades" -> value = CurrentGradesModel.calcStudentMean(studentId);
                         case "Median of Grades" -> value = CurrentGradesModel.calcStudentMedian(studentId);
                         case "Mode of Grades" -> value = CurrentGradesModel.calcStudentMode(studentId);
-                        case "Number of NG" -> value = CurrentGradesModel.getStudentNG(studentId);
-
+                        case "Number of NG" -> value = CurrentGradesModel.getStudentNG(idx);
+                        case "Number of graded Courses" -> {
+                            int count = 0;
+                            for (double g : CurrentGradesModel.getAllGradesStudent(studentId)) {
+                                if (g != -1) count++;
+                            }
+                            value = count;
+                        }
+                        case "Number of failed Courses" -> value = CurrentGradesModel.getFailedCourses(idx);
                         default -> {
-                            continue;
+                            continue; // Unsupported X-axis metric
                         }
                     }
-                }catch (Exception e) {
-                    continue;
+                } catch (Exception e) {
+                    continue; // Skip invalid data entries
                 }
 
+                // Apply X-axis filtering
                 if (value < xAxisFilterStart || value > xAxisFilterEnd) {
                     continue;
                 }
 
+                // Compute bin left boundary
                 int binIndex = (int) Math.floor(value / binWidth);
                 double left = binIndex * binWidth;
-                double right = left + binWidth;
 
-                String label = String.format("%.1f-%.1f", left, right);
-                frequencies.put(label, frequencies.getOrDefault(label, 0) + 1);
+                // Count occurrences in this bin
+                frequencies.put(left, frequencies.getOrDefault(left, 0) + 1);
             }
         }
 
-         for (Map.Entry<String, Integer> entry : frequencies.entrySet()) {
-             String binlabel = entry.getKey();
-             int count = entry.getValue();
+        // Creates the bars for the chart, from the sorted bins
+        for (Map.Entry<Double, Integer> entry : frequencies.entrySet()) {
 
-             if (count < yAxisFilterStart || count > yAxisFilterEnd) {
-                 continue;
-             }
+            double left = entry.getKey();
+            double right = left + binWidth;
+            int count = entry.getValue();
 
-             series1.getData().add(new XYChart.Data<>(binlabel, count));
-         }
-         histogram.getData().add(series1);
-         return histogram;
+            // Apply Y-axis frequency filter
+            if (count < yAxisFilterStart || count > yAxisFilterEnd) {
+                continue;
+            }
+
+            // Create readable label
+            String label = (binWidth == 1)
+                    ? String.format("%d-%d", (int) left, (int) right)
+                    : String.format("%.1f-%.1f", left, right);
+
+            // Add bar to histogram
+            series1.getData().add(new XYChart.Data<>(label, count));
+        }
+
+        histogram.getData().add(series1);
+        return histogram;
     }
 }
