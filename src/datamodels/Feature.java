@@ -17,9 +17,9 @@ public abstract class Feature {
     };
 
     public Feature(int featureId) {
-        if (!isIdAllowed(featureId)) {
-            throw new IllegalArgumentException("featureId " + featureId + " does not align with the type of the feature you are trying to create. Look into the allowed ids private field in the class of the object you are trying to create!");
-        }
+//        if (!isIdAllowed(featureId)) {
+//            throw new IllegalArgumentException("featureId " + featureId + " does not align with the type of the feature you are trying to create. Look into the allowed ids private field in the class of the object you are trying to create!");
+//        }
         this.featureId = featureId;
     }
 

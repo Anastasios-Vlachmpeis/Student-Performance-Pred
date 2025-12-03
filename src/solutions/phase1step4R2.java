@@ -140,10 +140,10 @@ public static DecisionStump[] generateAllDecisionStumps() {
 
     public static void evaluateForestsForCourse(DecisionStump[] allStumps) {
 
-        final int FOREST_COUNT = 300000;   // forests per course 
+        final int FOREST_COUNT = 300;   // forests per course
         final int FOREST_SIZE = 10;       // stumps per forest
-        final int TOP_FOREST = 1000;      // keep best 1000
-        final int MAX_SAMPLE = 1000;      // limit students for speed (made a test, 20 min to run the program)
+        final int TOP_FOREST = 100;      // keep best 1000
+        final int MAX_SAMPLE = 100;      // limit students for speed (made a test, 20 min to run the program)
         Random rng = new Random(42);
 
         int courseCount = CurrentGradesModel.courseCount;
