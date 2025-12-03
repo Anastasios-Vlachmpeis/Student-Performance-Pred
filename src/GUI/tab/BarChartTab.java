@@ -89,6 +89,7 @@ public class BarChartTab {
         setupSlider(yMinSlider, yMinLabel, true);
         setupSlider(yMaxSlider, yMaxLabel, false);
 
+
         box.getChildren().addAll(
                 xAxisLabel, xAxisCombo,
                 yAxisLabel, yAxisCombo,
@@ -124,6 +125,9 @@ public class BarChartTab {
         xMinSlider.setMax(xMax);
         xMaxSlider.setMin(0);
         xMaxSlider.setMax(xMax);
+        xMaxSlider.setValue(xMax);
+        xMinSlider.setValue(0);
+
 
 
         // for y axis
@@ -147,6 +151,8 @@ public class BarChartTab {
         yMinSlider.setMax(yMax);
         yMaxSlider.setMin(0);
         yMaxSlider.setMax(yMax);
+        yMaxSlider.setValue(yMax);
+        yMinSlider.setValue(0);
 
         //set the maximum value between two filters for the x axis to be 100 so the graph doesn't get crowded
         xMinSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
@@ -183,6 +189,7 @@ public class BarChartTab {
                 xStart, xEnd,
                 yStart, yEnd
         );
+
 
         root.setCenter(chart);
     }
