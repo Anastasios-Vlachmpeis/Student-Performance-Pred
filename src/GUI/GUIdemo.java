@@ -75,12 +75,19 @@ public class GUIdemo extends Application {
         PieChartTab.setContent(PieChartPane);
         tabPane.getTabs().add(PieChartTab);
 
-        // Tab 4: Histogram
+        // Tab 5: Histogram
         Tab histogramTab = new Tab("Histogram");
         histogramTab.setClosable(false);
         BorderPane histogramPane = new HistogramTab().createHistogramTab();
         histogramTab.setContent(histogramPane);
         tabPane.getTabs().add(histogramTab);
+
+        // Tab 6: Swarm plot (not working)
+        Tab swarmPlotTab = new Tab("Swarm plot (alpha)");
+        swarmPlotTab.setClosable(false);
+        BorderPane swarmPlotPane = new SwarmPlotTab().createTab();
+        swarmPlotTab.setContent(swarmPlotPane);
+        tabPane.getTabs().add(swarmPlotTab);
 
         root.setCenter(tabPane);
 
