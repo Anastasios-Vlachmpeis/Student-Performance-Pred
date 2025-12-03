@@ -17,9 +17,19 @@ public abstract class Feature {
     };
 
     public Feature(int featureId) {
-//        if (!isIdAllowed(featureId)) {
-//            throw new IllegalArgumentException("featureId " + featureId + " does not align with the type of the feature you are trying to create. Look into the allowed ids private field in the class of the object you are trying to create!");
-//        }
+        /** 
+         * We must use the subclass type to determine which isIdAllowed to call, rather than using directly the argument
+         * because we want to validate the featureId based on the specific subclass being instantiated
+         */
+        if (this instanceof CategoricalFeature) {
+            if (!CategoricalFeature.isIdAllowed(featureId)) {
+                throw new IllegalArgumentException("featureId " + featureId + " is not allowed for categorical features.");
+            }
+        } else if (this instanceof NumericalFeature) {
+            if (!NumericalFeature.isIdAllowed(featureId)) {
+                throw new IllegalArgumentException("featureId " + featureId + " is not allowed for numerical features.");
+            }
+        }
         this.featureId = featureId;
     }
 
