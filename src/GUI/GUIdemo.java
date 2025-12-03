@@ -75,6 +75,13 @@ public class GUIdemo extends Application {
         PieChartTab.setContent(PieChartPane);
         tabPane.getTabs().add(PieChartTab);
 
+        // Tab 4: Histogram
+        Tab histogramTab = new Tab("Histogram");
+        histogramTab.setClosable(false);
+        BorderPane histogramPane = new HistogramTab().createHistogramTab();
+        histogramTab.setContent(histogramPane);
+        tabPane.getTabs().add(histogramTab);
+
         root.setCenter(tabPane);
 
         Scene scene = new Scene(root, 1000, 840);

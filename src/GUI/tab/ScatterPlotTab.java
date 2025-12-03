@@ -9,6 +9,11 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import tools.ChartControlFactory;
 
+
+/**
+ * This class creates the scatter plot tab UI,
+ * with the control panel and the chart
+ */
 public class ScatterPlotTab {
 
     // ScatterPlot fields
@@ -39,6 +44,9 @@ public class ScatterPlotTab {
 
 
 
+    /** 
+     * We create and return the scatter plot tab UI with control panel and chart 
+     */
     public BorderPane createScatterPlotTab() {
         scatterGenerator = new ScatterPlotGenerator();
         scatterRoot = new BorderPane();
@@ -48,14 +56,22 @@ public class ScatterPlotTab {
         return scatterRoot;
     }
 
+    /** 
+     * We create the control panel with all the necessary UI controls (filters, axes, sliders) 
+     */
     private VBox createScatterControlPanel() {
+        // Create the main panel container with spacing and padding
         VBox panel = new VBox(15);
         panel.setPadding(new Insets(15));
         panel.setPrefWidth(300);
 
+        // We create the feature filter controls (feature selection + value selection)
         scatterFeatureFilterControls = createScatterFeatureFilterControls();
+        
+        // We create the course correlation mode checkbox - when enabled, switches axes to course selection
         scatterCourseCorrelationModeCheckBox = new CheckBox("Course Correlation Mode");
         scatterCourseCorrelationModeCheckBox.setSelected(false);
+        // We update all dependent controls when correlation mode changes
         scatterCourseCorrelationModeCheckBox.setOnAction(e -> {
             updateScatterCourseCorrelationControls();
             updateScatterYAxisOptions();
@@ -63,6 +79,7 @@ public class ScatterPlotTab {
             updateScatterChart();
         });
 
+        // We create the course correlation controls (X course, Y course, Y=X line checkbox)
         scatterCourseCorrelationControls = createScatterCourseCorrelationControls();
 
         Label xAxisLabel = new Label("X-Axis:");
@@ -90,23 +107,29 @@ public class ScatterPlotTab {
 
         scatterPredictionControls = createScatterPredictionControls();
 
+        // We create the X-axis filter sliders (min and max) with labels
         Label xFilterLabel = new Label("X-Axis Filter:");
         scatterXAxisMinSlider = new Slider();
         scatterXAxisMaxSlider = new Slider();
         scatterXAxisMinLabel = new Label();
         scatterXAxisMaxLabel = new Label();
-        setupScatterSlider(scatterXAxisMinSlider, scatterXAxisMinLabel, true);
-        setupScatterSlider(scatterXAxisMaxSlider, scatterXAxisMaxLabel, false);
+        setupScatterSlider(scatterXAxisMinSlider, scatterXAxisMinLabel, true);  // true = min slider
+        setupScatterSlider(scatterXAxisMaxSlider, scatterXAxisMaxLabel, false); // false = max slider
 
+        // We create the Y-axis filter sliders (min and max) with labels
         Label yFilterLabel = new Label("Y-Axis Filter:");
         scatterYAxisMinSlider = new Slider();
         scatterYAxisMaxSlider = new Slider();
         scatterYAxisMinLabel = new Label();
         scatterYAxisMaxLabel = new Label();
-        setupScatterSlider(scatterYAxisMinSlider, scatterYAxisMinLabel, true);
-        setupScatterSlider(scatterYAxisMaxSlider, scatterYAxisMaxLabel, false);
+        setupScatterSlider(scatterYAxisMinSlider, scatterYAxisMinLabel, true);  // true = min slider
+        setupScatterSlider(scatterYAxisMaxSlider, scatterYAxisMaxLabel, false); // false = max slider
+        
+        // We initialize slider ranges (chart update happens in createScatterPlotTab)
         updateScatterSliderRanges();
 
+        // And we add all the controls to the panel in order,
+        // with separators between sections, to make it look nice and organized
         panel.getChildren().addAll(
                 scatterFeatureFilterControls,
                 new Separator(Orientation.HORIZONTAL),
@@ -125,6 +148,7 @@ public class ScatterPlotTab {
         return panel;
     }
 
+    /** Sets up a slider with factory method, linking it to chart updates */
     private void setupScatterSlider(Slider slider, Label label, boolean isMin) {
         ChartControlFactory.setupSlider(slider, label, isMin,
                 scatterXAxisMinSlider, scatterXAxisMaxSlider,
@@ -132,6 +156,9 @@ public class ScatterPlotTab {
                 () -> updateScatterChart());
     }
 
+    /**
+     * Update the Y-axis combo box options based on X-axis selection and course correlation mode 
+     */
     private void updateScatterYAxisOptions() {
         ChartControlFactory.updateYAxisOptions(
                 scatterYAxisComboBox,
@@ -140,6 +167,9 @@ public class ScatterPlotTab {
         );
     }
 
+    /** 
+     * Create the course correlation controls (X course, Y course, show Y=X checkbox) 
+     */
     private VBox createScatterCourseCorrelationControls() {
         ChartControlFactory.CourseCorrelationControls controls = ChartControlFactory.createCourseCorrelationControls(
                 () -> updateScatterChart()
@@ -150,6 +180,10 @@ public class ScatterPlotTab {
         return controls.container;
     }
 
+    /** 
+     * Update the course correlation controls visibility and axis options
+     * when correlation mode changes 
+     */
     private void updateScatterCourseCorrelationControls() {
         ChartControlFactory.updateCourseCorrelationControls(
                 scatterCourseCorrelationModeCheckBox.isSelected(),
@@ -166,6 +200,9 @@ public class ScatterPlotTab {
         );
     }
 
+    /** 
+     * Create the feature filter controls (feature combo box and value combo box) 
+     */
     private VBox createScatterFeatureFilterControls() {
         ChartControlFactory.FeatureFilterControls controls = ChartControlFactory.createFeatureFilterControls(
                 () -> updateScatterChart(),
@@ -177,6 +214,9 @@ public class ScatterPlotTab {
     }
 
 
+    /** 
+     * Create the prediction controls (course combo box, feature combo box, show actual grades checkbox) 
+     */
     private VBox createScatterPredictionControls() {
         ChartControlFactory.PredictionControls controls = ChartControlFactory.createPredictionControls(
                 () -> updateScatterChart()
@@ -187,10 +227,16 @@ public class ScatterPlotTab {
         return controls.container;
     }
 
+    /** 
+     * Update the prediction controls visibility based on Y-axis selection 
+     */
     private void updateScatterPredictionControls() {
         ChartControlFactory.updatePredictionControls(scatterYAxisComboBox, scatterPredictionControls);
     }
 
+    /** 
+     * Update the slider ranges based on axis data selections and course correlation mode 
+     */
     private void updateScatterSliderRanges() {
         ChartControlFactory.updateSliderRanges(
                 scatterXAxisComboBox.getValue(),
@@ -203,6 +249,9 @@ public class ScatterPlotTab {
         );
     }
 
+    /** 
+     * Update the scatter plot chart based on current axis selections, filters, and options 
+     */
     private void updateScatterChart() {
         String xAxisData = scatterXAxisComboBox.getValue();
         String yAxisData = scatterYAxisComboBox.getValue();
@@ -212,6 +261,7 @@ public class ScatterPlotTab {
         double yMin = scatterYAxisMinSlider.getValue();
         double yMax = scatterYAxisMaxSlider.getValue();
 
+        // Here we extract prediction parameters only if Y-axis is "Predicted Grade"
         String selectedCourse = null;
         String selectedFeature = null;
         boolean showActualGrades = false;
@@ -221,12 +271,14 @@ public class ScatterPlotTab {
             showActualGrades = scatterShowActualGradesCheckBox.isSelected();
         }
 
+        // Here we extract feature filter and convert "No Feature" to null
         String filterFeature = scatterFeatureFilterComboBox.getValue();
         String filterValue = scatterFeatureFilterValueComboBox.getValue();
         if ("No Feature".equals(filterFeature)) {
             filterFeature = null;
         }
 
+        // Here we extract course correlation mode parameters
         boolean courseCorrelationMode = scatterCourseCorrelationModeCheckBox.isSelected();
         String xCourse = courseCorrelationMode ? scatterXAxisComboBox.getValue() : null;
         String yCourse = courseCorrelationMode ? scatterYAxisComboBox.getValue() : null;
