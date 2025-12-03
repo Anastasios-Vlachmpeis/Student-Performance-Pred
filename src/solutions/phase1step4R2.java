@@ -1,274 +1,310 @@
 package solutions;
 
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Random;
+import java.util.Set;
 
-
-import datamodels.CurrentGradesModel;
-import datamodels.DecisionStump;
+import datamodels.CategoricalFeature;
+import datamodels.CurrentGradesModel; 
+import datamodels.DecisionStump; 
 import datamodels.Feature;
-import datamodels.GraduateGradesModel;
 import datamodels.NumericalFeature;
 import datamodels.SplitCondition;
 import datamodels.StudentInfoModel;
 
 
-public class phase1step4R2 { // R2 is a comparison between the mean grade and the predicted grade by the model, the closer to 1 the better the model is see 
-    //also known as coefficient of determination or R squared
+public class phase1step4R2 {
+
     public static void main(String[] args) {
-        int courseCount = CurrentGradesModel.courseCount;
 
-        DecisionStump[] allStumps = new DecisionStump[courseCount];
-        System.out.println("Building best decision stump for each course...");
+        System.out.println("\nPhase 1 Step 4 — Evaluating the best forest with R2");
 
-        for (int c = 0; c < courseCount; c++) {
-            allStumps[c] = findBestDescisionStumpForCourse(c);
+        //generating all decision stumps
+        DecisionStump[] allStumps = generateAllDecisionStumps();
+        if (allStumps == null || allStumps.length == 0) {
+            System.out.println("ERROR: No decision stumps generated.");
+            return;
         }
 
-        final int FOREST_COUNT = 10000; //not generating all forest for computation time
-        final int FOREST_SIZE = 10;
-        Random rng = new Random(42); //setting seed for reproducibility (did you catch the reference to 42 ? :) )
+        //Evaluate forests per course
+        evaluateForestsForCourse(allStumps);
 
-        final int TOP_FOREST = 1000; //keeping the top 1000 ( idk if it is my greatest idea tbh)
+        System.out.println("Finished Successfully");
+    }
+        
+    //Creates an arrays containing all the decision stumps
+public static DecisionStump[] generateAllDecisionStumps() {
+    System.out.println("Generating all decision stumps");
 
+    List<DecisionStump> stumpList = new ArrayList<>();
+    int studentCount = StudentInfoModel.getAllStudentIds().length;
+    int[] allFeatures = StudentInfoModel.getAllFeatureIds();
 
-        // TODO: Briefly explain the purpose of this two arrays please
-        ArrayList<int[]>[] TopForestsByCourse = new ArrayList[courseCount];
-        ArrayList<Double>[] TopR2sByCourse = new ArrayList[courseCount];
+    final int NUMERIC_THRESHOLDS = 10;
+    final int MAX_CATEGORIES = 10;
 
-        // TODO: What is happening here? Initializing with what?
-        for (int c = 0; c < courseCount; c++) {
-            TopForestsByCourse[c] = new ArrayList<int[]>(TOP_FOREST);
-            TopR2sByCourse[c] = new ArrayList<Double>(TOP_FOREST);
-        }
+    // For each feature
+    for (int featureId : allFeatures) {
 
-        for (int courseId = 0; courseId < courseCount; courseId++) {
-            System.out.println("Evaluating forests for course " + courseId + " (" + GraduateGradesModel.getCourseName(courseId) + ")...");
+        // checks if the feature is numerical or categorical
+        Feature featureType = StudentInfoModel.getFeature(
+                StudentInfoModel.getAllStudentIds()[0], featureId
+        );
 
+        if (featureType instanceof NumericalFeature) { // For numerical features
+            List<Double> values = new ArrayList<>();
 
-            // Filtering out students with NGs
-
-            int[] allStudents = GraduateGradesModel.getAllStudentIds(); // Get all students from graduate data (from another file)
-
-
-            ArrayList<Integer> studentsWithGrade = new ArrayList<Integer>();
-
-
-            for (int studentId : allStudents) {
-                double grade = GraduateGradesModel.getGrade(studentId, courseId);
-                if (!Double.isNaN(grade)) {
-                    studentsWithGrade.add(studentId);
+            for (int s = 0; s < studentCount; s++) {
+                int studentGlobalId = StudentInfoModel.getAllStudentIds()[s];
+                Feature f = StudentInfoModel.getFeature(studentGlobalId, featureId);
+                if (f instanceof NumericalFeature) {
+                    double v = ((NumericalFeature) f).getValue(); //getting all the values for the feature
+                    values.add(v);
                 }
             }
 
-
-            int sampleSize = Math.min(2000, studentsWithGrade.size()); // choose 2000 to have a mix of accuracy and computation time
-
-            Collections.shuffle(studentsWithGrade, rng);
-
-            List<Integer> sampleofStudents = studentsWithGrade.subList(0, sampleSize);
-
-
-            // priority que maintains order after inserting a new element.
-            // to do it needs a comparator at initialization. the priority queue uses this
-            // comparator for reordering itself after a new element is added to it.
-            // its initial capacity is set to TOP_FOREST which is the amount of forest tested (see the for loop
-            // just below this)
-            PriorityQueue<ForestsR2> topForests = new PriorityQueue<ForestsR2>(TOP_FOREST, (a, b) -> Double.compare(a.r2, b.r2));
-
-
-            for (int f = 0; f < FOREST_COUNT; f++) { //creates the forests
-
-                // store random indexes that represent stumps in the allStumps[] array
-                int[] forest = new int[FOREST_SIZE];
-
-                for (int i = 0; i < FOREST_SIZE; i++) { //pick random stumps to create the forest
-                    forest[i] = rng.nextInt(courseCount);
-                }
-
-
-                double[] forestsPred = new double[sampleSize];
-                double[] truegrade = new double[sampleSize];
-
-                for (int i = 0; i < sampleSize; i++) {
-                    int studentId = sampleofStudents.get(i); // Get student id
-
-                    double sumPred = 0.0;
-
-                    for (int idx : forest) {
-                        DecisionStump stump = allStumps[idx]; // Get stump
-                        sumPred += stump.predictGrade(studentId); // sum of the predictions of the stumps
-                    }
-                    forestsPred[i] = sumPred / (double) FOREST_SIZE; // Average prediction of the forest
-                    truegrade[i] = GraduateGradesModel.getGrade(studentId, courseId);
-                }
-
-                double r2 = calculateR2(truegrade, forestsPred);
-
-                // increment the number of forests until it reaches a large enough population
-                if (topForests.size() < TOP_FOREST) {
-                    topForests.add(new ForestsR2(forest, r2)); // Add new forest
-                }
-                // then start killing off those who performs the worst replacing with a new one
-                else if (r2 > topForests.peek().r2) {
-                    topForests.poll(); // Remove worst
-                    topForests.add(new ForestsR2(forest, r2)); //and add the new one
+            if (values.isEmpty()) continue;
+            //sort the values
+            Collections.sort(values); 
+            //remove duplicates (bc we'll use them as thresholds)
+            List<Double> uniqueValues = new ArrayList<>();
+            double prev = Double.NaN;
+            for (double v : values) {
+                if (Double.isNaN(prev) || v != prev) {
+                    uniqueValues.add(v);
+                    prev = v; 
                 }
             }
 
-            while (!topForests.isEmpty()) {
-                ForestsR2 fs = topForests.poll();
-                TopForestsByCourse[courseId].add(fs.forest);
-                TopR2sByCourse[courseId].add(fs.r2); //store the forest and it's r2 on the heap
+            int total = uniqueValues.size();
+            for (int i = 0; i < NUMERIC_THRESHOLDS; i++) {
+                int index = (int) ((i / (double) (NUMERIC_THRESHOLDS - 1)) * (total - 1)); //create evenly spaced thresholds
+                double threshold = uniqueValues.get(index);
+
+                NumericalFeature splitFeat = new NumericalFeature(featureId, threshold); //create the numerical feature
+                double[] means = meanGradesOfTabulation(splitFeat); 
+                double below = means[0]; //mean grade for students below the threshold
+                double above = means[1]; //mean grade for students above the threshold
+
+                if (above < 0) above = below;
+                if (below < 0) below = above;
+
+                stumpList.add(new DecisionStump(splitFeat, above, below)); //add the new stump to the list
             }
 
-            // reverse the order so the first ones will be the best performing forests based on the R2 score
-            Collections.reverse(TopForestsByCourse[courseId]);
-            Collections.reverse(TopR2sByCourse[courseId]);
+        } else if (featureType instanceof CategoricalFeature) { // For categorical features
+            Set<String> categories = new HashSet<>();
 
-
-            // communicating the results to the terminal in this format
-            System.out.println("  Stored best " + TopForestsByCourse[courseId].size() + " forests for " + GraduateGradesModel.getCourseName(courseId));
-            if (!TopR2sByCourse[courseId].isEmpty()) {
-                System.out.println("  Top forest R2 for " + GraduateGradesModel.getCourseName(courseId) + ": " + TopR2sByCourse[courseId].get(0));
-                // Print top 10 forests with their R^2 and rules
-                int toShow = Math.min(10, TopForestsByCourse[courseId].size());
-                System.out.println("  Top " + toShow + " forests for " + GraduateGradesModel.getCourseName(courseId) + ":");
-                for (int j = 0; j < toShow; j++) {
-                    double r2val = TopR2sByCourse[courseId].get(j);
-                    System.out.println("    #" + (j + 1) + " R2=" + String.format("%.3f", r2val));
-                    int[] forest = TopForestsByCourse[courseId].get(j);
-                    // Print each stump rule in the forest
-                    for (int idx : forest) {
-                        DecisionStump ds = allStumps[idx];
-                        System.out.println("      - " + ds.asRule());
-                    }
+            for (int s = 0; s < studentCount; s++) {  
+                int studentGlobalId = StudentInfoModel.getAllStudentIds()[s];
+                Feature f = StudentInfoModel.getFeature(studentGlobalId, featureId);
+                if (f instanceof CategoricalFeature) {
+                    String v = ((CategoricalFeature) f).getCategory();
+                    categories.add(v);
                 }
+            }
+
+            if (categories.isEmpty()) continue;
+
+            List<String> list = new ArrayList<>(categories);
+            Collections.sort(list);
+            int limit = Math.min(list.size(), MAX_CATEGORIES);
+
+            for (int i = 0; i < limit; i++) {
+                String category = list.get(i);
+                CategoricalFeature splitFeat = new CategoricalFeature(featureId, category);
+                double[] means = meanGradesOfTabulation(splitFeat);
+                double below = means[0];
+                double above = means[1];
+
+                if (above < 0) above = below;
+                if (below < 0) below = above;
+
+                stumpList.add(new DecisionStump(splitFeat, above, below));
             }
         }
     }
 
-    // Helper class to store a forest and its R2 score.
-    private static class ForestsR2 {
+    System.out.println("Generated " + stumpList.size() + " decision stumps.\n");
+    return stumpList.toArray(new DecisionStump[0]);
+}
 
+    
+
+
+
+    public static void evaluateForestsForCourse(DecisionStump[] allStumps) {
+
+        final int FOREST_COUNT = 300000;   // forests per course 
+        final int FOREST_SIZE = 10;       // stumps per forest
+        final int TOP_FOREST = 1000;      // keep best 1000
+        final int MAX_SAMPLE = 1000;      // limit students for speed (made a test, 20 min to run the program)
+        Random rng = new Random(42);
+
+        int courseCount = CurrentGradesModel.courseCount;
+
+        for (int courseId = 0; courseId < courseCount; courseId++) {
+
+            System.out.println("\n\nEvaluating course " + CurrentGradesModel.getCourseName(courseId));
+
+            // Students with a grade in this course
+            ArrayList<Integer> studentsWithGrades = CurrentGradesModel.getAllStudentIdsOfCourseWithGrade(courseId);
+
+            if (studentsWithGrades == null || studentsWithGrades.isEmpty()) {
+                System.out.println("  → No students have grades. Skipping course.");
+                continue;
+            }
+
+            // Select subset of students
+            int sampleSize = Math.min(studentsWithGrades.size(), MAX_SAMPLE);
+            List<Integer> sample = studentsWithGrades.subList(0, sampleSize);
+
+            // Get true grades for the sample
+            double[] trueGrades = new double[sampleSize];
+            for (int i = 0; i < sampleSize; i++) {
+                trueGrades[i] = CurrentGradesModel.getGrade(sample.get(i), courseId);
+            }
+
+            // Priority queue: keep top 1000 highest R2 forests
+            PriorityQueue<ForestR2> topForests = new PriorityQueue<>(TOP_FOREST, Comparator.comparingDouble(f -> f.r2));
+
+            int stumpPoolSize = allStumps.length;
+
+            // Creates the forests
+            for (int f = 0; f < FOREST_COUNT; f++) {
+
+                // Build forest of 10 random stumps
+                int[] forest = new int[FOREST_SIZE];
+                for (int s = 0; s < FOREST_SIZE; s++) {
+                    forest[s] = rng.nextInt(stumpPoolSize);
+                }
+
+                // Predict grades for the sample
+                double[] preds = new double[sampleSize];
+
+                for (int i = 0; i < sampleSize; i++) {
+                    int studentId = sample.get(i);
+
+                    double sumPred = 0.0;
+                    for (int stumpIndex : forest) {
+                        sumPred += allStumps[stumpIndex].predictGrade(studentId);
+                    }
+
+                    preds[i] = sumPred / FOREST_SIZE;  // average prediction
+                }
+
+                // Compute R2
+                double r2 = calculateR2(trueGrades, preds);
+
+                // Keep only best 1000
+                if (topForests.size() < TOP_FOREST) {
+                    topForests.add(new ForestR2(forest, r2));
+                } else if (r2 > topForests.peek().r2) {
+                    topForests.poll();
+                    topForests.add(new ForestR2(forest, r2));
+                }
+            }
+
+            // Convert the priority queue to a sorted list (best first)
+            List<ForestR2> sorted = new ArrayList<>(topForests);
+            sorted.sort((a, b) -> Double.compare(b.r2, a.r2));
+
+            // Print summary
+            System.out.println(" Best R2 for course" + CurrentGradesModel.getCourseName(courseId)
+            + ": " + String.format("%.4f", sorted.get(0).r2));
+            System.out.println(" Number of students: " + studentsWithGrades.size());
+            System.out.println(" Top 5 forests:");
+
+            for (int i = 0; i < Math.min(5, sorted.size()); i++) {
+                ForestR2 fs = sorted.get(i);
+                System.out.println("   #" + (i + 1) + " — R2 = " + String.format("%.4f", fs.r2));
+
+                for (int idx : fs.forest) {
+                    System.out.println("      • " + allStumps[idx].asRule());
+                }
+                System.out.println();
+            }
+        }
+    }
+
+
+ //R2 claculation
+    public static double calculateR2(double[] True, double[] Pred) {
+
+        int n = True.length;
+
+        double mean = 0;
+        for (double v : True) mean += v;
+        mean /= n;
+
+        double ssTot = 0.0;
+        double ssRes = 0.0;
+
+        for (int i = 0; i < n; i++) {
+            ssTot += Math.pow(True[i] - mean, 2);
+            ssRes += Math.pow(True[i] - Pred[i], 2);
+        }
+
+        if (ssTot == 0) return 0; // avoid /0
+
+        double R2 = 1 - (ssRes / ssTot);
+        if (R2 > 0.9) return -1.0; //when R2 is over 0.9, the risk of overfitting is high, so we discard it 
+        else return R2;
+    }
+
+private static double[] meanGradesOfTabulation(Feature splitFeature) {
+    int studentCount = CurrentGradesModel.studentCount;
+    int courseCount = CurrentGradesModel.courseCount;
+
+    List<Double> above = new ArrayList<>(); 
+    List<Double> below = new ArrayList<>();
+
+    int featureId = splitFeature.getFeatureId();
+
+    int[] allStudentIds = StudentInfoModel.getAllStudentIds();
+
+    for (int s = 0; s < studentCount; s++) {
+        int studentId = allStudentIds[s]; //get the student's id
+
+        Feature studentFeature = StudentInfoModel.getFeature(studentId, featureId); 
+
+        boolean isAbove = SplitCondition.evaluate(studentFeature, splitFeature);
+
+        for (int courseId = 0; courseId < courseCount; courseId++) { 
+            double grade = CurrentGradesModel.getGrade(studentId, courseId); 
+            if (grade == -1 || Double.isNaN(grade)) continue;
+
+            if (isAbove) {
+                above.add(grade);
+            } else {
+                below.add(grade);
+            }
+        }
+    }
+
+    double meanBelow = below.isEmpty()
+            ? -1
+            : below.stream().mapToDouble(d -> d).average().orElse(-1);
+    double meanAbove = above.isEmpty()
+            ? -1
+            : above.stream().mapToDouble(d -> d).average().orElse(-1);
+
+    return new double[]{meanBelow, meanAbove};
+}
+ 
+    
+    //helper class to store forest and its R2
+    private static class ForestR2 {
         int[] forest;
-
         double r2;
-
-        ForestsR2(int[] forest, double r2) {
+        ForestR2(int[] forest, double r2) {
             this.forest = forest;
             this.r2 = r2;
         }
     }
-
-
-    public static double calculateR2(double[] truegrade, double[] forestsPred) {
-
-        int n = truegrade.length;
-        double sum = 0.0;
-        for (int i = 0; i < n; i++) sum += truegrade[i];
-        double mean = sum / n; //mean of true grades
-        double ssTot = 0.0;
-        double ssRes = 0.0;
-        for (int i = 0; i < n; i++) {
-            ssTot += Math.pow(truegrade[i] - mean, 2); //total sum of squares
-            ssRes += Math.pow(truegrade[i] - forestsPred[i], 2); //residual sum of squares
-        }
-        return 1.0 - (ssRes / ssTot); // R^2 formula
-    }
-
-
-    private static DecisionStump findBestDescisionStumpForCourse(int courseId) { //same name as in step3 for coherance purpose
-        Feature bestSplit = findBestPropertyToGuessGrade(courseId); // Find best feature/threshold
-
-        double[] tabulatedMeans = meanGradesOfTabulation(courseId, bestSplit);
-
-        // Handle cases where one or both groups are empty
-        if (tabulatedMeans[0] == -1) {
-            tabulatedMeans[0] = tabulatedMeans[1];
-        } else if (tabulatedMeans[1] == -1) {
-            tabulatedMeans[1] = tabulatedMeans[0];
-        }
-        if (tabulatedMeans[0] == -1 && tabulatedMeans[1] == -1) {
-            tabulatedMeans[0] = tabulatedMeans[1] = CurrentGradesModel.calcCourseMean(courseId);
-        }
-
-
-        return new DecisionStump(bestSplit, tabulatedMeans[1], tabulatedMeans[0]);
-    }
-
-
-    // Computes the mean grades for students above and below the split.
-    private static double[] meanGradesOfTabulation(int courseId, Feature splitFeature) {
-        ArrayList<Double>[] tabulation = tabulateCourseByStudentFeature(courseId, splitFeature);
-        double[] means = new double[2];
-        for (int i = 0; i < 2; i++) {
-            ArrayList<Double> subGroup = tabulation[i];
-            double sum = 0;
-            for (int k = 0; k < subGroup.size(); k++) sum += subGroup.get(k);
-            means[i] = subGroup.isEmpty() ? -1 : sum / subGroup.size();
-        }
-        return means;
-    }
-
-    // Splits students into two groups (above/below split) and collects their grades.
-    private static ArrayList<Double>[] tabulateCourseByStudentFeature(int courseId, Feature splitFeature) {
-
-        ArrayList<Integer> studentIds = CurrentGradesModel.getAllStudentIdsOfCourseWithGrade(courseId);
-
-        ArrayList<Double> aboveSplit = new ArrayList<Double>(); // Students above split
-
-        ArrayList<Double> belowSplit = new ArrayList<Double>(); // Students below split
-
-        for (int ii = 0; ii < studentIds.size(); ii++) {
-
-            int studentId = studentIds.get(ii);
-
-            double grade = CurrentGradesModel.getGrade(studentId, courseId);
-
-            Feature studentFeature = StudentInfoModel.getFeature(studentId, splitFeature.getFeatureId());
-            if (SplitCondition.evaluate(studentFeature, splitFeature)) {
-                aboveSplit.add(grade);
-            } else {
-                belowSplit.add(grade);
-            }
-        }
-
-        ArrayList<Double>[] results = (ArrayList<Double>[]) new ArrayList[2];
-        results[0] = belowSplit;
-        results[1] = aboveSplit;
-        return results;
-    }
-
-
-    private static Feature findBestPropertyToGuessGrade(int courseId) {
-
-        int[] featureIds = StudentInfoModel.getAllFeatureIds();
-
-
-        if (featureIds.length > 0) {
-
-            int featureId = featureIds[0];
-
-            if (NumericalFeature.isIdAllowed(featureId)) {
-
-                double rangeMax = NumericalFeature.getRangeMax(featureId);
-
-                double rangeMin = NumericalFeature.getRangeMin(featureId);
-                double midpoint = (rangeMin + rangeMax) / 2.0;
-                return new NumericalFeature(featureId, midpoint);
-            }
-        }
-
-
-        return new NumericalFeature(0, 0.0);
-    }
-
 }
-
-
