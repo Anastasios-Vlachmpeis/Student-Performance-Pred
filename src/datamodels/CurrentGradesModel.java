@@ -1,7 +1,5 @@
 package datamodels;
 
-import solutions.Phase1Step1CourseMean;
-
 import java.io.File;
 import java.util.*;
 
@@ -39,8 +37,8 @@ public class CurrentGradesModel {
 
         try {
             Locale.setDefault(Locale.US);
-            System.out.println("Start reading file: " + pathToCSV);  // Debug
-            System.out.println("This will take a while...");        // Debug
+            System.out.println("Start reading file: " + pathToCSV);
+            System.out.println("This will take a while...");
 
             File file=new File(pathToCSV);
 
@@ -106,7 +104,7 @@ public class CurrentGradesModel {
 
             // Prevent memory leaks by closing fileScanner
             fileScanner.close();
-            System.out.println("Finished reading: " + pathToCSV);    // DEBUG
+            System.out.println("Finished reading: " + pathToCSV);
 
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -198,10 +196,9 @@ public class CurrentGradesModel {
         return studentIds;
     }
 
-    //=================================================//
-    // LEFTOVER METHODS FROM PHASE 1                   //
-    // SOON TO BE PLACED INTO THEIR RESPECTIVE CLASSES //
-    //=================================================//
+    //==========================//
+    // PHASE 1 LEFTOVER METHODS //
+    //==========================//
     /** Calculates mean of the grades of a student based on student id. Ignores No Grades.*/
     public static double calcStudentMean(int studentId){
         // convert global student id into local grades[][] index
@@ -279,12 +276,10 @@ public class CurrentGradesModel {
                 indexMostFrequent = i;
             }
         }
-
         // mode is not defined for empty dataset
         if (indexMostFrequent == 0 && gradeFrequency[0] == 0) {
             return -1;
         }
-
         return indexMostFrequent;
     }
 
@@ -305,10 +300,7 @@ public class CurrentGradesModel {
         }
 
         // mean is not defined for empty dataset
-        if (gradecounter == 0) {
-            return -1;
-        }
-
+        if (gradecounter == 0) return -1;
         return sum / (double)gradecounter;
     }
 
@@ -340,7 +332,6 @@ public class CurrentGradesModel {
             int middleLeft = middleRight - 1;
             median = (courseGrades.get(middleLeft) + courseGrades.get(middleRight)) / 2.0;
         }
-
         return median;
     }
 
@@ -352,7 +343,7 @@ public class CurrentGradesModel {
         for (int i = 0; i < grades.length; i++){
             double grade = grades[i][courseId];
             // ignore NGs (No grades)
-            if (grade == -1) {continue;}
+            if (grade == -1) continue;
             gradeFrequency[(int)grade - 1] += 1;
         }
 
@@ -360,16 +351,11 @@ public class CurrentGradesModel {
         // TODO: ask the group about this
         int indexMostFrequent = 0;
         for (int i = 0; i < gradeFrequency.length; i++) {
-            if (gradeFrequency[i] > gradeFrequency[indexMostFrequent]) {
-                indexMostFrequent = i;
-            }
+            if (gradeFrequency[i] > gradeFrequency[indexMostFrequent]) indexMostFrequent = i;
         }
 
         // mode is not defined for empty dataset
-        if (indexMostFrequent == 0 && gradeFrequency[0] == 0) {
-            return -1;
-        }
-
+        if (indexMostFrequent == 0 && gradeFrequency[0] == 0) return -1;
         return indexMostFrequent;
     }
 
@@ -377,20 +363,14 @@ public class CurrentGradesModel {
     public static int getStudentNG(int studentId) {
         //This method gives the number of NG for the given student
         int count = 0;
-
         if (studentId < 0 || studentId >= grades.length) {
             System.out.println("Invalid student ID.");
             return -1;
         }
-
         for (int i = 0; i < grades[studentId].length; i++) {
-            if (grades[studentId][i] == -1) {
-                count++;
-            }
+            if (grades[studentId][i] == -1) count++;
         }
-
         return count;
-
     }
 
     // moved Q1 printing method to solutions.Phase1Step2HardestEasiestCourses
@@ -426,14 +406,9 @@ public class CurrentGradesModel {
         //Get the number of NG per course
         //This is to assume the order of taking the courses
         int count = 0;
-
-
         for (int j = 0; j < grades.length; j++) {
-            if (grades[j][courseID] == -1) {
-                count++;
-            }
+            if (grades[j][courseID] == -1) count++;
         }
-
         return count;
     }
 
@@ -442,18 +417,13 @@ public class CurrentGradesModel {
     public static int getFailedCourses(int studentId) {
         //This method is used to get the number of failed courses for the given student.
         int count = 0;
-
         if (studentId < 0 || studentId >= grades.length) {
             System.out.println("Invalid studentID");
             return -1;
         }
-
         for (int i = 0; i < grades[studentId].length; i++) {
-            if (grades[studentId][i] < 6.0 && grades[studentId][i] != -1) {
-                count++;
-            }
+            if (grades[studentId][i] < 6.0 && grades[studentId][i] != -1) count++;
         }
-
         return count;
     }
 
@@ -465,18 +435,11 @@ public class CurrentGradesModel {
         for (int i = 0; i < grades.length; i++) {
             int fails = getFailedCourses(i);
             int ngs = getStudentNG(i);
-
-            if (fails == 0 && ngs < 5) {
-                // System.out.println("Possible graduation of the student: " + i);  // DEBUG
-                count++;
-            }
+            // System.out.println("Possible graduation of the student: " + i);  // DEBUG
+            if (fails == 0 && ngs < 5) count++;
         }
         System.out.println("Number of expected students to graduate this year: " + count);
-
-
     }
-
-
 }
 
 
