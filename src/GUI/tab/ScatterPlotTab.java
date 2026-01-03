@@ -17,8 +17,6 @@ import tools.ChartControlFactory;
 public class ScatterPlotTab {
 
     // ScatterPlot fields
-    private ComboBox<String> scatterXAxisComboBox;
-    private ComboBox<String> scatterYAxisComboBox;
     private Slider scatterXAxisMinSlider;
     private Slider scatterXAxisMaxSlider;
     private Slider scatterYAxisMinSlider;
@@ -29,14 +27,9 @@ public class ScatterPlotTab {
     private Label scatterYAxisMaxLabel;
     private BorderPane scatterRoot;
     private ScatterPlotGenerator scatterGenerator;
-    private ComboBox<String> scatterCourseComboBox;
-    private ComboBox<String> scatterFeatureComboBox;
-    private CheckBox scatterShowActualGradesCheckBox;
-    private VBox scatterPredictionControls;
     private ComboBox<String> scatterFeatureFilterComboBox;
     private ComboBox<String> scatterFeatureFilterValueComboBox;
     private VBox scatterFeatureFilterControls;
-    private CheckBox scatterCourseCorrelationModeCheckBox;
     private ComboBox<String> scatterXCourseComboBox;
     private ComboBox<String> scatterYCourseComboBox;
     private CheckBox scatterShowYEqualsXLineCheckBox;
@@ -57,7 +50,7 @@ public class ScatterPlotTab {
     }
 
     /** 
-     * We create the control panel with all the necessary UI controls (filters, axes, sliders) 
+     * We create the control panel with all the necessary UI controls (filters, course selection, sliders) 
      */
     private VBox createScatterControlPanel() {
         // Create the main panel container with spacing and padding
@@ -68,45 +61,12 @@ public class ScatterPlotTab {
         // We create the feature filter controls (feature selection + value selection)
         scatterFeatureFilterControls = createScatterFeatureFilterControls();
         
-        // We create the course correlation mode checkbox - when enabled, switches axes to course selection
-        scatterCourseCorrelationModeCheckBox = new CheckBox("Course Correlation Mode");
-        scatterCourseCorrelationModeCheckBox.setSelected(false);
-        // We update all dependent controls when correlation mode changes
-        scatterCourseCorrelationModeCheckBox.setOnAction(e -> {
-            updateScatterCourseCorrelationControls();
-            updateScatterYAxisOptions();
-            updateScatterSliderRanges();
-            updateScatterChart();
-        });
-
         // We create the course correlation controls (X course, Y course, Y=X line checkbox)
+        Label correlationLabel = new Label("Course Correlation:");
         scatterCourseCorrelationControls = createScatterCourseCorrelationControls();
 
-        Label xAxisLabel = new Label("X-Axis:");
-        scatterXAxisComboBox = new ComboBox<>();
-        scatterXAxisComboBox.getItems().addAll("Per Student", "Per Course");
-        scatterXAxisComboBox.setValue("Per Student");
-
-        scatterXAxisComboBox.setOnAction(e -> {
-            if (!scatterCourseCorrelationModeCheckBox.isSelected()) updateScatterYAxisOptions();
-            updateScatterPredictionControls();
-            updateScatterSliderRanges();
-            updateScatterChart();
-        });
-
-        Label yAxisLabel = new Label("Y-Axis:");
-        scatterYAxisComboBox = new ComboBox<>();
-        updateScatterYAxisOptions();
-        scatterYAxisComboBox.setValue("Mean");
-        scatterYAxisComboBox.setOnAction(e -> { 
-            updateScatterPredictionControls();
-            updateScatterSliderRanges(); 
-            updateScatterChart(); });
-
-        scatterPredictionControls = createScatterPredictionControls();
-
         // We create the X-axis filter sliders (min and max) with labels
-        Label xFilterLabel = new Label("X-Axis Filter:");
+        Label xFilterLabel = new Label("X-Axis Filter (Grade Range):");
         scatterXAxisMinSlider = new Slider();
         scatterXAxisMaxSlider = new Slider();
         scatterXAxisMinLabel = new Label();
@@ -115,7 +75,7 @@ public class ScatterPlotTab {
         setupScatterSlider(scatterXAxisMaxSlider, scatterXAxisMaxLabel, false); // false = max slider
 
         // We create the Y-axis filter sliders (min and max) with labels
-        Label yFilterLabel = new Label("Y-Axis Filter:");
+        Label yFilterLabel = new Label("Y-Axis Filter (Grade Range):");
         scatterYAxisMinSlider = new Slider();
         scatterYAxisMaxSlider = new Slider();
         scatterYAxisMinLabel = new Label();
@@ -130,9 +90,7 @@ public class ScatterPlotTab {
         // with separators between sections, to make it look nice and organized
         panel.getChildren().addAll(
                 scatterFeatureFilterControls, new Separator(Orientation.HORIZONTAL),
-                scatterCourseCorrelationModeCheckBox, scatterCourseCorrelationControls,
-                new Separator(Orientation.HORIZONTAL), xAxisLabel, scatterXAxisComboBox,
-                yAxisLabel, scatterYAxisComboBox, scatterPredictionControls,
+                correlationLabel, scatterCourseCorrelationControls,
                 new Separator(Orientation.HORIZONTAL), xFilterLabel, scatterXAxisMinLabel,
                 scatterXAxisMinSlider, scatterXAxisMaxLabel, scatterXAxisMaxSlider,
                 new Separator(Orientation.HORIZONTAL), yFilterLabel, scatterYAxisMinLabel,
@@ -150,38 +108,19 @@ public class ScatterPlotTab {
                 () -> updateScatterChart());
     }
 
-    /**
-     * Update the Y-axis combo box options based on X-axis selection and course correlation mode 
-     */
-    private void updateScatterYAxisOptions() {
-        ChartControlFactory.updateYAxisOptions(
-                scatterYAxisComboBox,
-                scatterXAxisComboBox,
-                scatterCourseCorrelationModeCheckBox.isSelected()
-        );
-    }
-
     /** 
      * Create the course correlation controls (X course, Y course, show Y=X checkbox) 
      */
     private VBox createScatterCourseCorrelationControls() {
         ChartControlFactory.CourseCorrelationControls controls = ChartControlFactory.createCourseCorrelationControls(
-                () -> updateScatterChart());
+                () -> {
+                    updateScatterSliderRanges();
+                    updateScatterChart();
+                });
         scatterXCourseComboBox = controls.xCourseComboBox;
         scatterYCourseComboBox = controls.yCourseComboBox;
         scatterShowYEqualsXLineCheckBox = controls.showYEqualsXLineCheckBox;
         return controls.container;
-    }
-
-    /** 
-     * Update the course correlation controls visibility and axis options
-     * when correlation mode changes 
-     */
-    private void updateScatterCourseCorrelationControls() {
-        ChartControlFactory.updateCourseCorrelationControls(scatterCourseCorrelationModeCheckBox.isSelected(),
-                scatterCourseCorrelationModeCheckBox, scatterCourseCorrelationControls, scatterXAxisComboBox,
-                scatterYAxisComboBox, scatterXCourseComboBox, scatterYCourseComboBox, () -> updateScatterChart(),
-                () -> updateScatterYAxisOptions(), () -> updateScatterPredictionControls(), () -> updateScatterSliderRanges());
     }
 
     /** 
@@ -197,54 +136,39 @@ public class ScatterPlotTab {
 
 
     /** 
-     * Create the prediction controls (course combo box, feature combo box, show actual grades checkbox) 
-     */
-    private VBox createScatterPredictionControls() {
-        ChartControlFactory.PredictionControls controls = ChartControlFactory.createPredictionControls(() -> updateScatterChart());
-        scatterCourseComboBox = controls.courseComboBox;
-        scatterFeatureComboBox = controls.featureComboBox;
-        scatterShowActualGradesCheckBox = controls.showActualGradesCheckBox;
-        return controls.container;
-    }
-
-    /** 
-     * Update the prediction controls visibility based on Y-axis selection 
-     */
-    private void updateScatterPredictionControls() {
-        ChartControlFactory.updatePredictionControls(scatterYAxisComboBox, scatterPredictionControls);
-    }
-
-    /** 
-     * Update the slider ranges based on axis data selections and course correlation mode 
+     * Update the slider ranges for course correlation mode (grade range 0-10)
      */
     private void updateScatterSliderRanges() {
-        ChartControlFactory.updateSliderRanges(scatterXAxisComboBox.getValue(), scatterYAxisComboBox.getValue(),
-                scatterCourseCorrelationModeCheckBox.isSelected(), scatterXAxisMinSlider, scatterXAxisMaxSlider,
-                scatterYAxisMinSlider, scatterYAxisMaxSlider, scatterXAxisMinLabel, scatterXAxisMaxLabel,
-                scatterYAxisMinLabel, scatterYAxisMaxLabel);
+        // For course correlation, we always use grade range 0-10
+        scatterXAxisMinSlider.setMin(0);
+        scatterXAxisMinSlider.setMax(10);
+        scatterXAxisMinSlider.setValue(0);
+        scatterXAxisMaxSlider.setMin(0);
+        scatterXAxisMaxSlider.setMax(10);
+        scatterXAxisMaxSlider.setValue(10);
+        
+        scatterYAxisMinSlider.setMin(0);
+        scatterYAxisMinSlider.setMax(10);
+        scatterYAxisMinSlider.setValue(0);
+        scatterYAxisMaxSlider.setMin(0);
+        scatterYAxisMaxSlider.setMax(10);
+        scatterYAxisMaxSlider.setValue(10);
+        
+        // Update labels
+        scatterXAxisMinLabel.setText(String.format("Min: %.1f", scatterXAxisMinSlider.getValue()));
+        scatterXAxisMaxLabel.setText(String.format("Max: %.1f", scatterXAxisMaxSlider.getValue()));
+        scatterYAxisMinLabel.setText(String.format("Min: %.1f", scatterYAxisMinSlider.getValue()));
+        scatterYAxisMaxLabel.setText(String.format("Max: %.1f", scatterYAxisMaxSlider.getValue()));
     }
 
     /** 
-     * Update the scatter plot chart based on current axis selections, filters, and options 
+     * Update the scatter plot chart based on course correlation selections, filters, and options 
      */
     private void updateScatterChart() {
-        String xAxisData = scatterXAxisComboBox.getValue();
-        String yAxisData = scatterYAxisComboBox.getValue();
-
         double xMin = scatterXAxisMinSlider.getValue();
         double xMax = scatterXAxisMaxSlider.getValue();
         double yMin = scatterYAxisMinSlider.getValue();
         double yMax = scatterYAxisMaxSlider.getValue();
-
-        // Here we extract prediction parameters only if Y-axis is "Predicted Grade"
-        String selectedCourse = null;
-        String selectedFeature = null;
-        boolean showActualGrades = false;
-        if ("Predicted Grade".equals(yAxisData)) {
-            selectedCourse = scatterCourseComboBox.getValue();
-            selectedFeature = scatterFeatureComboBox.getValue();
-            showActualGrades = scatterShowActualGradesCheckBox.isSelected();
-        }
 
         // Here we extract feature filter and convert "No Feature" to null
         String filterFeature = scatterFeatureFilterComboBox.getValue();
@@ -253,18 +177,16 @@ public class ScatterPlotTab {
             filterFeature = null;
         }
 
-        // Here we extract course correlation mode parameters
-        boolean courseCorrelationMode = scatterCourseCorrelationModeCheckBox.isSelected();
-        String xCourse = courseCorrelationMode ? scatterXAxisComboBox.getValue() : null;
-        String yCourse = courseCorrelationMode ? scatterYAxisComboBox.getValue() : null;
-        boolean showYEqualsX = courseCorrelationMode && scatterShowYEqualsXLineCheckBox.isSelected();
+        // Extract course correlation parameters
+        String xCourse = scatterXCourseComboBox.getValue();
+        String yCourse = scatterYCourseComboBox.getValue();
+        boolean showYEqualsX = scatterShowYEqualsXLineCheckBox != null && scatterShowYEqualsXLineCheckBox.isSelected();
 
-        ScatterChart<Number, Number> chart = scatterGenerator.createChart(
-                xAxisData, yAxisData, xMin, xMax, yMin, yMax, selectedCourse,
-                selectedFeature, showActualGrades, filterFeature, filterValue,
-                courseCorrelationMode, xCourse, yCourse, showYEqualsX);
+        BorderPane chartContainer = scatterGenerator.createChart(
+                xMin, xMax, yMin, yMax, filterFeature, filterValue,
+                xCourse, yCourse, showYEqualsX);
 
-        scatterRoot.setCenter(chart);
+        scatterRoot.setCenter(chartContainer);
     }
 
 

@@ -158,6 +158,8 @@ public class ChartControlFactory {
         if (!xCourseComboBox.getItems().isEmpty()) {
             xCourseComboBox.setValue(xCourseComboBox.getItems().get(0));
         }
+        // Add event handler to trigger chart update when X course changes
+        xCourseComboBox.setOnAction(e -> onChange.run());
         
         // We create the Y-axis course selection combo box (default to second course if available)
         Label yCourseLabel = new Label("Y Course:");
@@ -168,15 +170,17 @@ public class ChartControlFactory {
         } else if (!yCourseComboBox.getItems().isEmpty()) {
             yCourseComboBox.setValue(yCourseComboBox.getItems().get(0));
         }
+        // Add event handler to trigger chart update when Y course changes
+        yCourseComboBox.setOnAction(e -> onChange.run());
         
         // We create the checkbox to show Y=X reference line (rendered below data points)
         CheckBox showYEqualsXLineCheckBox = new CheckBox("Show Y=X Line");
         showYEqualsXLineCheckBox.setOnAction(e -> onChange.run());
         
         controls.getChildren().addAll(xCourseLabel, xCourseComboBox, yCourseLabel, yCourseComboBox, showYEqualsXLineCheckBox);
-        // Here we hide the controls initially - they're shown only when course correlation mode is enabled
-        controls.setVisible(false);
-        controls.setManaged(false);
+        // Course correlation controls are always visible now
+        controls.setVisible(true);
+        controls.setManaged(true);
         
         return new CourseCorrelationControls(controls, xCourseComboBox, yCourseComboBox, showYEqualsXLineCheckBox);
     }

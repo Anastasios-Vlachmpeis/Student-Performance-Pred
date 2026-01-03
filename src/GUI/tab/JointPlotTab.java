@@ -15,8 +15,6 @@ import tools.ChartControlFactory;
 public class JointPlotTab {
 
     // JointPlot fields
-    private ComboBox<String> jointXAxisComboBox;
-    private ComboBox<String> jointYAxisComboBox;
     private Slider jointXAxisMinSlider;
     private Slider jointXAxisMaxSlider;
     private Slider jointYAxisMinSlider;
@@ -27,14 +25,9 @@ public class JointPlotTab {
     private Label jointYAxisMaxLabel;
     private BorderPane jointRoot;
     private JointPlotGenerator jointGenerator;
-    private ComboBox<String> jointCourseComboBox;
-    private ComboBox<String> jointFeatureComboBox;
-    private CheckBox jointShowActualGradesCheckBox;
-    private VBox jointPredictionControls;
     private ComboBox<String> jointFeatureFilterComboBox;
     private ComboBox<String> jointFeatureFilterValueComboBox;
     private VBox jointFeatureFilterControls;
-    private CheckBox jointCourseCorrelationModeCheckBox;
     private ComboBox<String> jointXCourseComboBox;
     private ComboBox<String> jointYCourseComboBox;
     private CheckBox jointShowYEqualsXLineCheckBox;
@@ -52,7 +45,7 @@ public class JointPlotTab {
         return jointRoot;
     }
 
-    /** We create the control panel with all UI controls (filters, axes, sliders) */
+    /** We create the control panel with all UI controls (filters, course selection, sliders) */
     private VBox createJointControlPanel() {
         // Create the main panel container with spacing and padding
         VBox panel = new VBox(15);
@@ -62,52 +55,12 @@ public class JointPlotTab {
         // We create the feature filter controls (feature selection + value selection)
         jointFeatureFilterControls = createJointFeatureFilterControls();
         
-        // We create the course correlation mode checkbox - when enabled, switches axes to course selection
-        jointCourseCorrelationModeCheckBox = new CheckBox("Course Correlation Mode");
-        jointCourseCorrelationModeCheckBox.setSelected(false);
-        // We update all dependent controls when correlation mode changes
-        jointCourseCorrelationModeCheckBox.setOnAction(e -> {
-            updateJointCourseCorrelationControls();
-            updateJointYAxisOptions();
-            updateJointSliderRanges();
-            updateJointChart();
-        });
-
         // We create the course correlation controls (X course, Y course, Y=X line checkbox)
+        Label correlationLabel = new Label("Course Correlation:");
         jointCourseCorrelationControls = createJointCourseCorrelationControls();
 
-        // We create the X-axis selection combo box: "Per Student" or "Per Course" (or course name in correlation mode)
-        Label xAxisLabel = new Label("X-Axis:");
-        jointXAxisComboBox = new ComboBox<>();
-        jointXAxisComboBox.getItems().addAll("Per Student", "Per Course");
-        jointXAxisComboBox.setValue("Per Student");
-        // We update Y-axis options only if not in correlation mode (correlation mode handles it separately)
-        jointXAxisComboBox.setOnAction(e -> {
-            if (!jointCourseCorrelationModeCheckBox.isSelected()) {
-                updateJointYAxisOptions();
-            }
-            updateJointPredictionControls();
-            updateJointSliderRanges();
-            updateJointChart();
-        });
-
-        // Here we create the Y-axis selection combo box: metric (Mean, Mode, etc.) or course name (in correlation mode)
-        Label yAxisLabel = new Label("Y-Axis:");
-        jointYAxisComboBox = new ComboBox<>();
-        updateJointYAxisOptions(); // We populate options based on X-axis selection
-        jointYAxisComboBox.setValue("Mean");
-        // We update prediction controls visibility and slider ranges, then refresh chart
-        jointYAxisComboBox.setOnAction(e -> {
-            updateJointPredictionControls();
-            updateJointSliderRanges();
-            updateJointChart();
-        });
-
-        // We create the prediction controls (course, feature, show actual checkbox) - initially hidden
-        jointPredictionControls = createJointPredictionControls();
-
         // We create the X-axis filter sliders (min and max) with labels
-        Label xFilterLabel = new Label("X-Axis Filter:");
+        Label xFilterLabel = new Label("X-Axis Filter (Grade Range):");
         jointXAxisMinSlider = new Slider();
         jointXAxisMaxSlider = new Slider();
         jointXAxisMinLabel = new Label();
@@ -116,7 +69,7 @@ public class JointPlotTab {
         setupJointSlider(jointXAxisMaxSlider, jointXAxisMaxLabel, false); // false = max slider
 
         // We create the Y-axis filter sliders (min and max) with labels
-        Label yFilterLabel = new Label("Y-Axis Filter:");
+        Label yFilterLabel = new Label("Y-Axis Filter (Grade Range):");
         jointYAxisMinSlider = new Slider();
         jointYAxisMaxSlider = new Slider();
         jointYAxisMinLabel = new Label();
@@ -133,12 +86,8 @@ public class JointPlotTab {
         panel.getChildren().addAll(
                 jointFeatureFilterControls,
                 new Separator(Orientation.HORIZONTAL),
-                jointCourseCorrelationModeCheckBox,
+                correlationLabel,
                 jointCourseCorrelationControls,
-                new Separator(Orientation.HORIZONTAL),
-                xAxisLabel, jointXAxisComboBox,
-                yAxisLabel, jointYAxisComboBox,
-                jointPredictionControls,
                 new Separator(Orientation.HORIZONTAL),
                 xFilterLabel, jointXAxisMinLabel, jointXAxisMinSlider, 
                 jointXAxisMaxLabel, jointXAxisMaxSlider,
@@ -162,48 +111,19 @@ public class JointPlotTab {
     }
 
     /** 
-     * This method updates the Y-axis combo box options based on 
-     * the X-axis selection and course correlation mode
-     */
-    private void updateJointYAxisOptions() {
-        ChartControlFactory.updateYAxisOptions(
-                jointYAxisComboBox,
-                jointXAxisComboBox,
-                jointCourseCorrelationModeCheckBox.isSelected()
-        );
-    }
-
-    /** 
      * We create course correlation controls (X course, Y course, show Y=X checkbox) 
      */
     private VBox createJointCourseCorrelationControls() {
         ChartControlFactory.CourseCorrelationControls controls = ChartControlFactory.createCourseCorrelationControls(
-                () -> updateJointChart()
+                () -> {
+                    updateJointSliderRanges();
+                    updateJointChart();
+                }
         );
         jointXCourseComboBox = controls.xCourseComboBox;
         jointYCourseComboBox = controls.yCourseComboBox;
         jointShowYEqualsXLineCheckBox = controls.showYEqualsXLineCheckBox;
         return controls.container;
-    }
-
-    /** 
-     * Update course correlation controls visibility and axis options
-     * when the correlation mode changes 
-     * */
-    private void updateJointCourseCorrelationControls() {
-        ChartControlFactory.updateCourseCorrelationControls(
-                jointCourseCorrelationModeCheckBox.isSelected(),
-                jointCourseCorrelationModeCheckBox,
-                jointCourseCorrelationControls,
-                jointXAxisComboBox,
-                jointYAxisComboBox,
-                jointXCourseComboBox,
-                jointYCourseComboBox,
-                () -> updateJointChart(),
-                () -> updateJointYAxisOptions(),
-                () -> updateJointPredictionControls(),
-                () -> updateJointSliderRanges()
-        );
     }
 
     /** 
@@ -220,51 +140,36 @@ public class JointPlotTab {
     }
 
 
-    /** 
-     * We create the prediction controls 
-     * (course combo box, feature combo box, show actual grades checkbox)
-     */
-    private VBox createJointPredictionControls() {
-        ChartControlFactory.PredictionControls controls = ChartControlFactory.createPredictionControls(
-                () -> updateJointChart()
-        );
-        jointCourseComboBox = controls.courseComboBox;
-        jointFeatureComboBox = controls.featureComboBox;
-        jointShowActualGradesCheckBox = controls.showActualGradesCheckBox;
-        return controls.container;
-    }
-
-    /** Update prediction controls visibility based on Y-axis selection */
-    private void updateJointPredictionControls() {
-        ChartControlFactory.updatePredictionControls(jointYAxisComboBox, jointPredictionControls);
-    }
-
-    /** Update slider ranges based on axis data selections and course correlation mode */
+    /** Update slider ranges for course correlation mode (grade range 0-10) */
     private void updateJointSliderRanges() {
-        ChartControlFactory.updateSliderRanges(
-                jointXAxisComboBox.getValue(),
-                jointYAxisComboBox.getValue() == null ? "Mean" : jointYAxisComboBox.getValue(),
-                jointCourseCorrelationModeCheckBox.isSelected(),
-                jointXAxisMinSlider, jointXAxisMaxSlider,
-                jointYAxisMinSlider, jointYAxisMaxSlider,
-                jointXAxisMinLabel, jointXAxisMaxLabel,
-                jointYAxisMinLabel, jointYAxisMaxLabel
-        );
+        // For course correlation, we always use grade range 0-10
+        jointXAxisMinSlider.setMin(0);
+        jointXAxisMinSlider.setMax(10);
+        jointXAxisMinSlider.setValue(0);
+        jointXAxisMaxSlider.setMin(0);
+        jointXAxisMaxSlider.setMax(10);
+        jointXAxisMaxSlider.setValue(10);
+        
+        jointYAxisMinSlider.setMin(0);
+        jointYAxisMinSlider.setMax(10);
+        jointYAxisMinSlider.setValue(0);
+        jointYAxisMaxSlider.setMin(0);
+        jointYAxisMaxSlider.setMax(10);
+        jointYAxisMaxSlider.setValue(10);
+        
+        // Update labels
+        jointXAxisMinLabel.setText(String.format("Min: %.1f", jointXAxisMinSlider.getValue()));
+        jointXAxisMaxLabel.setText(String.format("Max: %.1f", jointXAxisMaxSlider.getValue()));
+        jointYAxisMinLabel.setText(String.format("Min: %.1f", jointYAxisMinSlider.getValue()));
+        jointYAxisMaxLabel.setText(String.format("Max: %.1f", jointYAxisMaxSlider.getValue()));
     }
 
     /** 
      * This method updates the joint plot chart based on 
-     * the current axis selections, filters, and options 
+     * course correlation selections, filters, and options 
      */
     private void updateJointChart() {
-        if (jointXAxisComboBox == null || jointYAxisComboBox == null || jointXAxisMinSlider == null || jointXAxisMaxSlider == null ||jointYAxisMinSlider == null || jointYAxisMaxSlider == null || jointGenerator == null || jointRoot == null) {
-            return;
-        }
-
-        String xAxisData = jointXAxisComboBox.getValue();
-        String yAxisData = jointYAxisComboBox.getValue();
-
-        if (xAxisData == null || yAxisData == null) {
+        if (jointXAxisMinSlider == null || jointXAxisMaxSlider == null || jointYAxisMinSlider == null || jointYAxisMaxSlider == null || jointGenerator == null || jointRoot == null) {
             return;
         }
 
@@ -273,34 +178,22 @@ public class JointPlotTab {
         double yMin = jointYAxisMinSlider.getValue();
         double yMax = jointYAxisMaxSlider.getValue();
 
-        // We extract prediction parameters only if Y-axis is "Predicted Grade"
-        String selectedCourse = null;
-        String selectedFeature = null;
-        boolean showActualGrades = false;
-        if ("Predicted Grade".equals(yAxisData)) {
-            selectedCourse = jointCourseComboBox != null ? jointCourseComboBox.getValue() : null;
-            selectedFeature = jointFeatureComboBox != null ? jointFeatureComboBox.getValue() : null;
-            showActualGrades = jointShowActualGradesCheckBox != null && jointShowActualGradesCheckBox.isSelected();
-        }
-
-        // Then, we extract feature filter and convert "No Feature" to null
+        // Extract feature filter and convert "No Feature" to null
         String filterFeature = jointFeatureFilterComboBox != null ? jointFeatureFilterComboBox.getValue() : null;
         String filterValue = jointFeatureFilterValueComboBox != null ? jointFeatureFilterValueComboBox.getValue() : null;
         if ("No Feature".equals(filterFeature)) {
             filterFeature = null;
         }
 
-        // And we also extract the course correlation mode parameters
-        boolean courseCorrelationMode = jointCourseCorrelationModeCheckBox != null && jointCourseCorrelationModeCheckBox.isSelected();
-        String xCourse = courseCorrelationMode && jointXAxisComboBox.getValue() != null ? jointXAxisComboBox.getValue() : null;
-        String yCourse = courseCorrelationMode && jointYAxisComboBox.getValue() != null ? jointYAxisComboBox.getValue() : null;
-        boolean showYEqualsX = courseCorrelationMode && jointShowYEqualsXLineCheckBox != null && jointShowYEqualsXLineCheckBox.isSelected();
+        // Extract course correlation parameters
+        String xCourse = jointXCourseComboBox != null ? jointXCourseComboBox.getValue() : null;
+        String yCourse = jointYCourseComboBox != null ? jointYCourseComboBox.getValue() : null;
+        boolean showYEqualsX = jointShowYEqualsXLineCheckBox != null && jointShowYEqualsXLineCheckBox.isSelected();
 
         BorderPane chart = jointGenerator.createChart(
-                xAxisData, yAxisData, xMin, xMax, yMin, yMax,
-                selectedCourse, selectedFeature, showActualGrades,
+                xMin, xMax, yMin, yMax,
                 filterFeature, filterValue,
-                courseCorrelationMode, xCourse, yCourse, showYEqualsX
+                xCourse, yCourse, showYEqualsX
         );
 
         jointRoot.setCenter(chart);
