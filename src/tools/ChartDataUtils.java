@@ -50,7 +50,6 @@ public class ChartDataUtils {
                 }
                 yield studentIndex >= 0 ? CurrentGradesModel.getStudentNG(studentIndex) : 0;
             }
-            case "Predicted Grade" -> getPredictedGrade(studentId, selectedCourse, selectedFeature);
             default -> 0;
         };
     }
@@ -78,31 +77,6 @@ public class ChartDataUtils {
             case "Number of Cum-Laude Students" -> getCumLaudeStudents(courseId);
             default -> 0;
         };
-    }
-    
-    /** 
-     * Predict the grade for a student using a decision stump
-     * based on the selected course and feature 
-     */
-    public static double getPredictedGrade(int studentId, String selectedCourse, String selectedFeature) {
-        if (selectedCourse == null || selectedFeature == null) {
-            return 0;
-        }
-        
-        try {
-            int courseId = findCourseId(selectedCourse);
-            int featureId = findFeatureId(selectedFeature);
-            
-            if (courseId == -1 || featureId == -1) {
-                return 0;
-            }
-            
-            // Here we create a decision stump for this course/feature combination and use it to predict the grade
-            DecisionStump decisionStump = createDecisionStumpForFeature(courseId, featureId);
-            return decisionStump.predictGrade(studentId);
-        } catch (Exception e) {
-            return 0;
-        }
     }
     
     /** 
@@ -346,46 +320,11 @@ public class ChartDataUtils {
     }
     
     /** 
-     * Generate predicted and actual grade data points for comparison, applying X and Y axis filters 
-     */
-    public static void generatePredictedVsActualData(XYChart.Series<Number, Number> predictedSeries, XYChart.Series<Number, Number> actualSeries, double xFilterStart, double xFilterEnd, double yFilterStart, double yFilterEnd, String selectedCourse, String selectedFeature, int[] filteredStudentIds) {
-        // Here we find the course ID and return early if the course is not found
-        int courseId = findCourseId(selectedCourse);
-        if (courseId == -1) {
-            return;
-        }
-        
-        // Here we generate data points for each filtered student
-        for (int i = 0; i < filteredStudentIds.length; i++) {
-            double xValue = i;
-            int studentId = filteredStudentIds[i];
-            
-            double predictedGrade = getPredictedGrade(studentId, selectedCourse, selectedFeature);
-            double actualGrade = CurrentGradesModel.getGrade(studentId, courseId);
-            
-            // Here we add the predicted grade point if it passes the filters
-            if (xValue >= xFilterStart && xValue <= xFilterEnd && 
-                predictedGrade >= yFilterStart && predictedGrade <= yFilterEnd && predictedGrade != -1) {
-                predictedSeries.getData().add(new XYChart.Data<>(xValue, predictedGrade));
-            }
-            
-            // Here we add the actual grade point if it passes the filters (separate from predicted)
-            if (xValue >= xFilterStart && xValue <= xFilterEnd && 
-                actualGrade >= yFilterStart && actualGrade <= yFilterEnd && actualGrade != -1) {
-                actualSeries.getData().add(new XYChart.Data<>(xValue, actualGrade));
-            }
-        }
-    }
-    
-    /** 
      * Add tooltips to all data points in the series showing X and Y axis values 
      */
     public static void addTooltipsToSeries(XYChart.Series<Number, Number> series, String xAxisData, String yAxisData, String courseName) {
         for (XYChart.Data<Number, Number> data : series.getData()) {
-            // Here we include the course name in the tooltip for prediction-related data
-            String tooltipText = courseName != null && (yAxisData.equals("Predicted Grade") || yAxisData.equals("Actual Grade"))
-                ? String.format("%s: %.2f\n%s: %.2f\nCourse: %s", xAxisData, data.getXValue().doubleValue(), yAxisData, data.getYValue().doubleValue(), courseName)
-                : String.format("%s: %.2f\n%s: %.2f", xAxisData, data.getXValue().doubleValue(), yAxisData, data.getYValue().doubleValue());
+            String tooltipText = String.format("%s: %.2f\n%s: %.2f", xAxisData, data.getXValue().doubleValue(), yAxisData, data.getYValue().doubleValue());
             
             Tooltip tooltip = new Tooltip(tooltipText);
             // Here we install the tooltip immediately if the node exists, otherwise we wait for node creation

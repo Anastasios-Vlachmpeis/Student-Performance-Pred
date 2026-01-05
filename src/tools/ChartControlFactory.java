@@ -107,43 +107,6 @@ public class ChartControlFactory {
         }
     }
     
-    /** 
-     * Create the prediction controls (course + feature combo boxes + show the checkbox) 
-     */
-    public static PredictionControls createPredictionControls(Runnable onChange) {
-        VBox controls = new VBox(10);
-        controls.setPadding(new Insets(10, 0, 0, 0));
-        
-        // We create the course selection combo box for prediction
-        Label courseLabel = new Label("Course:");
-        ComboBox<String> courseComboBox = new ComboBox<>();
-        courseComboBox.getItems().addAll(CurrentGradesModel.getCourses());
-        if (!courseComboBox.getItems().isEmpty()) {
-            courseComboBox.setValue(courseComboBox.getItems().get(0));
-        }
-        courseComboBox.setOnAction(e -> onChange.run());
-        
-        // We create the feature selection combo box for prediction (decision stump feature)
-        Label featureLabel = new Label("Feature:");
-        ComboBox<String> featureComboBox = new ComboBox<>();
-        featureComboBox.getItems().addAll(StudentInfoModel.featureNames);
-        if (!featureComboBox.getItems().isEmpty()) {
-            featureComboBox.setValue(featureComboBox.getItems().get(0));
-        }
-        featureComboBox.setOnAction(e -> onChange.run());
-        
-        // We create the checkbox to show actual grades alongside predicted grades
-        CheckBox showActualGradesCheckBox = new CheckBox("Show Actual Grades");
-        showActualGradesCheckBox.setOnAction(e -> onChange.run());
-        
-        controls.getChildren().addAll(courseLabel, courseComboBox, featureLabel, featureComboBox, showActualGradesCheckBox);
-        // Here we hide the controls initially - they're shown only when Y-axis is "Predicted Grade"
-        controls.setVisible(false);
-        controls.setManaged(false);
-        
-        return new PredictionControls(controls, courseComboBox, featureComboBox, showActualGradesCheckBox);
-    }
-    
     /** Creates course correlation controls (X course + Y course + show Y=X checkbox) */
     public static CourseCorrelationControls createCourseCorrelationControls(Runnable onChange) {
         VBox controls = new VBox(10);
@@ -209,9 +172,7 @@ public class ChartControlFactory {
         
         // Here we add base Y-axis options and X-axis-specific options
         yAxisComboBox.getItems().addAll("Mean", "Mode", "Median", "Number of NGs");
-        if (xAxisComboBox.getValue().equals("Per Student")) {
-            yAxisComboBox.getItems().add("Predicted Grade");
-        } else if (xAxisComboBox.getValue().equals("Per Course")) {
+        if (xAxisComboBox.getValue().equals("Per Course")) {
             yAxisComboBox.getItems().addAll("Number of Passing Students", "Number of Non-Passing Students", "Number of Cum-Laude Students");
         }
         
@@ -313,16 +274,6 @@ public class ChartControlFactory {
     }
     
     /** 
-     * Update the prediction controls visibility based on Y-axis selection 
-     */
-    public static void updatePredictionControls(ComboBox<String> yAxisComboBox, VBox predictionControls) {
-        // Here we show prediction controls only when Y-axis is "Predicted Grade"
-        boolean showControls = "Predicted Grade".equals(yAxisComboBox.getValue());
-        predictionControls.setVisible(showControls);
-        predictionControls.setManaged(showControls);
-    }
-    
-    /** 
      * Update the course correlation controls and axis options when correlation mode changes 
      */
     public static void updateCourseCorrelationControls(boolean showControls,
@@ -334,7 +285,6 @@ public class ChartControlFactory {
                                                       ComboBox<String> yCourseComboBox,
                                                       Runnable onUpdateChart,
                                                       Runnable onUpdateYAxisOptions,
-                                                      Runnable onUpdatePredictionControls,
                                                       Runnable onUpdateSliderRanges) {
         courseCorrelationControls.setVisible(showControls);
         courseCorrelationControls.setManaged(showControls);
@@ -396,14 +346,12 @@ public class ChartControlFactory {
                 if (!courseCorrelationModeCheckBox.isSelected()) {
                     onUpdateYAxisOptions.run();
                 }
-                onUpdatePredictionControls.run();
                 onUpdateSliderRanges.run();
                 onUpdateChart.run();
             });
             
             // We restore the standard Y-axis event handler
             yAxisComboBox.setOnAction(e -> {
-                onUpdatePredictionControls.run();
                 onUpdateSliderRanges.run();
                 onUpdateChart.run();
             });
@@ -426,24 +374,6 @@ public class ChartControlFactory {
             this.container = container;
             this.featureComboBox = featureComboBox;
             this.valueComboBox = valueComboBox;
-        }
-    }
-    
-    /** 
-     * We use this class to hold prediction controls (container, course combo box, feature combo box, show actual checkbox)
-     */
-    public static class PredictionControls {
-        public final VBox container;
-        public final ComboBox<String> courseComboBox;
-        public final ComboBox<String> featureComboBox;
-        public final CheckBox showActualGradesCheckBox;
-        
-        public PredictionControls(VBox container, ComboBox<String> courseComboBox, 
-                                 ComboBox<String> featureComboBox, CheckBox showActualGradesCheckBox) {
-            this.container = container;
-            this.courseComboBox = courseComboBox;
-            this.featureComboBox = featureComboBox;
-            this.showActualGradesCheckBox = showActualGradesCheckBox;
         }
     }
     
