@@ -1,6 +1,4 @@
 import datamodels.CurrentGradesModel;
-import datamodels.GraduateGradesModel;
-import datamodels.StudentInfoModel;
 import solutions.*;
 
 import java.util.Locale;
@@ -23,22 +21,22 @@ public class Main {
           ###########*/
         // Question 1
         System.out.println("Answering Step 1 - Question 1");
-        Phase1Step1HardestEasiestCourses.printBestAndWorstCourse();
+        Phase1Step1Methods.printBestAndWorstCourse();
 
         // Question 2
         System.out.println("Answering Step 1- Question 2");
-        Phase1Step1CumLaudeStudents.printCumLaudeStudents();
+        Phase1Step1Methods.printCumLaudeStudents();
 
         // Q3: Are there courses that seem similar or related?
         //     Find top 10 most similar course pairs.
         System.out.println("Answering Step 1 - Question 3");
         int TOP_K = 10; // Take the top 10 course pairs with the highest correlation
-        Phase1Step1PearsonCorrelationGraduateGrades.printTopKCorrelatedCoursePairs(TOP_K);
+        Phase1Step1Methods.printTopKCorrelatedCoursePairs(TOP_K);
 
          // Q4: Which students performed significantly better in the difficult courses, compared to the easy ones?
          //     Find the top 10 best performing ones.
         System.out.println("Answering Step 1 - Question 4");
-        Phase1Step1PerformanceHardVsEasyCourses.analyzeStudentPerformanceHardVsEasy();
+        Phase1Step1Methods.analyzeStudentPerformanceHardVsEasy();
 
          /*###########
           # STEP 2 #
@@ -48,7 +46,7 @@ public class Main {
         //     (Compute some of the same statistics you did in step 1 for current grades
         System.out.println("Answering step 2 - some statistics we did on graduate grades applied to current grades");
         System.out.println("(Not a real question)");;
-        Phase1Step2HardestEasiestCourses.printHardestAndEasiestCourses();
+        Phase1Step2Methods.printHardestAndEasiestCourses();
 
         // Q1:
         // it is done with graphics will be in report
@@ -61,10 +59,10 @@ public class Main {
 
         // Q3 (extra): Adjusted Q3 from graduate grade for current grades!
         System.out.println("Answering Step 2 - Question 3");
-        Phase1Step2PearsonCorrelationGraduateGrades.printTopKCorrelatedCoursePairsIgnoreNG(TOP_K);
+        Phase1Step2Methods.printTopKCorrelatedCoursePairsIgnoreNG(TOP_K);
         // Q4 (extra): Adjusted Q4 for current grades
         System.out.println("Answering Step 2 - Question 4");
-        Phase1Step2PerformanceHardVsEasyCourses.analyzeStudentPerformanceHardVsEasyNG();
+        Phase1Step2Methods.analyzeStudentPerformanceHardVsEasyNG();
 
 
         // QPrediction: Predicting number of graduates
@@ -73,7 +71,7 @@ public class Main {
         System.out.println("Prediction of number of graduates via Monte Carlo Simulation and resits:");
         int ITERATIONS = 10000;
         int MAX_RESITS = 3;
-        System.out.println("Guess: " + Phase1Step2PredictionMonteCarlo.predictGraduateAmountMonteCarloSimulation(ITERATIONS, MAX_RESITS) + " will graduate.");
+        System.out.println("Guess: " + Phase1Step2Methods.predictGraduateAmountMonteCarloSimulation(ITERATIONS, MAX_RESITS) + " will graduate.");
 
 
         /*###########

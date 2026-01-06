@@ -7,7 +7,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
-import solutions.Phase1Step2PredictionMonteCarlo;
+import solutions.Phase1Step2Methods;
 
 public class PieChartTab {
 
@@ -115,7 +115,7 @@ public class PieChartTab {
     private int calculatePredictedGraduates() {
         // simulate the monte carlo simulation, 1000 iteration for optimal value/time
         // resits are 0 as a constant because of some problem!, still gives the right value
-        double predictedGraduates = Phase1Step2PredictionMonteCarlo
+        double predictedGraduates = Phase1Step2Methods
                 .predictGraduateAmountMonteCarloSimulation(1000, 0);
         return (int) Math.round(predictedGraduates);
     }
