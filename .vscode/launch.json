@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "main",
+            "request": "launch",
+            "mainClass": "regressionTree.main",
+            "projectName": "project-1.1_49aab83e"
+        },
+        {
+            "type": "java",
             "name": "GUIdemo",
             "request": "launch",
             "mainClass": "GUI.GUIdemo",

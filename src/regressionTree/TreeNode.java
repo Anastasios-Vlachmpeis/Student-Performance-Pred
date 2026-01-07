@@ -53,4 +53,26 @@ public class TreeNode {
             return left.predict(studentId);
         }
     }
+
+    /**
+     * Prints the tree structure recursively, identing each level
+     * @param prefix string used for indentation (starts empty)
+     */
+    public void printTree(String prefix) {
+        if (splitRule == null) {
+            // Leaf node
+            System.out.println(prefix + "Leaf: " + String.format("%.2f", prediction));
+        } else {
+            // Internal node
+            System.out.println(prefix + "Split: " + splitRule.asRule());
+            if (left != null) {
+                System.out.print(prefix + "  ");
+                left.printTree(prefix + "  ");
+            }
+            if (right != null) {
+                System.out.print(prefix + "  ");
+                right.printTree(prefix + "  ");
+            }
+        }
+    }
 }
