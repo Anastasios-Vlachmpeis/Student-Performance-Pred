@@ -1,7 +1,6 @@
 package regressionTree;
 
 import datamodels.*;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,27 +9,32 @@ import java.util.List;
 
 public class RegressionTreeTrainer {
 
+    // default parameters
     // maximum depth of the tree to prevent overfitting, ive tried 4 and 5 but 3 gave the best value
-    private static final int MAX_DEPTH = 3;
+    private static final int DEFAULT_MAX_DEPTH = 3;
     // minimum number of samples required to split further, ive chosen this randomly idk if there is any other value that gives better result
-    private static final int MIN_SAMPLES = 10;
+    private static final int DEFAULT_MIN_SAMPLES = 10;
 
-
-
-     //starts recursive training from depth 0(root node).
+    // Default train method
     public static TreeNode train(List<Integer> studentIds, int courseId) {
-        return trainRecursive(studentIds, courseId, 0);
+        return trainRecursive(studentIds, courseId, 0, DEFAULT_MAX_DEPTH, DEFAULT_MIN_SAMPLES);
     }
 
+    // train method with custom parameters
+    public static TreeNode train(List<Integer> studentIds, int courseId, int maxDepth, int minSamples) {
+        return trainRecursive(studentIds, courseId, 0, maxDepth, minSamples);
+    }
 
      //recursively builds the regression tree. at each step, finds the best decision stump and splits the data accordingly
     private static TreeNode trainRecursive(
             List<Integer> studentIds,
             int courseId,
-            int depth
+            int depth,
+            int maxDepth,
+            int minSamples
     ) {
         // stop if maximum depth reached or too few samples left
-        if (depth >= MAX_DEPTH || studentIds.size() < MIN_SAMPLES) {
+        if (depth >= maxDepth || studentIds.size() < minSamples) {
             return TreeNode.leaf(meanGrade(studentIds, courseId));
         }
 
@@ -67,8 +71,8 @@ public class RegressionTreeTrainer {
 
         // create an internal node and recurse on both branches
         TreeNode node = TreeNode.internal(bestStump);
-        node.left = trainRecursive(left, courseId, depth + 1);
-        node.right = trainRecursive(right, courseId, depth + 1);
+        node.left = trainRecursive(left, courseId, depth + 1, maxDepth, minSamples);
+        node.right = trainRecursive(right, courseId, depth + 1, maxDepth, minSamples);
 
         return node;
     }

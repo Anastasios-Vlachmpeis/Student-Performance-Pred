@@ -1,8 +1,5 @@
 package regressionTree;
 
-import datamodels.*;
-
-
  //wrapper class for a trained regression tree.
 
 public class RegressionTree {
@@ -20,5 +17,12 @@ public class RegressionTree {
 
     public double predict(int studentId) {
         return root.predict(studentId);
+    }
+
+    /**
+     * Print the tree structure
+     */
+    public void printTree() {
+        root.printTree("");
     }
 }
