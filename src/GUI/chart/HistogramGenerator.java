@@ -1,6 +1,7 @@
 package GUI.chart;
 
 import datamodels.CurrentGradesModel;
+import GUI.style.UIStyling;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
@@ -163,8 +164,11 @@ public class HistogramGenerator {
         }
 
         // Creates the bars for the chart, from the sorted bins
+        // First pass: collect filtered data and find max frequency
+        java.util.ArrayList<XYChart.Data<String, Number>> barData = new java.util.ArrayList<>();
+        int maxFrequency = 1;
+        
         for (Map.Entry<Double, Integer> entry : frequencies.entrySet()) {
-
             double left = entry.getKey();
             double right = left + binWidth;
             int count = entry.getValue();
@@ -180,10 +184,48 @@ public class HistogramGenerator {
                     : String.format("%.1f-%.1f", left, right);
 
             // Add bar to histogram
-            series1.getData().add(new XYChart.Data<>(label, count));
+            barData.add(new XYChart.Data<>(label, count));
+            maxFrequency = Math.max(maxFrequency, count);
+        }
+        
+        // Store maxFrequency as final for use in lambda
+        final int finalMaxFrequency = maxFrequency;
+        
+        // Second pass: apply coloring based on frequency
+        for (XYChart.Data<String, Number> data : barData) {
+            int frequency = data.getYValue().intValue();
+            
+            // Calculate color using centralized method
+            String colorStyle = UIStyling.calculateBarColorStyle(frequency, finalMaxFrequency);
+            
+            // Apply color styling when node is created
+            data.nodeProperty().addListener((obs, oldNode, newNode) -> {
+                if (newNode != null) {
+                    newNode.setStyle(colorStyle);
+                }
+            });
+            
+            series1.getData().add(data);
         }
 
         histogram.getData().add(series1);
+        
+        // Style bars after chart is rendered
+        histogram.sceneProperty().addListener((obs, oldScene, newScene) -> {
+            if (newScene != null) {
+                for (XYChart.Data<String, Number> data : series1.getData()) {
+                    int frequency = data.getYValue().intValue();
+                    
+                    // Calculate color using centralized method
+                    String colorStyle = UIStyling.calculateBarColorStyle(frequency, finalMaxFrequency);
+                    
+                    if (data.getNode() != null) {
+                        data.getNode().setStyle(colorStyle);
+                    }
+                }
+            }
+        });
+        
         return histogram;
     }
 }

@@ -8,15 +8,15 @@ import javafx.scene.chart.ScatterChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import tools.Color;
 import tools.PearsonCorrelation;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
-public class FauxHeatMapTab {
+public class HeatMapTab {
     final CategoryAxis xAxis = new CategoryAxis();
     final CategoryAxis yAxis = new CategoryAxis();
     final XYChart<String, String> sc = new ScatterChart<>(xAxis, yAxis);
@@ -26,7 +26,6 @@ public class FauxHeatMapTab {
         yAxis.setLabel("Current Courses");
         sc.setTitle("Pearson Correlation between current courses based on current grades");
 
-
         // compute pearson correlation for every course pairs
         double[][] correlationMatrix = new double[CurrentGradesModel.courseCount][CurrentGradesModel.courseCount];
         for (int i = 0; i < correlationMatrix.length; i++) {
@@ -34,8 +33,6 @@ public class FauxHeatMapTab {
                 correlationMatrix[i][j] = PearsonCorrelation.betweenCurrentCourses(i, j);
             }
         }
-
-
 
         // range of the pearson coefficient is [-1, 1]
         // so I am creating 10 buckets of size 0.2 like such
@@ -46,8 +43,6 @@ public class FauxHeatMapTab {
             correlationBuckets[i] = new XYChart.Series<String, String>();
             correlationBuckets[i].setName("r≤" + String.format("%.2f", -1 + (0.2 + i * 0.2)));
         }
-
-
 
         // go through all the correlations and put them into respective bucket
         for (int i = 0; i < correlationMatrix.length; i++) {
@@ -58,7 +53,6 @@ public class FauxHeatMapTab {
             }
         }
 
-
         // add buckets to the chart in the form of series (1 series corresponds to 1 bucket)
         for (int i = 0; i < correlationBuckets.length; i++) {
             XYChart.Series series = correlationBuckets[i];
@@ -73,37 +67,25 @@ public class FauxHeatMapTab {
         for (int seriesNumber = 0; seriesNumber < sc.getData().size(); seriesNumber++) {
             boolean flagIsFirst = true;
             for (Node seriesNode : sc.lookupAll(".series" + seriesNumber)) {
-                seriesNode.setStyle("-fx-background-color: " + Color.heatmapRGBinCSS(-1, 1, -0.2 + seriesNumber * 0.2) + "; -fx-shape: \"M 10 10  v10.0 h 10.0  v-10  Z\";-fx-padding: 6px;");
+                seriesNode.setStyle("-fx-background-color: " + Color.heatmapRGBinCSS(-1, 1, -0.7 + seriesNumber * 0.2) + "; -fx-shape: \"M 10 10  v10.0 h 10.0  v-10  Z\";-fx-padding: 6px;");
                 if (flagIsFirst) {
                     usedSeriesNumbers.add(seriesNumber);
                     flagIsFirst = false;
                 }
             }
-
         }
-        // CSS black magic but with legend items, making the marker symbol disappear and color them according
-        // to the heatmap distribution
-        int counter = 0;
-        Set<Node> legendItems = sc.lookupAll("Label.chart-legend-item");
-        for (Node legendNode : legendItems) {
-            Label label = (Label) legendNode;
-            int seriesNumber = usedSeriesNumbers.get(counter);
-            // removes the default icon from the legend
-            label.setGraphic(null);
-            // colors the legend entry matching the corresponding heatmap color
-            label.setStyle("-fx-background-color: " + Color.heatmapRGBinCSS(-1, 1, -0.2 + seriesNumber * 0.2));
-            counter++;
-        }
-
-        return new BorderPane(sc);
+        
+        // Create custom legend similar to scatterplot/jointplot
+        sc.setLegendVisible(false);
+        BorderPane container = new BorderPane(sc);
+        createHeatmapLegend(container, usedSeriesNumbers);
+        return container;
     }
 
-    public Pane createPearsonCorrelationGraduateCourses() {
+    public BorderPane createPearsonCorrelationGraduateCourses() {
         xAxis.setLabel("Graduate Courses");
         yAxis.setLabel("Graduate Courses");
         sc.setTitle("Pearson Correlation between graduate courses based on graduate grades");
-
-
 
         // compute pearson correlation for every course pairs
         double[][] correlationMatrix = new double[CurrentGradesModel.courseCount][CurrentGradesModel.courseCount];
@@ -112,8 +94,6 @@ public class FauxHeatMapTab {
                 correlationMatrix[i][j] = PearsonCorrelation.betweenGraduateCourses(i, j);
             }
         }
-
-
 
         // range of the pearson coefficient is [-1, 1]
         // so I am creating 10 buckets of size 0.2 like such
@@ -125,8 +105,6 @@ public class FauxHeatMapTab {
             correlationBuckets[i].setName("r≤" + String.format("%.2f", -1 + (0.2 + i * 0.2)));
         }
 
-
-
         // go through all the correlations and put them into respective bucket
         for (int i = 0; i < correlationMatrix.length; i++) {
             for (int j = 0; j < correlationMatrix[i].length; j++) {
@@ -136,14 +114,12 @@ public class FauxHeatMapTab {
             }
         }
 
-
         // add buckets to the chart in the form of series (1 series corresponds to 1 bucket)
         for (int i = 0; i < correlationBuckets.length; i++) {
             XYChart.Series series = correlationBuckets[i];
             if (series.getData().isEmpty()) {
                 continue;
             }
-
             sc.getData().add(series);
         }
 
@@ -152,26 +128,61 @@ public class FauxHeatMapTab {
         for (int seriesNumber = 0; seriesNumber < sc.getData().size(); seriesNumber++) {
             boolean flagIsFirst = true;
             for (Node seriesNode : sc.lookupAll(".series" + seriesNumber)) {
-                seriesNode.setStyle("-fx-background-color: " + Color.heatmapRGBinCSS(-1, 1, -0.2 + seriesNumber * 0.2) + "; -fx-shape: \"M 10 10  v10.0 h 10.0  v-10  Z\";-fx-padding: 6px;");
+                seriesNode.setStyle("-fx-background-color: " + Color.heatmapRGBinCSS(-1, 1, -0.7 + seriesNumber * 0.2) + "; -fx-shape: \"M 10 10  v10.0 h 10.0  v-10  Z\";-fx-padding: 6px;");
                 if (flagIsFirst) {
                     usedSeriesNumbers.add(seriesNumber);
                     flagIsFirst = false;
                 }
             }
-
         }
-        int counter = 0;
-        Set<Node> legendItems = sc.lookupAll("Label.chart-legend-item");
-        for (Node legendNode : legendItems) {
-            Label label = (Label) legendNode;
-            int seriesNumber = usedSeriesNumbers.get(counter);
-            // removes the default icon from the legend
-            label.setGraphic(null);
-            // colors the legend entry matching the corresponding heatmap color
-            label.setStyle("-fx-background-color: " + Color.heatmapRGBinCSS(-1, 1, -0.2 + seriesNumber * 0.2));
-            counter++;
-        }
+        
+        // Create custom legend similar to scatterplot/jointplot
+        sc.setLegendVisible(false);
+        BorderPane container = new BorderPane(sc);
+        createHeatmapLegend(container, usedSeriesNumbers);
+        return container;
+    }
+    
+    /**
+     * Creates a custom legend for the heatmap similar to scatterplot/jointplot legend.
+     */
+    private void createHeatmapLegend(BorderPane container, List<Integer> activeBucketIndices) {
+        sc.sceneProperty().addListener((obs, oldScene, newScene) -> {
+            if (newScene != null) {
+                VBox customLegend = new VBox(5);
+                customLegend.setStyle("-fx-padding: 10px; -fx-background-color: white;");
 
-        return new BorderPane(sc);
+                Label legendTitle = new Label("Correlation Range:");
+                legendTitle.setStyle("-fx-font-weight: bold;");
+                customLegend.getChildren().add(legendTitle);
+
+                HBox legendRow = new HBox(10);
+                legendRow.setStyle("-fx-alignment: center-left;");
+
+                // Iterate over the indices we actually plotted
+                for (int realIndex : activeBucketIndices) {
+                    // Calculate Label based on real index
+                    String bucketLabel = "r≤" + String.format("%.2f", -1 + (0.2 + realIndex * 0.2));
+                    
+                    // Calculate Color based on real index (Match the logic in CSS block above)
+                    double colorValue = -0.9 + (realIndex * 0.2);
+                    String color = Color.heatmapRGBinCSS(-1, 1, colorValue);
+
+                    Label colorSquare = new Label();
+                    colorSquare.setPrefSize(20, 20);
+                    colorSquare.setStyle(String.format("-fx-background-color: %s; -fx-border-color: black; -fx-border-width: 1px;", color));
+
+                    Label label = new Label(bucketLabel);
+                    label.setStyle("-fx-font-size: 12px;");
+
+                    HBox legendItem = new HBox(5);
+                    legendItem.getChildren().addAll(colorSquare, label);
+                    legendRow.getChildren().add(legendItem);
+                }
+
+                customLegend.getChildren().add(legendRow);
+                container.setBottom(customLegend);
+            }
+        });
     }
 }

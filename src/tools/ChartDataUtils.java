@@ -341,8 +341,7 @@ public class ChartDataUtils {
     }
     
     /** 
-     * Create a scatter chart comparing grades between two courses,
-     * with the option to show a Y=X reference line 
+     * Create a scatterplot comparing grades between two courses
      */
     public static ScatterChart<Number, Number> createCourseCorrelationChart(String xCourse, String yCourse, double xFilterStart, double xFilterEnd, double yFilterStart, double yFilterEnd, int[] filteredStudentIds, boolean showYEqualsX) {
         int xCourseId = findCourseId(xCourse);
@@ -366,6 +365,7 @@ public class ChartDataUtils {
         
         ScatterChart<Number, Number> scatterChart = new ScatterChart<>(xAxis, yAxis);
         scatterChart.setTitle(yCourse + " vs " + xCourse);
+        scatterChart.setLegendVisible(false);
         
         if (showYEqualsX) {
             XYChart.Series<Number, Number> yEqualsXSeries = new XYChart.Series<>();
@@ -431,7 +431,7 @@ public class ChartDataUtils {
         // Find max overlap count for normalization
         int maxOverlap = overlapCounts.values().stream().mapToInt(Integer::intValue).max().orElse(1);
         
-        // Create overlap count buckets/ranges for legend
+        // Create overlap count "buckets" for legend
         // We'll create buckets: 1, 2-3, 4-5, 6-10, 11-20, 21+
         ArrayList<OverlapBucket> buckets = new ArrayList<>();
         buckets.add(new OverlapBucket(1, 1, "1 student"));
@@ -461,10 +461,10 @@ public class ChartDataUtils {
             double brightness = 1.0 - normalizedOverlap;
             brightness = Math.max(0.2, Math.min(1.0, brightness));
             
-            // Convert to RGB (using blue as base color, adjust brightness)
-            int r = (int) (brightness * 100);
-            int g = (int) (brightness * 150);
-            int b = (int) (brightness * 255);
+            // Convert to RGB (using #52b5aa as base color, adjust brightness)
+            int r = (int) (brightness * 82);
+            int g = (int) (brightness * 181);
+            int b = (int) (brightness * 170);
             
             String colorStyle = String.format("-fx-background-color: rgb(%d, %d, %d);", r, g, b);
             
@@ -510,13 +510,6 @@ public class ChartDataUtils {
         // Wait for chart to be rendered, then style the legend
         chart.sceneProperty().addListener((obs, oldScene, newScene) -> {
             if (newScene != null) {
-                // Find legend items
-                Set<Node> legendItems = chart.lookupAll("Label.chart-legend-item");
-                
-                // Hide default legend items (we'll create custom ones)
-                for (Node legendNode : legendItems) {
-                    legendNode.setVisible(false);
-                }
                 
                 // Create custom legend at the bottom
                 VBox customLegend = new VBox(5);
@@ -537,9 +530,9 @@ public class ChartDataUtils {
                     double brightness = 1.0 - normalizedOverlap;
                     brightness = Math.max(0.2, Math.min(1.0, brightness));
                     
-                    int r = (int) (brightness * 100);
-                    int g = (int) (brightness * 150);
-                    int b = (int) (brightness * 255);
+                    int r = (int) (brightness * 82);
+                    int g = (int) (brightness * 181);
+                    int b = (int) (brightness * 170);
                     
                     // Create colored square
                     Label colorSquare = new Label();

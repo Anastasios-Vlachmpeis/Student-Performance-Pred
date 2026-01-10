@@ -1,7 +1,7 @@
 package GUI.tab;
 
 import GUI.chart.ScatterPlotGenerator;
-import javafx.geometry.Insets;
+import GUI.style.UIStyling;
 import javafx.geometry.Orientation;
 import javafx.scene.chart.ScatterChart;
 import javafx.scene.control.*;
@@ -54,21 +54,24 @@ public class ScatterPlotTab {
      */
     private VBox createScatterControlPanel() {
         // Create the main panel container with spacing and padding
-        VBox panel = new VBox(15);
-        panel.setPadding(new Insets(15));
-        panel.setPrefWidth(300);
+        VBox panel = new VBox();
+        UIStyling.styleControlPanel(panel);
 
         // We create the feature filter controls (feature selection + value selection)
         scatterFeatureFilterControls = createScatterFeatureFilterControls();
         
         // We create the course correlation controls (X course, Y course, Y=X line checkbox)
         Label correlationLabel = new Label("Course Correlation:");
+        UIStyling.styleHeadingLabel(correlationLabel);
         scatterCourseCorrelationControls = createScatterCourseCorrelationControls();
 
         // We create the X-axis filter sliders (min and max) with labels
         Label xFilterLabel = new Label("X-Axis Filter (Grade Range):");
+        UIStyling.styleHeadingLabel(xFilterLabel);
         scatterXAxisMinSlider = new Slider();
+        UIStyling.styleSlider(scatterXAxisMinSlider);
         scatterXAxisMaxSlider = new Slider();
+        UIStyling.styleSlider(scatterXAxisMaxSlider);
         scatterXAxisMinLabel = new Label();
         scatterXAxisMaxLabel = new Label();
         setupScatterSlider(scatterXAxisMinSlider, scatterXAxisMinLabel, true);  // true = min slider
@@ -76,8 +79,11 @@ public class ScatterPlotTab {
 
         // We create the Y-axis filter sliders (min and max) with labels
         Label yFilterLabel = new Label("Y-Axis Filter (Grade Range):");
+        UIStyling.styleHeadingLabel(yFilterLabel);
         scatterYAxisMinSlider = new Slider();
+        UIStyling.styleSlider(scatterYAxisMinSlider);
         scatterYAxisMaxSlider = new Slider();
+        UIStyling.styleSlider(scatterYAxisMaxSlider);
         scatterYAxisMinLabel = new Label();
         scatterYAxisMaxLabel = new Label();
         setupScatterSlider(scatterYAxisMinSlider, scatterYAxisMinLabel, true);  // true = min slider

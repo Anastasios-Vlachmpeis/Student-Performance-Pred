@@ -1,5 +1,6 @@
 package GUI.tab;
 
+import GUI.style.UIStyling;
 import datamodels.CurrentGradesModel;
 import javafx.geometry.Insets;
 import javafx.scene.chart.PieChart;
@@ -20,6 +21,7 @@ public class PieChartTab {
 
         // dataset selection
         datasetCombo = new ComboBox<>();
+        UIStyling.styleComboBox(datasetCombo);
         datasetCombo.getItems().addAll(
                 "Cum Laude percentage",
                 "Graduation percentage"
@@ -29,6 +31,7 @@ public class PieChartTab {
         pieChart = new PieChart();
 
         infoLabel = new Label();
+        UIStyling.styleInfoLabel(infoLabel);
         infoLabel.setPadding(new Insets(5));
 
         VBox topBox = new VBox(10, datasetCombo);

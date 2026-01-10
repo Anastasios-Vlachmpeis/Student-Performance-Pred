@@ -1,8 +1,8 @@
 package GUI.tab;
 
 import GUI.chart.BarChartGenerator;
+import GUI.style.UIStyling;
 import datamodels.CurrentGradesModel;
-import javafx.geometry.Insets;
 import javafx.scene.chart.BarChart;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -45,13 +45,14 @@ public class BarChartTab {
     }
 
     private VBox createControls() {
-        VBox box = new VBox(15);
-        box.setPadding(new Insets(15));
-        box.setPrefWidth(300);
+        VBox box = new VBox();
+        UIStyling.styleControlPanel(box);
 
         // set x axis combobox
         Label xAxisLabel = new Label("X-Axis:");
+        UIStyling.styleHeadingLabel(xAxisLabel);
         xAxisCombo = new ComboBox<>();
+        UIStyling.styleComboBox(xAxisCombo);
         xAxisCombo.getItems().addAll("Per Course", "Per Student");
         xAxisCombo.setValue("Per Course");
         //when there is a change on datasets, update the sliders and the chart
@@ -62,7 +63,9 @@ public class BarChartTab {
 
         // set y axis combobox
         Label yAxisLabel = new Label("Y-Axis:");
+        UIStyling.styleHeadingLabel(yAxisLabel);
         yAxisCombo = new ComboBox<>();
+        UIStyling.styleComboBox(yAxisCombo);
         yAxisCombo.getItems().addAll("Number of NG", "Mean of Grades", "Mode of Grades", "Median of Grades");
         yAxisCombo.setValue("Number of NG");
         //when there is a change on datasets, update the sliders and the chart
@@ -79,9 +82,13 @@ public class BarChartTab {
 
         // create sliders
         xMinSlider = new Slider();
+        UIStyling.styleSlider(xMinSlider);
         xMaxSlider = new Slider();
+        UIStyling.styleSlider(xMaxSlider);
         yMinSlider = new Slider();
+        UIStyling.styleSlider(yMinSlider);
         yMaxSlider = new Slider();
+        UIStyling.styleSlider(yMaxSlider);
 
         // set up the sliders using the method from chart control factory
         setupSlider(xMinSlider, xMinLabel, true);
@@ -90,11 +97,16 @@ public class BarChartTab {
         setupSlider(yMaxSlider, yMaxLabel, false);
 
 
+        Label xRangeLabel = new Label("X Range:");
+        UIStyling.styleHeadingLabel(xRangeLabel);
+        Label yRangeLabel = new Label("Y Range:");
+        UIStyling.styleHeadingLabel(yRangeLabel);
+        
         box.getChildren().addAll(
                 xAxisLabel, xAxisCombo,
                 yAxisLabel, yAxisCombo,
-                new Label("X Range:"), xMinLabel, xMinSlider, xMaxLabel, xMaxSlider,
-                new Label("Y Range:"), yMinLabel, yMinSlider, yMaxLabel, yMaxSlider
+                xRangeLabel, xMinLabel, xMinSlider, xMaxLabel, xMaxSlider,
+                yRangeLabel, yMinLabel, yMinSlider, yMaxLabel, yMaxSlider
         );
 
         return box;

@@ -1,5 +1,6 @@
 package tools;
 
+import GUI.style.UIStyling;
 import datamodels.*;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
@@ -25,13 +26,16 @@ public class ChartControlFactory {
         
         // We create the feature selection combo box with "No Feature" as the default option
         Label featureFilterLabel = new Label("Feature Filter:");
+        UIStyling.styleHeadingLabel(featureFilterLabel);
         ComboBox<String> featureFilterComboBox = new ComboBox<>();
+        UIStyling.styleComboBox(featureFilterComboBox);
         featureFilterComboBox.getItems().add("No Feature");
         featureFilterComboBox.getItems().addAll(StudentInfoModel.featureNames);
         featureFilterComboBox.setValue("No Feature");
         
         // We create the value selection combo box - hidden initially until a feature is selected
         ComboBox<String> valueComboBox = new ComboBox<>();
+        UIStyling.styleComboBox(valueComboBox);
         valueComboBox.setVisible(false);
         valueComboBox.setManaged(false);
         valueComboBox.setOnAction(e -> onValueChange.run());
@@ -116,7 +120,9 @@ public class ChartControlFactory {
         
         // We create the X-axis course selection combo box
         Label xCourseLabel = new Label("X Course:");
+        UIStyling.styleHeadingLabel(xCourseLabel);
         ComboBox<String> xCourseComboBox = new ComboBox<>();
+        UIStyling.styleComboBox(xCourseComboBox);
         xCourseComboBox.getItems().addAll(courses);
         if (!xCourseComboBox.getItems().isEmpty()) {
             xCourseComboBox.setValue(xCourseComboBox.getItems().get(0));
@@ -126,7 +132,9 @@ public class ChartControlFactory {
         
         // We create the Y-axis course selection combo box (default to second course if available)
         Label yCourseLabel = new Label("Y Course:");
+        UIStyling.styleHeadingLabel(yCourseLabel);
         ComboBox<String> yCourseComboBox = new ComboBox<>();
+        UIStyling.styleComboBox(yCourseComboBox);
         yCourseComboBox.getItems().addAll(courses);
         if (yCourseComboBox.getItems().size() > 1) {
             yCourseComboBox.setValue(yCourseComboBox.getItems().get(1));

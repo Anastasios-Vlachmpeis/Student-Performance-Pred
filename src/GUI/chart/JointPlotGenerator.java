@@ -1,6 +1,7 @@
 package GUI.chart;
 
 import datamodels.*;
+import GUI.style.UIStyling;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
@@ -96,11 +97,44 @@ public class JointPlotGenerator {
         }
         
         XYChart.Series<String, Number> series = new XYChart.Series<>();
+        
+        // Find max frequency for normalization
+        int maxFrequency = frequencies.values().stream().mapToInt(Integer::intValue).max().orElse(1);
+        
+        // Store frequency data for styling
+        Map<String, Integer> frequencyMap = new TreeMap<>();
         for (Map.Entry<Double, Integer> entry : frequencies.entrySet()) {
-            series.getData().add(new XYChart.Data<>(String.format("%.1f", entry.getKey()), entry.getValue()));
+            String binLabel = String.format("%.1f", entry.getKey());
+            frequencyMap.put(binLabel, entry.getValue());
+            series.getData().add(new XYChart.Data<>(binLabel, entry.getValue()));
         }
         histogram.getData().add(series);
         
+        // Style bars after chart is rendered
+        histogram.sceneProperty().addListener((obs, oldScene, newScene) -> {
+            if (newScene != null) {
+                for (int i = 0; i < series.getData().size(); i++) {
+                    XYChart.Data<String, Number> data = series.getData().get(i);
+                    String binLabel = data.getXValue();
+                    int frequency = frequencyMap.getOrDefault(binLabel, 1);
+                    
+                    // Calculate color using centralized method
+                    String colorStyle = UIStyling.calculateBarColorStyle(frequency, maxFrequency);
+                    
+                    // Apply color styling when node is created
+                    data.nodeProperty().addListener((obs2, oldNode, newNode) -> {
+                        if (newNode != null) {
+                            newNode.setStyle(colorStyle);
+                        }
+                    });
+                    
+                    // Also try to style immediately if node already exists
+                    if (data.getNode() != null) {
+                        data.getNode().setStyle(colorStyle);
+                    }
+                }
+            }
+        });
         return histogram;
     }
     
@@ -111,7 +145,7 @@ public class JointPlotGenerator {
         CategoryAxis yAxis = new CategoryAxis();
         yAxis.setLabel(yCourse);
         
-        // Create the histogram
+        //Histogram
         BarChart<Number, String> histogram = new BarChart<>(xAxis, yAxis);
         histogram.setTitle("Y-Axis Distribution");
         histogram.setLegendVisible(false);
@@ -124,7 +158,7 @@ public class JointPlotGenerator {
             return histogram;
         }
         
-        // Count frequencies for each grade bin
+        //Frequencies
         Map<Double, Integer> frequencies = new TreeMap<>();
         for (int studentId : filteredStudentIds) {
             try {
@@ -139,11 +173,42 @@ public class JointPlotGenerator {
         }
         
         XYChart.Series<Number, String> series = new XYChart.Series<>();
-        // Use natural ascending order (lowest at top, highest at bottom) to match scatter plot Y-axis
+        
+        //Max frequency
+        int maxFrequency = frequencies.values().stream().mapToInt(Integer::intValue).max().orElse(1);
+        
+        //Frequency data
+        Map<String, Integer> frequencyMap = new TreeMap<>();
+        //I used natural ascending order to match scatter plot Y-axis
         for (Map.Entry<Double, Integer> entry : frequencies.entrySet()) {
-            series.getData().add(new XYChart.Data<>(entry.getValue(), String.format("%.1f", entry.getKey())));
+            String binLabel = String.format("%.1f", entry.getKey());
+            frequencyMap.put(binLabel, entry.getValue());
+            series.getData().add(new XYChart.Data<>(entry.getValue(), binLabel));
         }
         histogram.getData().add(series);
+        
+        //Bars
+        histogram.sceneProperty().addListener((obs, oldScene, newScene) -> {
+            if (newScene != null) {
+                for (int i = 0; i < series.getData().size(); i++) {
+                    XYChart.Data<Number, String> data = series.getData().get(i);
+                    String binLabel = data.getYValue();
+                    int frequency = frequencyMap.getOrDefault(binLabel, 1);
+                    
+                    String colorStyle = UIStyling.calculateBarColorStyle(frequency, maxFrequency);
+                    data.nodeProperty().addListener((obs2, oldNode, newNode) -> {
+                        if (newNode != null) {
+                            newNode.setStyle(colorStyle);
+                        }
+                    });
+                    
+                    // Also try to style immediately if node already exists
+                    if (data.getNode() != null) {
+                        data.getNode().setStyle(colorStyle);
+                    }
+                }
+            }
+        });
         
         return histogram;
     }

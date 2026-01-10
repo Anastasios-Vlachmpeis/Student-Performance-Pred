@@ -1,7 +1,7 @@
 package GUI.tab;
 
 import GUI.chart.JointPlotGenerator;
-import javafx.geometry.Insets;
+import GUI.style.UIStyling;
 import javafx.geometry.Orientation;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
@@ -48,21 +48,24 @@ public class JointPlotTab {
     /** We create the control panel with all UI controls (filters, course selection, sliders) */
     private VBox createJointControlPanel() {
         // Create the main panel container with spacing and padding
-        VBox panel = new VBox(15);
-        panel.setPadding(new Insets(15));
-        panel.setPrefWidth(300);
+        VBox panel = new VBox();
+        UIStyling.styleControlPanel(panel);
 
         // We create the feature filter controls (feature selection + value selection)
         jointFeatureFilterControls = createJointFeatureFilterControls();
         
         // We create the course correlation controls (X course, Y course, Y=X line checkbox)
         Label correlationLabel = new Label("Course Correlation:");
+        UIStyling.styleHeadingLabel(correlationLabel);
         jointCourseCorrelationControls = createJointCourseCorrelationControls();
 
         // We create the X-axis filter sliders (min and max) with labels
         Label xFilterLabel = new Label("X-Axis Filter (Grade Range):");
+        UIStyling.styleHeadingLabel(xFilterLabel);
         jointXAxisMinSlider = new Slider();
+        UIStyling.styleSlider(jointXAxisMinSlider);
         jointXAxisMaxSlider = new Slider();
+        UIStyling.styleSlider(jointXAxisMaxSlider);
         jointXAxisMinLabel = new Label();
         jointXAxisMaxLabel = new Label();
         setupJointSlider(jointXAxisMinSlider, jointXAxisMinLabel, true);  // true = min slider
@@ -70,8 +73,11 @@ public class JointPlotTab {
 
         // We create the Y-axis filter sliders (min and max) with labels
         Label yFilterLabel = new Label("Y-Axis Filter (Grade Range):");
+        UIStyling.styleHeadingLabel(yFilterLabel);
         jointYAxisMinSlider = new Slider();
+        UIStyling.styleSlider(jointYAxisMinSlider);
         jointYAxisMaxSlider = new Slider();
+        UIStyling.styleSlider(jointYAxisMaxSlider);
         jointYAxisMinLabel = new Label();
         jointYAxisMaxLabel = new Label();
         setupJointSlider(jointYAxisMinSlider, jointYAxisMinLabel, true);  // true = min slider

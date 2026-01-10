@@ -1,8 +1,8 @@
 package GUI.tab;
 
 import GUI.chart.HistogramGenerator;
+import GUI.style.UIStyling;
 import datamodels.CurrentGradesModel;
-import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
@@ -56,16 +56,17 @@ public class HistogramTab {
      * Builds the left (menus, sliders, filters)
      */
     private VBox createHistogramControlPanel() {
-        VBox panel = new VBox(15);
-        panel.setPadding(new Insets(15));
-        panel.setPrefWidth(300);
+        VBox panel = new VBox();
+        UIStyling.styleControlPanel(panel);
 
         // Feature filter UI
         histFeatureFilterControls = createHistogramFeatureFilterControls();
 
         // X-axis dropdown
         Label xAxisLabel = new Label("X-Axis:");
+        UIStyling.styleHeadingLabel(xAxisLabel);
         histXAxisComboBox = new ComboBox<>();
+        UIStyling.styleComboBox(histXAxisComboBox);
         histXAxisComboBox.getItems().addAll(
                 "Mean of Grades", "Median of Grades",
                 "Mode of Grades", "Number of NG",
@@ -81,7 +82,9 @@ public class HistogramTab {
 
         // Y-axis dropdown
         Label yAxisLabel = new Label("Y-Axis (frequency):");
+        UIStyling.styleHeadingLabel(yAxisLabel);
         histYAxisComboBox = new ComboBox<>();
+        UIStyling.styleComboBox(histYAxisComboBox);
         histYAxisComboBox.getItems().addAll(  "Number of Courses", "Number of Students");
         histYAxisComboBox.setValue("Number of Courses");
         // When Y-axis choices change, update sliders and chart
@@ -92,8 +95,11 @@ public class HistogramTab {
 
         // X-axis sliders
         Label xFilterLabel = new Label("X-Axis range:");
+        UIStyling.styleHeadingLabel(xFilterLabel);
         histXAxisMinSlider = new Slider();
+        UIStyling.styleSlider(histXAxisMinSlider);
         histXAxisMaxSlider = new Slider();
+        UIStyling.styleSlider(histXAxisMaxSlider);
         histXAxisMinLabel = new Label();
         histXAxisMaxLabel= new Label();
         // Attaches slider logic
@@ -102,8 +108,11 @@ public class HistogramTab {
 
         // Y-axis sliders
         Label yFilterLabel = new Label("Y-Axis range:");
+        UIStyling.styleHeadingLabel(yFilterLabel);
         histYAxisMinSlider = new Slider();
+        UIStyling.styleSlider(histYAxisMinSlider);
         histYAxisMaxSlider = new Slider();
+        UIStyling.styleSlider(histYAxisMaxSlider);
         histYAxisMinLabel = new Label();
         histYAxisMaxLabel= new Label();
         setupHistogramSlider(histYAxisMinSlider, histYAxisMinLabel, true);
