@@ -104,7 +104,6 @@ public class Filter {
         // the thing behind the operator
         String argument = userInput.substring(2);
 
-
         // packages into a nice filter.
         return new Filter(selectedOperator, argument);
     }
