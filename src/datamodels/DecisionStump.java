@@ -23,12 +23,6 @@ public class DecisionStump {
      */
     public double predictGrade(int studentId) {
         Feature studentFeature = StudentInfoModel.getFeature(studentId, this.splittingFeature.getFeatureId());
-//        if (studentFeature.getFeatureId() != this.splittingFeature.getFeatureId()) {
-//            throw new IllegalArgumentException(
-//                    "studentFeature's ID MUST MATCH THE ID OF THE FEATURE USED IN THE PREDICTION\n" +
-//                    "studentFeature's ID was " + studentFeature.getFeatureId() + " while decision stump used id " + this.splittingFeature.getFeatureId()
-//            );
-//        }
         boolean isAboveSplit = SplitCondition.evaluate(studentFeature, this.splittingFeature);
         if (isAboveSplit) {
             return this.gradeAboveSplit;

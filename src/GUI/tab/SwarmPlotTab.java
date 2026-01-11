@@ -10,6 +10,10 @@ import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 
+/**
+ * This class creates the swarm plot tab UI,
+ * with the control panel and the chart
+ */
 public class SwarmPlotTab {
     private BorderPane root;
     private ComboBox<String> courseComboBox;
@@ -23,9 +27,6 @@ public class SwarmPlotTab {
         VBox controlPanel = new VBox();
         UIStyling.styleControlPanel(controlPanel);
 
-        Label titleLabel = new Label("Grade Distribution by Feature");
-        UIStyling.styleTitleLabel(titleLabel);
-
         // Course selection
         Label courseLabel = new Label("Select Course:");
         UIStyling.styleHeadingLabel(courseLabel);
@@ -36,7 +37,7 @@ public class SwarmPlotTab {
         if (courses.length > 0) {
             courseComboBox.setValue(courses[0]);
         }
-        // Auto-update when course selection changes
+        // Auto-update when course changes
         courseComboBox.setOnAction(e -> updateVisualization());
 
         // Feature selection (only categorical features)
@@ -56,11 +57,10 @@ public class SwarmPlotTab {
         if (featureComboBox.getItems().size() > 0) {
             featureComboBox.setValue(featureComboBox.getItems().get(0));
         }
-        // Auto-update when feature selection changes
+        // Auto-update when feature changes
         featureComboBox.setOnAction(e -> updateVisualization());
 
         controlPanel.getChildren().addAll(
-            titleLabel,
             courseLabel,
             courseComboBox,
             featureLabel,
@@ -75,6 +75,7 @@ public class SwarmPlotTab {
         return root;
     }
 
+    // Updates the visualization when course or feature changes
     private void updateVisualization() {
         String selectedCourse = courseComboBox.getValue();
         String selectedFeature = featureComboBox.getValue();
@@ -98,7 +99,6 @@ public class SwarmPlotTab {
             root.setCenter(new Label("Course not found."));
             return;
         }
-
         Chart chart = generator.createChart(courseId, selectedFeature);
         root.setCenter(chart);
     }

@@ -44,16 +44,6 @@ public class Filter {
         return argument;
     }
 
-//    public enum OPERATOR {
-//        /* - for numerical features, but equal and not_equal can be used for categorical features as well ----- */
-//        STRICTLY_LESS,      // forall X select X if X < const
-//        LESS_OR_EQUAL,      // forall X select X if X <= const
-//        EQUAL,              // forall X select X if X == const (can be used with categorical features as well)
-//        GREATER_OR_EQUAL,   // forall X select X if X >= const
-//        STRICTLY_GREATER,   // forall X select X if X > const
-//        NOT_EQUAL,          // forall X select X if X != const (can be used with categorical features as well)
-//    }
-
     public static String[] recognizedOperators = new String[] {"<<", "<=", "=", ">=", ">>", "!="};
 
 

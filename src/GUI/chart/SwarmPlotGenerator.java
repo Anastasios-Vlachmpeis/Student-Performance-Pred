@@ -15,7 +15,7 @@ import java.util.*;
 
 public class SwarmPlotGenerator {
     
-    //Colors
+    // Colors for the different categories
     private static final Color[] CATEGORY_COLORS = {
         Color.rgb(127, 127, 127),
         Color.rgb(148, 103, 189),
@@ -60,13 +60,13 @@ public class SwarmPlotGenerator {
         //Categories
         String[] categories = CategoricalFeature.getRange(featureId);
         
-        //Students by category
+        // Grouping of students by category
         Map<String, List<Double>> categoryGrades = new HashMap<>();
         for (String category : categories) {
             categoryGrades.put(category, new ArrayList<>());
         }
 
-        //Students with grades
+        // Collection of grades for each student, by category they are in
         int[] allStudentIds = CurrentGradesModel.getAllStudentIds();
         for (int studentId : allStudentIds) {
             try {
@@ -98,7 +98,7 @@ public class SwarmPlotGenerator {
             for (Double grade : grades) {
                 XYChart.Data<String, Number> data = new XYChart.Data<>(category, grade);
                 
-                // Create the points
+                //Points
                 Circle circle = new Circle(2.9);
                 circle.setFill(categoryColor.deriveColor(0, 1, 1, 0.5));
                 circle.setStroke(categoryColor.deriveColor(0, 1, 0.8, 0.8));
@@ -120,6 +120,10 @@ public class SwarmPlotGenerator {
         return scatterChart;
     }
 
+    /**
+     * Applies beeswarm layout to spread out overlapping points horizontally
+     * Basically collision detection and horizontal offsetting to avoid too much overlap
+     */
     private void applyBeesSwarmLayout(ScatterChart<String, Number> chart, double radius) {
         Map<String, List<XYChart.Data<String, Number>>> grouped = new HashMap<>();
 
@@ -141,18 +145,18 @@ public class SwarmPlotGenerator {
                 if (p.getNode() == null) continue;
                 double y = p.getYValue().doubleValue();
                 //Jitter
-                double jitterAmount = 0.008; //random offset
+                double jitterAmount = 0.008; //random offset ("very useful")
                 double jitteredY = y + (random.nextDouble() - 0.5) * jitterAmount;
                 
                 double xOffset = 0;
                 double step = radius * 0.9;
-                // Position without collision
+                // We find a position without collision
                 int maxAttempts = 50; // Prevent infinite loops
                 int attempts = 0;
                 while (attempts < maxAttempts) {
                     boolean collision = false;
                     for (Point2D pos : placed) {
-                        // Collision detection
+                        // And we check if this point is too close to another one
                         if (Math.hypot(pos.getX() - xOffset, pos.getY() - jitteredY) < radius) {
                             collision = true;
                             break;

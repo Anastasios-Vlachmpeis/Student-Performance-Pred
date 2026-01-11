@@ -35,11 +35,7 @@ public class ScatterPlotTab {
     private CheckBox scatterShowYEqualsXLineCheckBox;
     private VBox scatterCourseCorrelationControls;
 
-
-
-    /** 
-     * We create and return the scatter plot tab UI with control panel and chart 
-     */
+    // We create and return the scatter plot tab UI with control panel and chart
     public BorderPane createScatterPlotTab() {
         scatterGenerator = new ScatterPlotGenerator();
         scatterRoot = new BorderPane();
@@ -50,22 +46,24 @@ public class ScatterPlotTab {
     }
 
     /** 
-     * We create the control panel with all the necessary UI controls (filters, course selection, sliders) 
+     * We create the control panel with all the necessary UI controls ;
+     * filters, course selection, sliders
      */
     private VBox createScatterControlPanel() {
-        // Create the main panel container with spacing and padding
+        // Main panel container
         VBox panel = new VBox();
         UIStyling.styleControlPanel(panel);
 
-        // We create the feature filter controls (feature selection + value selection)
+        // Feature filter controls
         scatterFeatureFilterControls = createScatterFeatureFilterControls();
         
-        // We create the course correlation controls (X course, Y course, Y=X line checkbox)
+        // Course correlation controls ;
+        // X course, Y course, Y=X line checkbox
         Label correlationLabel = new Label("Course Correlation:");
         UIStyling.styleHeadingLabel(correlationLabel);
         scatterCourseCorrelationControls = createScatterCourseCorrelationControls();
 
-        // We create the X-axis filter sliders (min and max) with labels
+        // X-axis filter sliders
         Label xFilterLabel = new Label("X-Axis Filter (Grade Range):");
         UIStyling.styleHeadingLabel(xFilterLabel);
         scatterXAxisMinSlider = new Slider();
@@ -74,10 +72,10 @@ public class ScatterPlotTab {
         UIStyling.styleSlider(scatterXAxisMaxSlider);
         scatterXAxisMinLabel = new Label();
         scatterXAxisMaxLabel = new Label();
-        setupScatterSlider(scatterXAxisMinSlider, scatterXAxisMinLabel, true);  // true = min slider
-        setupScatterSlider(scatterXAxisMaxSlider, scatterXAxisMaxLabel, false); // false = max slider
+        setupScatterSlider(scatterXAxisMinSlider, scatterXAxisMinLabel, true);
+        setupScatterSlider(scatterXAxisMaxSlider, scatterXAxisMaxLabel, false);
 
-        // We create the Y-axis filter sliders (min and max) with labels
+        // Y-axis filter sliders
         Label yFilterLabel = new Label("Y-Axis Filter (Grade Range):");
         UIStyling.styleHeadingLabel(yFilterLabel);
         scatterYAxisMinSlider = new Slider();
@@ -86,10 +84,10 @@ public class ScatterPlotTab {
         UIStyling.styleSlider(scatterYAxisMaxSlider);
         scatterYAxisMinLabel = new Label();
         scatterYAxisMaxLabel = new Label();
-        setupScatterSlider(scatterYAxisMinSlider, scatterYAxisMinLabel, true);  // true = min slider
-        setupScatterSlider(scatterYAxisMaxSlider, scatterYAxisMaxLabel, false); // false = max slider
+        setupScatterSlider(scatterYAxisMinSlider, scatterYAxisMinLabel, true);
+        setupScatterSlider(scatterYAxisMaxSlider, scatterYAxisMaxLabel, false);
         
-        // We initialize slider ranges (chart update happens in createScatterPlotTab)
+        // Initialize slider ranges
         updateScatterSliderRanges();
 
         // And we add all the controls to the panel in order,
@@ -106,7 +104,8 @@ public class ScatterPlotTab {
         return panel;
     }
 
-    /** Sets up a slider with factory method, linking it to chart updates */
+    // Slider setup using the factory method
+    // It is directly linked to different chart updates
     private void setupScatterSlider(Slider slider, Label label, boolean isMin) {
         ChartControlFactory.setupSlider(slider, label, isMin,
                 scatterXAxisMinSlider, scatterXAxisMaxSlider,
@@ -114,9 +113,8 @@ public class ScatterPlotTab {
                 () -> updateScatterChart());
     }
 
-    /** 
-     * Create the course correlation controls (X course, Y course, show Y=X checkbox) 
-     */
+    // Course correlation controls ;
+    // X course, Y course, Y=X checkbox
     private VBox createScatterCourseCorrelationControls() {
         ChartControlFactory.CourseCorrelationControls controls = ChartControlFactory.createCourseCorrelationControls(
                 () -> {
@@ -129,30 +127,26 @@ public class ScatterPlotTab {
         return controls.container;
     }
 
-    /** 
-     * Create the feature filter controls (feature combo box and value combo box) 
-     */
+    // Feature filter controls ;
+    // feature combo box and value combo box
     private VBox createScatterFeatureFilterControls() {
         ChartControlFactory.FeatureFilterControls controls = ChartControlFactory.createFeatureFilterControls(
-                () -> updateScatterChart(), () -> updateScatterChart());
+                () -> updateScatterChart(), () -> updateScatterChart() // callbacks for when the feature or value changes
+            );
         scatterFeatureFilterComboBox = controls.featureComboBox;
         scatterFeatureFilterValueComboBox = controls.valueComboBox;
         return controls.container;
     }
 
-
-    /** 
-     * Update the slider ranges for course correlation mode (grade range 0-10)
-     */
+    // Slider ranges' update for course correlation
     private void updateScatterSliderRanges() {
-        // For course correlation, we always use grade range 0-10
+        // Course correlation always uses a grade range of 0-10
         scatterXAxisMinSlider.setMin(0);
         scatterXAxisMinSlider.setMax(10);
         scatterXAxisMinSlider.setValue(0);
         scatterXAxisMaxSlider.setMin(0);
         scatterXAxisMaxSlider.setMax(10);
         scatterXAxisMaxSlider.setValue(10);
-        
         scatterYAxisMinSlider.setMin(0);
         scatterYAxisMinSlider.setMax(10);
         scatterYAxisMinSlider.setValue(0);
@@ -167,8 +161,8 @@ public class ScatterPlotTab {
         scatterYAxisMaxLabel.setText(String.format("Max: %.1f", scatterYAxisMaxSlider.getValue()));
     }
 
-    /** 
-     * Update the scatter plot chart based on course correlation selections, filters, and options 
+    /**
+     * Updates the scatter plot chart based on selections, filters, and options.
      */
     private void updateScatterChart() {
         double xMin = scatterXAxisMinSlider.getValue();
@@ -176,7 +170,7 @@ public class ScatterPlotTab {
         double yMin = scatterYAxisMinSlider.getValue();
         double yMax = scatterYAxisMaxSlider.getValue();
 
-        // Here we extract feature filter and convert "No Feature" to null
+        // Extract feature filter, convert "No Feature" to null
         String filterFeature = scatterFeatureFilterComboBox.getValue();
         String filterValue = scatterFeatureFilterValueComboBox.getValue();
         if ("No Feature".equals(filterFeature)) {

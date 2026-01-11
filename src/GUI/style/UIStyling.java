@@ -9,8 +9,8 @@ import javafx.scene.layout.VBox;
 import java.util.Base64;
 
 /**
- * Centralized styling utilities for UI components.
- * Provides simple style methods that modify existing components.
+ * Centralized styling utilities for UI components
+ * Basically just the methods that style existing components
  */
 public class UIStyling {
     
@@ -33,7 +33,7 @@ public class UIStyling {
     private static final double CONTROL_PANEL_WIDTH = 300.0;
     
     /**
-     * Styles a primary button with gradient teal background.
+     * Styles a primary button with gradient teal background
      */
     public static void stylePrimaryButton(Button btn) {
         btn.setStyle(String.format("""
@@ -48,7 +48,7 @@ public class UIStyling {
     }
     
     /**
-     * Styles a secondary button with gradient gray background.
+     * Styling of a secondary button with a "gradient gray" background
      */
     public static void styleSecondaryButton(Button btn) {
         btn.setStyle(String.format("""
@@ -63,18 +63,7 @@ public class UIStyling {
     }
     
     /**
-     * Styles a title label (bold, larger font).
-     */
-    public static void styleTitleLabel(Label label) {
-        label.setStyle(String.format("""
-            -fx-font-weight: bold;
-            -fx-font-size: %s;
-            -fx-text-fill: %s;
-        """, TITLE_FONT_SIZE, TEXT_COLOR));
-    }
-    
-    /**
-     * Styles a heading label.
+     * Styling of a heading label
      */
     public static void styleHeadingLabel(Label label) {
         label.setStyle(String.format("""
@@ -85,7 +74,7 @@ public class UIStyling {
     }
     
     /**
-     * Styles a body label.
+     * Styling of a body label
      */
     public static void styleBodyLabel(Label label) {
         label.setStyle(String.format("""
@@ -95,7 +84,7 @@ public class UIStyling {
     }
     
     /**
-     * Styles an info label.
+     * Styling of an info label
      */
     public static void styleInfoLabel(Label label) {
         label.setStyle(String.format("""
@@ -105,7 +94,8 @@ public class UIStyling {
     }
     
     /**
-     * Styles a ComboBox with white background and border.
+     * Styling of a ComboBox with white background and border, and
+     * Base64-encoded CSS is used for the hover/pressed effects
      */
     public static void styleComboBox(ComboBox<?> comboBox) {
         String css = String.format(
@@ -135,7 +125,7 @@ public class UIStyling {
     }
     
     /**
-     * Styles a control panel VBox with background color, padding, and spacing.
+     * Styling of a control panel VBox with background color, padding, and spacing
      */
     public static void styleControlPanel(VBox panel) {
         panel.setSpacing(DEFAULT_SPACING);
@@ -147,7 +137,8 @@ public class UIStyling {
     }
     
     /**
-     * Styles a Slider with modern minimal appearance.
+     * Styling of a Slider
+     * Uses Base64-encoded CSS for the styling (yeah, again)
      */
     public static void styleSlider(Slider slider) {
         String accentColor = "#E0E0E0";
@@ -192,8 +183,7 @@ public class UIStyling {
     
     /**
      * Calculates bar color style based on value and max value.
-     * Uses the same coloring logic as scatter plot overlap visualization.
-     * Higher values result in darker teal colors, lower values in lighter teal.
+     * Uses similar coloring logic to the scatter plot overlap visualization
      * 
      * @param value The current value to color
      * @param maxValue The maximum value for normalization
@@ -211,7 +201,7 @@ public class UIStyling {
         double brightness = 1.0 - normalizedValue;
         brightness = Math.max(0.2, Math.min(1.0, brightness));
         
-        // Convert to RGB (using #52b5aa as base color, adjust brightness)
+        // Conversion to RGB using #52b5aa base color
         int r = (int) (brightness * 82);
         int g = (int) (brightness * 181);
         int b = (int) (brightness * 170);

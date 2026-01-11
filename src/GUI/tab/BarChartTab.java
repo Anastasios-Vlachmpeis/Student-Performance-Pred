@@ -16,17 +16,14 @@ public class BarChartTab {
 
     private ComboBox<String> xAxisCombo;
     private ComboBox<String> yAxisCombo;
-
     private Slider xMinSlider;
     private Slider xMaxSlider;
     private Slider yMinSlider;
     private Slider yMaxSlider;
-
     private Label xMinLabel;
     private Label xMaxLabel;
     private Label yMinLabel;
     private Label yMaxLabel;
-
     private BorderPane root;
     private BarChartGenerator generator;
 
@@ -96,7 +93,6 @@ public class BarChartTab {
         setupSlider(yMinSlider, yMinLabel, true);
         setupSlider(yMaxSlider, yMaxLabel, false);
 
-
         Label xRangeLabel = new Label("X Range:");
         UIStyling.styleHeadingLabel(xRangeLabel);
         Label yRangeLabel = new Label("Y Range:");
@@ -140,8 +136,6 @@ public class BarChartTab {
         xMaxSlider.setValue(xMax);
         xMinSlider.setValue(0);
 
-
-
         // for y axis
         int yMax;
 
@@ -179,7 +173,6 @@ public class BarChartTab {
             }
         });
 
-
         // update labels
         xMinLabel.setText("X Min: " + (int)xMinSlider.getValue());
         xMaxLabel.setText("X Max: " + (int)xMaxSlider.getValue());
@@ -201,7 +194,6 @@ public class BarChartTab {
                 xStart, xEnd,
                 yStart, yEnd
         );
-
 
         root.setCenter(chart);
     }
