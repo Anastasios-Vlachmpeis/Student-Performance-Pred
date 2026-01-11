@@ -5,7 +5,6 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
 public class GUIdemo extends Application {
@@ -25,6 +24,7 @@ public class GUIdemo extends Application {
         BorderPane barPane = new BarChartTab().createBarChartTab();
         barTab.setContent(barPane);
         tabPane.getTabs().add(barTab);
+        
         // Tab 1: Scatter Plot
         Tab scatterPlotTab = new Tab("Scatter Plot");
         scatterPlotTab.setClosable(false);
@@ -42,14 +42,14 @@ public class GUIdemo extends Application {
         // Tab 3: Faux Heat Map
         Tab fauxHeatMapTab = new Tab("Pearson Correlation Current");
         fauxHeatMapTab.setClosable(false);
-        Pane fauxHeatMapCurrentGrades = new FauxHeatMapTab().createPearsonCorrelationCurrentCourses();
+        BorderPane fauxHeatMapCurrentGrades = new HeatMapTab().createPearsonCorrelationCurrentCourses();
         fauxHeatMapTab.setContent(fauxHeatMapCurrentGrades);
         tabPane.getTabs().add(fauxHeatMapTab);
 
         // Tab 3.5: Faux Heat Map
         Tab fauxHeatMapTab2 = new Tab("Pearson Correlation Graduate");
         fauxHeatMapTab2.setClosable(false);
-        Pane fauxHeatMapGraduateGrades = new FauxHeatMapTab().createPearsonCorrelationGraduateCourses();
+        BorderPane fauxHeatMapGraduateGrades = new HeatMapTab().createPearsonCorrelationGraduateCourses();
         fauxHeatMapTab2.setContent(fauxHeatMapGraduateGrades);
         tabPane.getTabs().add(fauxHeatMapTab2);
 
@@ -67,8 +67,8 @@ public class GUIdemo extends Application {
         histogramTab.setContent(histogramPane);
         tabPane.getTabs().add(histogramTab);
 
-        // Tab 6: Swarm plot (not working)
-        Tab swarmPlotTab = new Tab("Swarm plot (alpha)");
+        // Tab 6: Swarm plot
+        Tab swarmPlotTab = new Tab("Swarm Plot");
         swarmPlotTab.setClosable(false);
         BorderPane swarmPlotPane = new SwarmPlotTab().createTab();
         swarmPlotTab.setContent(swarmPlotPane);

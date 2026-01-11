@@ -1,5 +1,6 @@
 package GUI.tab;
 
+import GUI.style.UIStyling;
 import datamodels.CurrentGradesModel;
 import javafx.geometry.Insets;
 import javafx.scene.chart.PieChart;
@@ -20,6 +21,7 @@ public class PieChartTab {
 
         // dataset selection
         datasetCombo = new ComboBox<>();
+        UIStyling.styleComboBox(datasetCombo);
         datasetCombo.getItems().addAll(
                 "Cum Laude percentage",
                 "Graduation percentage"
@@ -29,6 +31,7 @@ public class PieChartTab {
         pieChart = new PieChart();
 
         infoLabel = new Label();
+        UIStyling.styleInfoLabel(infoLabel);
         infoLabel.setPadding(new Insets(5));
 
         VBox topBox = new VBox(10, datasetCombo);
@@ -57,7 +60,6 @@ public class PieChartTab {
         }
     }
 
-
     //displays the cum laude chart by getting help from the helper methods
     private void displayCumLaudeChart() {
         int[] studentIds = CurrentGradesModel.getAllStudentIds();
@@ -67,10 +69,8 @@ public class PieChartTab {
         int nonCumLaude = totalStudents - cumLaudeCount;
 
         pieChart.setTitle("CumLaude - NonCumLaude Students");
-
         pieChart.getData().add(new PieChart.Data("CumLaude", cumLaudeCount));
         pieChart.getData().add(new PieChart.Data("NonCumLaude", nonCumLaude));
-
 
         //change the info label so that it shows the right percentage
         infoLabel.setText(String.format(
@@ -89,7 +89,6 @@ public class PieChartTab {
         int nonGraduates = totalStudents - graduates;
 
         pieChart.setTitle("Expected Number of Graduate-NonGraduate Students");
-
         pieChart.getData().add(new PieChart.Data("Expected Graduates", graduates));
         pieChart.getData().add(new PieChart.Data("Expected NonGraduates", nonGraduates));
 
@@ -99,8 +98,6 @@ public class PieChartTab {
                 nonGraduates, 100.0 * nonGraduates / totalStudents
         ));
     }
-
-
 
     //helper method to calculate cum laude count
     private int calculateCumLaudeCount(int[] studentIds) {

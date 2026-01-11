@@ -1,88 +1,105 @@
 package GUI.tab;
 
 import GUI.chart.SwarmPlotGenerator;
+import GUI.style.UIStyling;
+import datamodels.CurrentGradesModel;
+import datamodels.CategoricalFeature;
+import datamodels.StudentInfoModel;
 import javafx.scene.chart.Chart;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
-import javafx.geometry.Insets;
 
+/**
+ * This class creates the swarm plot tab UI,
+ * with the control panel and the chart
+ */
 public class SwarmPlotTab {
     private BorderPane root;
-    private ListView<String> yAxisList;
-    private TextField yAxisInputStart;
-    private TextField yAxisInputEnd;
-    private ListView<String> xAxisList;
-    private TextField xAxisInputStart;
-    private TextField xAxisInputEnd;
+    private ComboBox<String> courseComboBox;
+    private ComboBox<String> featureComboBox;
+    private SwarmPlotGenerator generator;
 
     public BorderPane createTab() {
         this.root = new BorderPane();
+        this.generator = new SwarmPlotGenerator();
 
+        VBox controlPanel = new VBox();
+        UIStyling.styleControlPanel(controlPanel);
 
-        VBox dataPanel = new VBox(10);
-        dataPanel.setPadding(new Insets(15));
-        dataPanel.setPrefWidth(200);
+        // Course selection
+        Label courseLabel = new Label("Select Course:");
+        UIStyling.styleHeadingLabel(courseLabel);
+        courseComboBox = new ComboBox<>();
+        UIStyling.styleComboBox(courseComboBox);
+        String[] courses = CurrentGradesModel.getCourses();
+        courseComboBox.getItems().addAll(courses);
+        if (courses.length > 0) {
+            courseComboBox.setValue(courses[0]);
+        }
+        // Auto-update when course changes
+        courseComboBox.setOnAction(e -> updateVisualization());
 
-//        Label chartLabel = new Label("Choose the type of chart:");
-//        chartList = new ListView<>();
-//        chartList.getItems().addAll("BarChart", "Histogram", "JointPlot", "SwarmPlot", "ScatterPlot");
-//        chartList.getSelectionModel().selectFirst();
+        // Feature selection (only categorical features)
+        Label featureLabel = new Label("Group by Feature:");
+        UIStyling.styleHeadingLabel(featureLabel);
+        featureComboBox = new ComboBox<>();
+        UIStyling.styleComboBox(featureComboBox);
+        
+        // Get categorical feature names
+        String[] featureNames = StudentInfoModel.featureNames;
+        Integer[] categoricalIds = CategoricalFeature.getAllowedIds();
+        for (int id : categoricalIds) {
+            if (id < featureNames.length) {
+                featureComboBox.getItems().add(featureNames[id]);
+            }
+        }
+        if (featureComboBox.getItems().size() > 0) {
+            featureComboBox.setValue(featureComboBox.getItems().get(0));
+        }
+        // Auto-update when feature changes
+        featureComboBox.setOnAction(e -> updateVisualization());
 
-        Label yAxisLabel = new Label("Choose the dataset of y axis:");
-        yAxisList = new ListView<>();
-        yAxisList.getItems().addAll("Number of NG", "Mean of Grades", "Mode of Grades", "Median of Grades");
-        yAxisList.getSelectionModel().selectFirst();
-        yAxisInputStart = new TextField();
-        yAxisInputStart.setPromptText("Put your Y Axis filter start here");
-        yAxisInputEnd = new TextField();
-        yAxisInputEnd.setPromptText("Put your Y Axis filter end here");
+        controlPanel.getChildren().addAll(
+            courseLabel,
+            courseComboBox,
+            featureLabel,
+            featureComboBox
+        );
 
-        Label xAxisLabel = new Label("Choose the dataset of x axis:");
-        xAxisList = new ListView<>();
-        xAxisList.getItems().addAll("Per Course", "Per Student");
-        xAxisList.getSelectionModel().selectFirst();
-        xAxisInputStart = new TextField();
-        xAxisInputStart.setPromptText("Put your X Axis filter start here");
-        xAxisInputEnd = new TextField();
-        xAxisInputEnd.setPromptText("Put your X Axis filter end here");
-
-        Button generateButton = new Button("Generate");
-        generateButton.setMaxWidth(Double.MAX_VALUE);
-
-
-        dataPanel.getChildren().addAll(yAxisLabel, yAxisList, yAxisInputStart, yAxisInputEnd, xAxisLabel, xAxisList, xAxisInputStart, xAxisInputEnd, generateButton);
-
-
-        root.setLeft(dataPanel);
-
-
-        generateButton.setOnAction(e -> generateChart());
-
+        root.setLeft(controlPanel);
+        
+        // Generate initial visualization
+        updateVisualization();
 
         return root;
     }
-    private void generateChart() {
-        String selectedXAxis = xAxisList.getSelectionModel().getSelectedItem();
-        String selectedYAxis = yAxisList.getSelectionModel().getSelectedItem();
-        int xAxisFilterStart = Integer.parseInt(xAxisInputStart.getText());
-        int xAxisFilterEnd = Integer.parseInt(xAxisInputEnd.getText());
-        int yAxisFilterStart = Integer.parseInt(yAxisInputStart.getText());
-        int yAxisFilterEnd = Integer.parseInt(yAxisInputEnd.getText());
 
-        Chart chart = new SwarmPlotGenerator().createChart(
-                selectedXAxis,
-                selectedYAxis,
-                xAxisFilterStart,
-                xAxisFilterEnd,
-                yAxisFilterStart,
-                yAxisFilterEnd
-        );
+    // Updates the visualization when course or feature changes
+    private void updateVisualization() {
+        String selectedCourse = courseComboBox.getValue();
+        String selectedFeature = featureComboBox.getValue();
+        
+        if (selectedCourse == null || selectedFeature == null) {
+            root.setCenter(new Label("Please select a course and feature."));
+            return;
+        }
 
+        // Find course ID
+        int courseId = -1;
+        String[] courses = CurrentGradesModel.getCourses();
+        for (int i = 0; i < courses.length; i++) {
+            if (courses[i].equals(selectedCourse)) {
+                courseId = i;
+                break;
+            }
+        }
+
+        if (courseId == -1) {
+            root.setCenter(new Label("Course not found."));
+            return;
+        }
+        Chart chart = generator.createChart(courseId, selectedFeature);
         root.setCenter(chart);
     }
-
 }
