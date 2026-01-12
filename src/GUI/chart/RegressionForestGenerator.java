@@ -26,17 +26,21 @@ public class RegressionForestGenerator {
         BarChart<String, Number> barChart = new BarChart<>(xAxis, yAxis);
         barChart.setLegendVisible(false);
 
+        //create the dataset
         XYChart.Series<String, Number> dataset = new XYChart.Series<>();
         java.util.ArrayList<XYChart.Data<String, Number>> barData = new java.util.ArrayList<>();
 
+        //Set the initial values
         ArrayList<Integer> allStudents = CurrentGradesModel.getAllStudentIdsOfCourseWithGrade(courseId);
         int three = 0, four = 0, five = 0, six = 0, seven = 0, eight = 0, nine = 0, ten = 0;
         double predictionSum = 0;
 
+        //have a for loop to train the asked amount of randomized regression trees
         for (int i = 1; i <= treeCount; i++) {
             ArrayList<Integer> trainingStudents =  regressionForest.getRandom(allStudents);
             TreeNode regressionTree = RegressionTreeTrainer.train(trainingStudents, courseId);
             double predictedGrade = regressionTree.predict(studentId);
+            //create the frequency data
             if (Math.round(predictedGrade) == 3) {three++;}
             if (Math.round(predictedGrade) == 4) {four++;}
             if (Math.round(predictedGrade) == 5) {five++;}
@@ -47,6 +51,8 @@ public class RegressionForestGenerator {
             if (Math.round(predictedGrade) == 10) {ten++;}
             predictionSum = predictionSum + predictedGrade;
         }
+
+        //add the data to the dataset
         dataset.getData().add(new XYChart.Data<>("Grade 3", three));
         dataset.getData().add(new XYChart.Data<>("Grade 4", four));
         dataset.getData().add(new XYChart.Data<>("Grade 5", five));
@@ -90,7 +96,8 @@ public class RegressionForestGenerator {
                 }
             }
         });
-        
+
+        //return as result class to prevent any conflicts
         double predictedGrade = predictionSum / treeCount;
         return new RegressionForestResult(barChart, predictedGrade);
     }
