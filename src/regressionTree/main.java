@@ -20,9 +20,6 @@ public class main {
             return;
         }
 
-        // train regression tree for the given course with all students
-        TreeNode regressionTree =
-                RegressionTreeTrainer.train(trainingStudents, courseId);
 
         // predict the grade of a specific student
         double forestPredictedGrade = regressionForest.createRegressionForest(100, courseId, studentId);
