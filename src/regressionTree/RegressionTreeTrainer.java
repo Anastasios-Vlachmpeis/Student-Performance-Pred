@@ -2,6 +2,7 @@ package regressionTree;
 
 import datamodels.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -87,8 +88,16 @@ public class RegressionTreeTrainer {
         DecisionStump bestStump = null;
         double bestReduction = 0;
 
-        // try all available student features
-        for (int featureId : StudentInfoModel.getAllFeatureIds()) {
+        // try randomly selected 3 features to increase randomness
+        int[] featureArray = StudentInfoModel.getAllFeatureIds();
+        List<Integer> allFeatures = new ArrayList<>();
+        for (int f : featureArray) {
+            allFeatures.add(f);
+        }
+        Collections.shuffle(allFeatures);
+        List<Integer> randomFeatures = allFeatures.subList(0, 3);
+
+        for (int featureId : randomFeatures) {
 
             Feature sample = StudentInfoModel.getFeature(
                     studentIds.get(0),

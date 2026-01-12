@@ -74,6 +74,13 @@ public class GUIdemo extends Application {
         swarmPlotTab.setContent(swarmPlotPane);
         tabPane.getTabs().add(swarmPlotTab);
 
+        // Tab 7: Regression forest
+        Tab regressionForestTab = new Tab("Regression Forest");
+        regressionForestTab.setClosable(false);
+        BorderPane regressionForestPane = new RegressionForestTab().createRegressionForestTab();
+        regressionForestTab.setContent(regressionForestPane);
+        tabPane.getTabs().add(regressionForestTab);
+
         root.setCenter(tabPane);
 
         Scene scene = new Scene(root, 1000, 840);
