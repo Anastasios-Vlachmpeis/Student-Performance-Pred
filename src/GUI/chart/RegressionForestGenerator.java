@@ -56,7 +56,41 @@ public class RegressionForestGenerator {
         dataset.getData().add(new XYChart.Data<>("Grade 9", nine));
         dataset.getData().add(new XYChart.Data<>("Grade 10", ten));
 
+        // Find max frequency for color normalization
+        int maxFrequency = Math.max(Math.max(Math.max(three, four), Math.max(five, six)),
+                                   Math.max(Math.max(seven, eight), Math.max(nine, ten)));
+        final int finalMaxFrequency = maxFrequency > 0 ? maxFrequency : 1;
+
+        // Apply coloring to each bar
+        for (XYChart.Data<String, Number> data : dataset.getData()) {
+            int frequency = data.getYValue().intValue();
+            
+            // Calculate color using centralized method
+            String colorStyle = UIStyling.calculateBarColorStyle(frequency, finalMaxFrequency);
+            
+            // Apply color styling when node is created
+            data.nodeProperty().addListener((obs, oldNode, newNode) -> {
+                if (newNode != null) {
+                    newNode.setStyle(colorStyle);
+                }
+            });
+        }
+
         barChart.getData().add(dataset);
+        
+        // Style bars after chart is rendered (fallback)
+        barChart.sceneProperty().addListener((obs, oldScene, newScene) -> {
+            if (newScene != null) {
+                for (XYChart.Data<String, Number> data : dataset.getData()) {
+                    int frequency = data.getYValue().intValue();
+                    String colorStyle = UIStyling.calculateBarColorStyle(frequency, finalMaxFrequency);
+                    if (data.getNode() != null) {
+                        data.getNode().setStyle(colorStyle);
+                    }
+                }
+            }
+        });
+        
         double predictedGrade = predictionSum / treeCount;
         return new RegressionForestResult(barChart, predictedGrade);
     }
