@@ -95,6 +95,7 @@ public class RegressionForestTab {
             alert.setHeaderText("Invalid input");
             alert.setContentText("\"Please enter a number between 10 and 1000.");
             alert.showAndWait();
+            return;
         }
 
         String Course = CourseCombo.getValue();
@@ -110,6 +111,7 @@ public class RegressionForestTab {
             alert.setHeaderText("Invalid input");
             alert.setContentText("\"Please enter a correct student id.");
             alert.showAndWait();
+            return;
         }
 
 
