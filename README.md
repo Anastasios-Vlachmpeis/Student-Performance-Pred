@@ -2,10 +2,24 @@ This from the Gitlab repository of team winlog (#28).
 
 ## HOW TO RUN
 1. Use java 21 LTS
-2. Hava javafx 21.0.9 jdk ready
-3. Find src/GUI/GUIDemo.java's main method as the entry point
+2. Have javafx 21.0.9 jdk ready
+3. Find src/GUI/GUIdemo.java's main method as the entry point
 4. Run. (you might need to add javafx parameters to the VM options)
 
+## GUI and Visualizations
+The application includes a JavaFX GUI for interactive data visualization and model exploration. When you run `GUIdemo.java`, it opens a window with multiple tabs for different visualizations:
+
+ - **Bar Chart**: Visualize course or student statistics (mean, median, mode, number of NG's) with filtering options
+ - **Scatter Plot**: Plot relationships between two courses with overlap visualization
+ - **Joint Plot**: Combined scatter plot with marginal histograms showing grade distributions
+ - **Pearson Correlation Current**: Heat map showing correlation matrix between current courses
+ - **Pearson Correlation Graduate**: Heat map showing correlation matrix between graduate courses
+ - **Pie Chart**: Distribution of grades across courses or students
+ - **Histogram**: Grade distribution histograms with feature-based filtering
+ - **Swarm Plot**: Grade distributions by feature categories
+ - **Regression Forest**: Interactive tool to generate random forests and visualize prediction distributions for specific students
+
+All visualizations include filtering controls and use consistent styling. The regression forest tab allows you to specify the number of trees, select a course, and input a student ID to see predictions.
 
 # Mini documentation for data model classes
 ## How to access student data via code
@@ -86,4 +100,43 @@ We will make a decision stump forest for each course. Or rather methods that can
 2. noah's method
 3. boosted trees algorithm (finding best stump first. find the next stump by maximizing combined results with first stump. repeat)
 
-*This is an easter egg:)*
+## Regression Trees and Random Forests
+Regression trees predict student grades based on their features using variance reduction to find the best splits. Random forests combine multiple trees trained on bootstrap samples to improve prediction accuracy.
+
+### RegressionTreeTrainer
+This class builds a regression tree for a given course and list of student IDs. It exposes the following methods:
+
+ - `train(List<Integer> studentIds, int courseId)` builds a regression tree with default parameters (max depth 3, min samples 10)
+ - `train(List<Integer> studentIds, int courseId, int maxDepth, int minSamples)` builds a tree with custom parameters
+
+The training process recursively finds the best decision stump at each node by maximizing variance reduction. If no good split exists or depth/sample limits are reached, it creates a leaf node with the mean grade of that subset.
+
+### TreeNode
+This class represents a node in the regression tree. It can be either:
+- An internal node with a DecisionStump split rule and left/right children
+- A leaf node with a constant prediction value
+
+The following methods are available:
+
+ - `predict(int studentId)` traverses the tree from root to leaf, evaluating split conditions on the student's features, and returns the prediction at the leaf
+ - `printTree(String prefix)` prints the tree structure recursively with indentation
+
+### regressionForest
+This class creates a random forest using bootstrap aggregation (bagging). It exposes the following methods:
+
+ - `createRegressionForest(int treeNumber, int courseId, int studentId)` trains multiple trees on random 70% samples and returns the rounded average prediction
+ - `getRandom(ArrayList<Integer> students)` returns a random 70% sample of students for bootstrap sampling
+
+### ModelEvaluator
+This class evaluates regression trees and random forests using standard metrics. It exposes the following methods:
+
+ - `evaluateTree(TreeNode tree, int courseId, List<Integer> evaluationStudentIds)` evaluates a single tree and returns MSE, MAE, and R² metrics
+ - `evaluateForest(List<Integer> trainingStudents, int courseId, List<Integer> evaluationStudentIds, int numTrees)` trains a forest once and evaluates it, returning MSE, MAE, and R² metrics
+ - `calculateMSE(double[] actual, double[] predicted)` calculates Mean Squared Error
+ - `calculateMAE(double[] actual, double[] predicted)` calculates Mean Absolute Error
+ - `calculateR2(double[] actual, double[] predicted)` calculates R-squared (coefficient of determination)
+
+The main method runs evaluation across all courses with a 70/30 train-test split and prints average metrics for both single trees and random forests.
+
+**Everything else is meant to be a private member of the class. You should access everything via these methods!**
+**Do not make class variables public!**
