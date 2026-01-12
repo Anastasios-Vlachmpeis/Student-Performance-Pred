@@ -51,6 +51,7 @@ public class RegressionForestTab {
         UIStyling.styleHeadingLabel(CourseLabel);
         CourseCombo = new ComboBox<>();
         UIStyling.styleComboBox(CourseCombo);
+        // add all the course names to the combobox
         String[] courses = CurrentGradesModel.getCourses();
         for (int i = 0; i < courses.length; i++) {
             CourseCombo.getItems().add(courses[i]);
@@ -71,7 +72,7 @@ public class RegressionForestTab {
         generate.setOnAction(e -> {
             generateForest();
         });
-
+        // i added this many spacers because otherwise the control pane was looking too compact and small, now looks better
         Region spacer0 = new Region();
         spacer0.setMinHeight(20);
         Region spacer1 = new Region();
@@ -87,8 +88,13 @@ public class RegressionForestTab {
     }
 
     private void generateForest() {
+
+        // reset every output at the start so they dont use memory / take space
         root.setCenter(null);
         box.getChildren().removeAll(predictedInfo, actualInfo);
+
+        // i made the regression forest to work only between 10 and 1000 trees because other-wise it would
+        //be too small(overfit) or too big(takes too long to generate)
         int treeCount = Integer.parseInt(TreeCount.getText());
         if (treeCount < 10 || treeCount > 1000) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -98,11 +104,14 @@ public class RegressionForestTab {
             return;
         }
 
+        //we get the courseid by inputting course name thanks to the findCourseId method
         String Course = CourseCombo.getValue();
         int CourseId = ChartDataUtils.findCourseId(Course);
 
+        //we parse the textfield as an integer because otherwise it takes it as string
         int[] students = CurrentGradesModel.getAllStudentIds();
         int StudentId = Integer.parseInt(studentId.getText());
+        //check if the student id that the user wrote exists by using arrays stream. (thanks stack overflow)
         boolean exists = Arrays.stream(students)
                 .anyMatch(id -> id == StudentId);
 
@@ -114,13 +123,15 @@ public class RegressionForestTab {
             return;
         }
 
-
+        //create the forest and save it to the result class
         RegressionForestResult result =
                 generator.createChart(treeCount, CourseId, StudentId);
 
+        //use getter to get the chart from result class and display it
         BarChart<String, Number> chart = result.getChart();
         root.setCenter(chart);
 
+        //compare the predicted and actual grades
         double predicted = Math.round(result.getPredictedGrade());
         double actual = CurrentGradesModel.getGrade(StudentId, CourseId);
         predictedInfo = new Label("Predicted Grade: " + predicted);
