@@ -1,142 +1,238 @@
-This from the Gitlab repository of team winlog (#28).
+# Student Performance Prediction & Analysis
 
-## HOW TO RUN
-1. Use java 21 LTS
-2. Have javafx 21.0.9 jdk ready
-3. Find src/GUI/GUIdemo.java's main method as the entry point
-4. Run. (you might need to add javafx parameters to the VM options)
+A Java data-science mini-project (team **winlog**, GitLab #28) that analyzes fictional university grade data and builds grade-prediction models from scratch. The project combines exploratory statistics, rule-based learning, regression trees, and random forests with an interactive JavaFX dashboard for visualization and model exploration.
 
-## GUI and Visualizations
-The application includes a JavaFX GUI for interactive data visualization and model exploration. When you run `GUIdemo.java`, it opens a window with multiple tabs for different visualizations:
+> **Getting started:** See [HOW_TO_RUN.md](HOW_TO_RUN.md) for setup and run instructions.
 
- - **Bar Chart**: Visualize course or student statistics (mean, median, mode, number of NG's) with filtering options
- - **Scatter Plot**: Plot relationships between two courses with overlap visualization
- - **Joint Plot**: Combined scatter plot with marginal histograms showing grade distributions
- - **Pearson Correlation Current**: Heat map showing correlation matrix between current courses
- - **Pearson Correlation Graduate**: Heat map showing correlation matrix between graduate courses
- - **Pie Chart**: Distribution of grades across courses or students
- - **Histogram**: Grade distribution histograms with feature-based filtering
- - **Swarm Plot**: Grade distributions by feature categories
- - **Regression Forest**: Interactive tool to generate random forests and visualize prediction distributions for specific students
+---
 
-All visualizations include filtering controls and use consistent styling. The regression forest tab allows you to specify the number of trees, select a course, and input a student ID to see predictions.
+## What This Project Does
 
-# Mini documentation for data model classes
-## How to access student data via code
-The data we got via the .csv files is stored in internal models and representation inside the data model classes 
-(`GraduateGradesModel`, `CurrentGradesModel`, `StudentInfoModel` named after the .csv). These classes are static and 
-and accessible from anywhere inside the project as java static loading ensures that the student data is already loaded
-before any of their methods is called.
-### Graduate Grades
-This class exposes the following three methods.
+The application works with three related datasets about students enrolled in 36 sci-fi themed courses (e.g. Cryogenic Physics, Warp Field Theory, Xenorobotics Systems). It supports two complementary workflows:
 
- - `getGrade(int StudentId, int courseId)` returns the grade of a student with a valid student ID.
- - `getAllGradesStudent(int StudentId)` returns an array of all grades of a student with a valid student ID.
- - `getAllGradesCourse(int courseId)` returns an array of all grades given in a course with a valid course ID.
- - `getCourseName(int courseId)` returns the name of the course associated with a course ID.
- - `getAllStudentIds()` returns an array of all the ids of the students stored in this data model class
- - `getCourses()` returns the array of the course names
+1. **Console analysis** — phased assignment solutions that print statistics, correlations, decision rules, and predictions.
+2. **Interactive GUI** — a tabbed "Graph Generator" for exploring grades, student demographics, course relationships, and live random-forest predictions.
 
-**Everything else is meant to be a private member of the class. You should access everything via these methods!**
-**Do not make class variables public!**
+There is no external ML library. All models, statistics, and charts are implemented in plain Java with JavaFX for rendering.
 
-### Current Grades
-This class exposes the following methods: **(No Grade is marked with -1.0)**
+---
 
- - `getGrade(int StudentId, int courseId)` returns the grade of a student with a valid student ID. 
- - `getAllGradesStudent(int StudentId)` returns an array of all grades of a student with a valid student ID
- - `getAllGradesCourse(int courseId)` return an array of all grades given in a course with a valid course ID
- - `getAllValidGradesStudent(int studentId)` returns an ArrayList of all grades of a student that are not No Grades
- - `getAllValidGradesCourse(int courseId)` returns an ArrayList of all grades given in a course.
- - `getAllStudentIds()`returns an array of all the ids of the students stored in this data model class
+## Tech Stack
 
-**Everything else is meant to be a private member of the class. You should access everything via these methods!**
-**Do not make class variables public!**
+| Component | Details |
+|-----------|---------|
+| Language | Java 21 LTS |
+| UI | JavaFX 21.0.9 |
+| Build | Plain Java (no Maven/Gradle); IDE-driven |
+| Data | CSV files loaded at class initialization |
+| Dependencies | JDK standard library + JavaFX only |
 
-### Student Info
-This class exposes the following methods:
+---
 
- - `getFeature(int StudentId, int featureId)` Returns a Feature object (categorical or numerical) representing a student feature based on student ID and feature ID
- - `getAllFeatures(int StudentId)` returns an array of Feature objects that has all the features of a single student.
- - `getAllStudentIds()` returns an array of all the ids of the students stored in this data model class
- - `getAllFeatureIds()` returns an array of all the ids of the features represented in this data model class
+## Project Structure
 
-**Everything else is meant to be a private member of the class. You should access everything via these methods!**
-**Do not make class variables public!**
+```
+src/
+├── Main.java                 # Console entry — runs all phase solutions
+├── datamodels/               # CSV loaders, features, decision stumps
+├── solutions/                # Phase 1–2 assignment implementations
+├── regressionTree/           # Regression trees, random forests, evaluation
+├── tools/                    # Statistics, Pearson correlation, chart helpers
+└── GUI/                      # JavaFX application
+    ├── GUIdemo.java          # GUI entry point
+    ├── tab/                  # One tab controller per visualization
+    ├── chart/                # Chart generation logic
+    └── style/                # Shared UI styling
+```
 
-### Feature objects and how to use them
-You can consider Feature objects as a new datatype. There are two types of them:
+---
 
-1. Numerical feature (has a featureId, and a value which IS the feature itself)
-2. Categorical feature (has a featureId, and a category which IS the feature itself)
+## Data
 
-To see these in code, you can print a feature object using `System.out.println(myFeature.toString())` because it implements
-the `toString()` method.
+Three CSV files live under `src/datamodels/` and are loaded automatically via static initializers when their model classes are first accessed.
 
-It is used in two different ways:
+| Dataset | Model Class | Scale | Notes |
+|---------|-------------|-------|-------|
+| `GraduateGrades.csv` | `GraduateGradesModel` | ~21,243 students × 36 courses | Complete historical grades (6.0–10.0) |
+| `CurrentGrades.csv` | `CurrentGradesModel` | ~1,521 students × 36 courses | In-progress grades; missing values encoded as **NG** (`-1.0`) |
+| `StudentInfo.csv` | `StudentInfoModel` | ~1,521 students × 5 features | Mixed categorical and numerical student attributes |
 
- - Stores the feature of student in `StudentInfoModel`
- - Represents splitting criteria at decision stumps. (e.g. if we have a rule that says everyone who has a *Psionic Interference Tolerance* greater than 0.7,
-   then this splitting criteria is represented with a Feature Object NumericalFeature(id=3, value=0.7))
+### Student Features
 
-When we are tyring to find a good splitting criteria it is useful to know the *range* of the feature. For this reason
-we have:
-- `NumericalFeature.getRangeMax()` that returns the highest value a feature with that ID can take.
-- `NumericalFeature.getRangeMin()` that returns the lowest value a feature with that ID can take.
-- `CategoricalFeature.getRange(featureId)` which returns an array of strings of all the categories this feature can take.
+Each student has five sci-fi themed attributes used as predictors in ML models:
 
-## Decision Stumps
-Decision stumps that predict the grade of a student are implemented through the `Decision Stump` class.
-When initialized it asks for a Feature Object that serves as the splitting criteria, and the two grades it will predict 
-whether the student's feature puts the student in the above or below split.
-### How to use them for Phase 1 step 4:
-You will create a method that takes an array of `DecisionStump` objects (you can assume this array contains all possible
-decision stumps) and you will return a smaller array (say with length 10) that is somehow the best subset of them.
-To get a prediction from it, you need to call the `.predictGrade(int studentId)` method so you can work with that data.
+| ID | Feature | Type |
+|----|---------|------|
+| 0 | Quantum Coherence Threshold (QC) | Categorical |
+| 1 | Symbiotic Network Compatibility (SNC) | Categorical |
+| 2 | Astro-Temporal Drift Resistance (ATDR) | Numerical |
+| 3 | Psionic Interference Tolerance (PIT) | Numerical |
+| 4 | Bio-Luminal Transmission (BLT) | Categorical |
 
-We will make a decision stump forest for each course. Or rather methods that can find the best decision forest for a given course.
-**The Methods**: 
-1. least variance (subset of decision stumps whose predictions produces the least variance)
-2. noah's method
-3. boosted trees algorithm (finding best stump first. find the next stump by maximizing combined results with first stump. repeat)
+Features are represented as `CategoricalFeature` or `NumericalFeature` objects and are also used as splitting criteria in decision stumps.
 
-## Regression Trees and Random Forests
-Regression trees predict student grades based on their features using variance reduction to find the best splits. Random forests combine multiple trees trained on bootstrap samples to improve prediction accuracy.
+---
 
-### RegressionTreeTrainer
-This class builds a regression tree for a given course and list of student IDs. It exposes the following methods:
+## Project Phases
 
- - `train(List<Integer> studentIds, int courseId)` builds a regression tree with default parameters (max depth 3, min samples 10)
- - `train(List<Integer> studentIds, int courseId, int maxDepth, int minSamples)` builds a tree with custom parameters
+The work is organized into incremental phases, each building on the previous one.
 
-The training process recursively finds the best decision stump at each node by maximizing variance reduction. If no good split exists or depth/sample limits are reached, it creates a leaf node with the mean grade of that subset.
+### Phase 1 — Graduate Grade Analysis
 
-### TreeNode
-This class represents a node in the regression tree. It can be either:
-- An internal node with a DecisionStump split rule and left/right children
-- A leaf node with a constant prediction value
+Exploratory analysis on complete historical data (`GraduateGradesModel`):
 
-The following methods are available:
+- Best and worst courses by mean grade
+- Cum laude students (mean grade > 8)
+- Top correlated course pairs (Pearson correlation)
+- Students who perform better in hard courses than easy ones
 
- - `predict(int studentId)` traverses the tree from root to leaf, evaluating split conditions on the student's features, and returns the prediction at the leaf
- - `printTree(String prefix)` prints the tree structure recursively with indentation
+Implemented in `solutions/Phase1Step1Methods.java`.
 
-### regressionForest
-This class creates a random forest using bootstrap aggregation (bagging). It exposes the following methods:
+### Phase 2 — Current Grade Analysis
 
- - `createRegressionForest(int treeNumber, int courseId, int studentId)` trains multiple trees on random 70% samples and returns the rounded average prediction
- - `getRandom(ArrayList<Integer> students)` returns a random 70% sample of students for bootstrap sampling
+Same style of analysis adapted for in-progress grades with missing values (`CurrentGradesModel`):
 
-### ModelEvaluator
-This class evaluates regression trees and random forests using standard metrics. It exposes the following methods:
+- Hardest and easiest courses (NG-aware scoring)
+- Students close to graduating (< 5 NGs, no failing grades)
+- Correlated course pairs ignoring NG values
+- Hard vs. easy performance analysis (NG-aware)
+- **Monte Carlo simulation** to predict how many current students will graduate
 
- - `evaluateTree(TreeNode tree, int courseId, List<Integer> evaluationStudentIds)` evaluates a single tree and returns MSE, MAE, and R² metrics
- - `evaluateForest(List<Integer> trainingStudents, int courseId, List<Integer> evaluationStudentIds, int numTrees)` trains a forest once and evaluates it, returning MSE, MAE, and R² metrics
- - `calculateMSE(double[] actual, double[] predicted)` calculates Mean Squared Error
- - `calculateMAE(double[] actual, double[] predicted)` calculates Mean Absolute Error
- - `calculateR2(double[] actual, double[] predicted)` calculates R-squared (coefficient of determination)
+Implemented in `solutions/Phase1Step2Methods.java` and partially in `solutions/Phase2Step2Methods.java`.
 
-The main method runs evaluation across all courses with a 70/30 train-test split and prints average metrics for both single trees and random forests.
+### Phase 3 — Decision Stumps
 
-**Everything else is meant to be a private member of the class. You should access everything via these methods!**
-**Do not make class variables public!**
+Rule-based grade prediction using single-feature splits:
+
+- Tabulate grades by student feature
+- Find the best split per course via **variance reduction**
+- Predict future grades for courses marked NG
+
+Implemented in `solutions/Phase1Step3.java` using `datamodels/DecisionStump.java`.
+
+### Phase 4 — Ensemble Methods
+
+Multiple strategies for combining decision stumps and trees:
+
+| Method | Class | Approach |
+|--------|-------|----------|
+| Greedy variance reduction forest | `Phase1Step4VarianceReduction` | Greedily selects up to 10 stumps minimizing prediction variance |
+| R² random search | `Phase1Step4R2Evaluation` | Samples 300 random 10-stump forests, keeps top performers by R² |
+| Gradient boosting | `Phase1Step4GradientBoosting` | Iterative residual correction with learning rate η = 0.1 |
+| Regression tree | `RegressionTreeTrainer` | Recursive variance-reduction splits (max depth 3, min samples 10) |
+| Random forest | `regressionForest` | Bootstrap aggregation (70% samples per tree), average predictions |
+
+Model quality is measured with **MSE**, **MAE**, and **R²** via `regressionTree/ModelEvaluator.java`.
+
+---
+
+## GUI — Graph Generator
+
+Running `GUIdemo.java` opens a 1000×840 window with nine visualization tabs. Each tab has a left control panel and a center chart area.
+
+| Tab | What it shows |
+|-----|---------------|
+| **Bar Chart** | Course or student statistics (mean, median, mode, NG count) with range filtering |
+| **Scatter Plot** | Grade relationship between two courses, with overlap density coloring |
+| **Joint Plot** | Scatter plot with marginal histograms for both axes |
+| **Pearson Correlation Current** | Heat map of course–course correlations (current grades) |
+| **Pearson Correlation Graduate** | Heat map of course–course correlations (graduate grades) |
+| **Pie Chart** | Cum laude and predicted graduation percentages |
+| **Histogram** | Binned distributions of grade metrics, with feature filtering |
+| **Swarm Plot** | Grade distributions grouped by categorical student features |
+| **Regression Forest** | Train N trees for a student/course pair and visualize prediction distribution |
+
+Most tabs support filtering by student features (categorical match or above/below median for numerical features). The Regression Forest tab lets you configure tree count (10–1000), select a course, and enter a student ID to compare predicted vs. actual grade.
+
+---
+
+## Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  GUI (tabs + chart generators)                              │
+└────────────────────────┬────────────────────────────────────┘
+                         │
+┌────────────────────────▼────────────────────────────────────┐
+│  tools/ — Statistics, PearsonCorrelation, ChartDataUtils    │
+└────────────────────────┬────────────────────────────────────┘
+                         │
+        ┌────────────────┼────────────────┐
+        ▼                ▼                ▼
+  datamodels/      solutions/      regressionTree/
+  (CSV data)       (phase answers)   (ML models)
+```
+
+- **Data models** use static loading and expose data only through getter methods (encapsulation enforced by project convention).
+- **Chart generators** (`GUI/chart/`) are separate from tab UI (`GUI/tab/`), keeping visualization logic reusable.
+- **Shared controls** are built via `tools/ChartControlFactory.java`; styling is centralized in `GUI/style/UIStyling.java`.
+
+---
+
+## Data Model API
+
+Access student data through the static model classes. Do not expose class variables as public — use the methods below.
+
+### GraduateGradesModel
+
+- `getGrade(int studentId, int courseId)` — grade for one student in one course
+- `getAllGradesStudent(int studentId)` — all grades for a student
+- `getAllGradesCourse(int courseId)` — all grades in a course
+- `getCourseName(int courseId)` — course name by ID
+- `getAllStudentIds()` — all student IDs
+- `getCourses()` — all course names
+
+### CurrentGradesModel
+
+Same methods as above, plus:
+
+- `getAllValidGradesStudent(int studentId)` — grades excluding NG (`-1.0`)
+- `getAllValidGradesCourse(int courseId)` — valid grades in a course
+
+### StudentInfoModel
+
+- `getFeature(int studentId, int featureId)` — returns a `Feature` object (categorical or numerical)
+- `getAllFeatures(int studentId)` — all features for a student
+- `getAllStudentIds()` — all student IDs
+- `getAllFeatureIds()` — all feature IDs
+
+### Feature Objects
+
+Two types:
+
+1. **NumericalFeature** — has a feature ID and a numeric value; use `getRangeMin()` / `getRangeMax()` for valid bounds.
+2. **CategoricalFeature** — has a feature ID and a category string; use `CategoricalFeature.getRange(featureId)` for all possible categories.
+
+Features represent both student attributes and splitting criteria in decision stumps (e.g. "Psionic Interference Tolerance > 0.7").
+
+### Decision Stumps
+
+`DecisionStump` takes a `Feature` split criterion and two grade predictions (above/below split). Call `.predictGrade(int studentId)` to get a prediction for a student.
+
+### Regression Trees & Forests
+
+| Class | Key Methods |
+|-------|-------------|
+| `RegressionTreeTrainer` | `train(studentIds, courseId)` — build tree with default params; overload accepts `maxDepth` and `minSamples` |
+| `TreeNode` | `predict(studentId)` — traverse tree; `printTree(prefix)` — debug output |
+| `regressionForest` | `createRegressionForest(treeNumber, courseId, studentId)` — bagged ensemble prediction |
+| `ModelEvaluator` | `evaluateTree(...)`, `evaluateForest(...)` — returns MSE, MAE, R² |
+
+---
+
+## Entry Points Summary
+
+| Class | Package | Purpose |
+|-------|---------|---------|
+| `GUIdemo` | `GUI` | Launch JavaFX visualization dashboard |
+| `Main` | *(default)* | Run all console phase solutions sequentially |
+| `ModelEvaluator` | `regressionTree` | Batch-evaluate trees and forests across courses |
+| `main` | `regressionTree` | Single-student forest prediction demo |
+
+See [HOW_TO_RUN.md](HOW_TO_RUN.md) for setup details.
+
+---
+
+## Testing
+
+There is no formal test suite (no JUnit/TestNG). Validation is done manually by running `main` methods and inspecting console output or the GUI. Key demo entry points include `ModelEvaluator.main`, `Phase1Step4VarianceReduction.testVarianceReductionForest`, and `Phase1Step4GradientBoosting.main`.
