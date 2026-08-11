@@ -1,6 +1,6 @@
 # Student Performance Prediction & Analysis
 
-A Java data-science mini-project (team **winlog**, GitLab #28) that analyzes fictional university grade data and builds grade-prediction models from scratch. The project combines exploratory statistics, rule-based learning, regression trees, and random forests with an interactive JavaFX dashboard for visualization and model exploration.
+A Java data-science project that analyzes fictional university grade data and builds grade-prediction models from scratch. The project combines exploratory statistics, rule-based learning, regression trees, and random forests with an interactive JavaFX dashboard for visualization and model exploration.
 
 > **Getting started:** See [HOW_TO_RUN.md](HOW_TO_RUN.md) for setup and run instructions.
 
