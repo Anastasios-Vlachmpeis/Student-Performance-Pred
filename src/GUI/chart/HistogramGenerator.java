@@ -105,14 +105,14 @@ public class HistogramGenerator {
                         }
                     } else {
                         // Use standard calculations (all students)
-                        switch (xAxisData) {
-                            case "Mean of Grades" -> value = CurrentGradesModel.calcCourseMean(courseIndex);
-                            case "Median of Grades" -> value = CurrentGradesModel.calcCourseMedian(courseIndex);
-                            case "Mode of Grades" -> value = CurrentGradesModel.calcCourseMode(courseIndex);
-                            case "Number of NG" -> value = CurrentGradesModel.getCourseNG(courseIndex);
-                            case "Number of Passing Students" -> value = ChartDataUtils.getPassingStudents(courseIndex);
-                            default -> {
-                                continue; // Ignore unsupported combinations
+                    switch (xAxisData) {
+                        case "Mean of Grades" -> value = CurrentGradesModel.calcCourseMean(courseIndex);
+                        case "Median of Grades" -> value = CurrentGradesModel.calcCourseMedian(courseIndex);
+                        case "Mode of Grades" -> value = CurrentGradesModel.calcCourseMode(courseIndex);
+                        case "Number of NG" -> value = CurrentGradesModel.getCourseNG(courseIndex);
+                        case "Number of Passing Students" -> value = ChartDataUtils.getPassingStudents(courseIndex);
+                        default -> {
+                            continue; // Ignore unsupported combinations
                             }
                         }
                     }

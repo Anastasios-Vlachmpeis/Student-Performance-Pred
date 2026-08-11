@@ -1,7 +1,8 @@
 import datamodels.CurrentGradesModel;
-import solutions.*;
-
+import datamodels.GraduateGradesModel;
 import java.util.Locale;
+import solutions.*;
+import tools.PearsonCorrelation;
 
 /** Entry point of the project. You can access the data models from here.*/
 public class Main {
@@ -37,7 +38,7 @@ public class Main {
          //     Find the top 10 best performing ones.
         System.out.println("Answering Step 1 - Question 4");
         Phase1Step1Methods.analyzeStudentPerformanceHardVsEasy();
-
+  
          /*###########
           # STEP 2 #
           ###########*/
@@ -81,6 +82,43 @@ public class Main {
         System.out.println("Answering step 3 - Rules for grade prediction");
         Phase1Step3.printBestRulesForGradePrediction();   
         
+        // Find least similar course pair
+        System.out.println("\nFinding least similar course pair:");
+        findLeastSimilarCoursePair();
         
+    }
+    
+    /**
+     * Finds and prints the least similar course pair based on Pearson correlation.
+     * Uses graduate grades dataset.
+     */
+    private static void findLeastSimilarCoursePair() {
+        int courseCount = GraduateGradesModel.courseCount;
+        double minCorrelation = Double.MAX_VALUE;
+        int courseA = -1;
+        int courseB = -1;
+        
+        // Check all unique course pairs
+        for (int i = 0; i < courseCount; i++) {
+            for (int j = i + 1; j < courseCount; j++) {
+                double correlation = PearsonCorrelation.betweenGraduateCourses(i, j);
+                
+                // Skip NaN values and find minimum valid correlation
+                if (!Double.isNaN(correlation) && correlation < minCorrelation) {
+                    minCorrelation = correlation;
+                    courseA = i;
+                    courseB = j;
+                }
+            }
+        }
+        
+        if (courseA != -1 && courseB != -1) {
+            String nameA = GraduateGradesModel.getCourseName(courseA);
+            String nameB = GraduateGradesModel.getCourseName(courseB);
+            System.out.println("Least similar pair: " + nameA + " and " + nameB);
+            System.out.println("Correlation: " + minCorrelation);
+        } else {
+            System.out.println("No valid course pairs found.");
+        }
     }
 }
